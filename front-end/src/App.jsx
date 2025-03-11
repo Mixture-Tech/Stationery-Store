@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {Suspense/*, useState*/} from 'react'
+/*import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'*/
 import './App.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
@@ -9,9 +9,10 @@ import AuthLayout from "./layouts/AuthLayout";
 import BasicLayout from "./layouts/BasicLayout";
 import BlankLayout from "./layouts/LayoutNotSearch";
 
-const Login = loadable(() => import("./pages/Auth/Login"));
+/*const Login = loadable(() => import("./pages/Auth/Login"));
 const Home = loadable(() => import("./pages/Home"));
-const Regiter = loadable(() => import("./pages/Auth/Register"));
+const Regiter = loadable(() => import("./pages/Auth/Register"));*/
+const Product = loadable(() => import("./pages/list_product"));
 export default function App() {
     return (
         <BrowserRouter>
@@ -20,17 +21,25 @@ export default function App() {
                     {/* <Route path="/logout" element={<Logout />} /> */}
                 </Route>
                 <Route element={<BasicLayout />}>
-                    <Route
+                    {/*<Route
                         index
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Home title="Trang Chủ" />
                             </Suspense>
                         }
+                    />*/}
+                    <Route
+                        path="/danh-sach-san-pham"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <Product title="Danh sách sản phẩm" />
+                            </Suspense>
+                        }
                     />
                 </Route>
                 <Route element={<BlankLayout />}>
-                    <Route
+                    {/*<Route
                         path="/dang-nhap"
                         element={
                             <Suspense fallback={<CircularProgress />}>
@@ -45,7 +54,7 @@ export default function App() {
                                 <Regiter title="Đăng Kí" />
                             </Suspense>
                         }
-                    />
+                    />*/}
                 </Route>   
             </Routes>
         </BrowserRouter>
