@@ -1,10 +1,10 @@
-import Logo from "../../assets/img/Logo/Logo.png";
+/*import Logo from "../../assets/img/Logo/Logo.png";*/
 export default function Footer() {
     return (
     <footer className="px-4 mx-auto max-w-container pb-4 sm:px-6 lg:px-20 bg-blue-900  flex flex-col justify-center items-center ">
         <div className="grid grid-cols-5  mt-3 gap-6 w-11/12 border-black rounded-t-xl p-4 font-nunito text-[14px] text-slate-300">
             <div className="col-span-2">
-                <img src={Logo} alt="Logo" className="w-10 rounded-full object-cover "/>
+                {/*<img src={Logo} alt="Logo" className="w-10 rounded-full object-cover "/>*/}
                 <div className="whitespace-pre-line ">
                     <span className="">AVG Film</span> - Trang web của chúng tui có thể xem phimm trực tiếp miễn phí
                     với giao tiếp trực quan, cùng kho phim lớn, phim hay, luôn cập nhật, 

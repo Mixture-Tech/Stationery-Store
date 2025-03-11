@@ -1,4 +1,4 @@
-import Logo from "../../../assets/img/Logo/Logo.png";
+/*import Logo from "../../../assets/img/Logo/Logo.png";*/
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
@@ -89,9 +89,9 @@ export default function Navbar() {
                 {/* Mid (Nav Links) */}
                 <div className="hidden md:flex space-x-12 text-white items-center mx-auto">
                     {/*  (Logo) */}
-                    <div className="flex justify-center items-center">
+                    {/*<div className="flex justify-center items-center">
                         <img src={Logo} alt="Logo" className="h-12 rounded-full overflow-hidden" />
-                    </div>
+                    </div>*/}
 
                     <a href="/" className="text-Light-Cream-500 hover:text-yellow-500">
                         Trang Chủ

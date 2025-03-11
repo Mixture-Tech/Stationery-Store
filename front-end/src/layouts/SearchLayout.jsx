@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { StorageKeys } from "../services/key/keys";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate/*, Outlet*/ } from "react-router-dom";
 import {useState} from "react";
 
 export default function BasicLayout(){
