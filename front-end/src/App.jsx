@@ -13,6 +13,7 @@ const Home = loadable(() => import("./pages/Home"));
 const MailTemplate = loadable(() => import("./pages/MailForm"));
 const Cart = loadable(() => import('./pages/Cart'));
 const Payment = loadable(() => import('./pages/Payment'));
+const Product = loadable(() => import("./pages/list_product"));
 export default function App() {
     return (
         <BrowserRouter>
@@ -26,6 +27,14 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Home title="Trang Chủ" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/danh-sach-san-pham"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <Product title="Danh sách sản phẩm" />
                             </Suspense>
                         }
                     />
