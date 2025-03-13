@@ -9,11 +9,11 @@ import CartProvider from "./context/CartProvider";
 
 const Login = loadable(() => import("./pages/Auth/Login"));
 const Regiter = loadable(() => import("./pages/Auth/Register"));
-const Product = loadable(() => import("./pages/list_product"));
 const Home = loadable(() => import("./pages/Home"));
 const MailTemplate = loadable(() => import("./pages/MailForm"));
 const Cart = loadable(() => import('./pages/Cart'));
 const Payment = loadable(() => import('./pages/Payment'));
+const Product = loadable(() => import("./pages/list_product"));
 export default function App() {
     return (
         <BrowserRouter>
@@ -22,14 +22,14 @@ export default function App() {
                     {/* <Route path="/logout" element={<Logout />} /> */}
                 </Route>
                 <Route element={<BasicLayout />}>
-                    {/*<Route
+                    <Route
                         index
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Home title="Trang Chủ" />
                             </Suspense>
                         }
-                    />*/}
+                    />
                     <Route
                         path="/danh-sach-san-pham"
                         element={
@@ -64,35 +64,9 @@ export default function App() {
                             </Suspense>
                         }
                     />
-                    <Route
-                        path="/bieu-mau-mail"
-                        element={
-                            <Suspense fallback={<CircularProgress />}>
-                                <MailTemplate title="Biểu mẫu mail" />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path="/gio-hang"
-                        element={
-                            <Suspense fallback={<CircularProgress />}>
-                                <CartProvider>
-                                    <Cart title="Giỏ hàng" />
-                                </CartProvider>
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path="/thanh-toan"
-                        element={
-                            <Suspense fallback={<CircularProgress />}>
-                                <Payment title="Payment" />
-                            </Suspense>
-                        }
-                    />
                 </Route>
                 <Route element={<BlankLayout />}>
-                    {/*<Route
+                    <Route
                         path="/dang-nhap"
                         element={
                             <Suspense fallback={<CircularProgress />}>
@@ -108,7 +82,7 @@ export default function App() {
                             </Suspense>
                         }
                     />
-                </Route>   
+                </Route>
             </Routes>
         </BrowserRouter>
     );
