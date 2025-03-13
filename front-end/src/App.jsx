@@ -12,7 +12,9 @@ import BlankLayout from "./layouts/LayoutNotSearch";
 /*const Login = loadable(() => import("./pages/Auth/Login"));
 const Home = loadable(() => import("./pages/Home"));
 const Regiter = loadable(() => import("./pages/Auth/Register"));*/
-const Product = loadable(() => import("./pages/list_product"));
+const Product = loadable(() => import("./pages/ListProduct"));
+const ProductDetail = loadable(() => import("./pages/ProductDetail/index.jsx"));
+const AboutUs = loadable(() => import("./pages/AboutUs/index.jsx"));
 export default function App() {
     return (
         <BrowserRouter>
@@ -34,6 +36,22 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Product title="Danh sách sản phẩm" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/chi-tiet-san-pham"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <ProductDetail title="Chi tiết sản phẩm" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/ve-chung-toi"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <AboutUs title="Về chúng tôi" />
                             </Suspense>
                         }
                     />
