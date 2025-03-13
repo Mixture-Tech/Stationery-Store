@@ -3,6 +3,9 @@ import path from 'path';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger';
+import { AppDataSource } from "./config/database";
+import { ApiPath } from "./const/ApiPath";
+import userRoutes from "./routes/userRouter";
 dotenv.config();
 
 const app = express();
@@ -21,9 +24,13 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.get('/', (req:Request, res:Response) => {
-    res.send('Hello World!');
+AppDataSource.then(dataSource => {
+  dataSource.initialize().then(() => {
+      console.log("✅ Kết nối Database thành công!");
+  }).catch(err => console.error("❌ Lỗi kết nối Database:", err));
 });
+
+app.use(ApiPath.BaseApi, userRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`);
