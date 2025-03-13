@@ -89,7 +89,10 @@ export default function Navbar() {
                 <div className="hidden md:flex space-x-12 text-white items-center mx-auto">
                     {/*  (Logo) */}
                     <div className="flex justify-center items-center">
-                        <img src={Logo} alt="Logo" className="h-12 rounded-full overflow-hidden" />
+                        <a href="/">
+                            <img src={Logo} alt="Logo" className="h-12 rounded-full overflow-hidden" />
+                        </a>
+                        
                     </div>
 
                     <a href="/" className="text-Light-Cream-500 hover:text-yellow-500">

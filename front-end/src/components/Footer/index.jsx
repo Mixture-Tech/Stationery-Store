@@ -1,4 +1,4 @@
-import Logo from "../../assets/img/Logo/Logo.png";
+import Logo from "../../assets/img/Logo/Logo.svg";
 export default function Footer() {
     return (
     <footer className="px-4 mx-auto max-w-container pb-4 sm:px-6 lg:px-20 bg-blue-900  flex flex-col justify-center items-center ">
