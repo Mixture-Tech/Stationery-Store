@@ -20,6 +20,7 @@ const swaggerSpec = swaggerJSDoc({
         `${__dirname}/routers/*.ts`,
         `${__dirname}/swagger.js`,
         `${__dirname}/swagger.s`,
+        `${__dirname}/routes/*.ts`,
     ]
 })
 
