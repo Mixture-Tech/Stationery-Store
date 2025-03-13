@@ -122,9 +122,9 @@ const DropdownMenu = ({ title, data }) => {
             <div className="absolute left-0 mt-2 min-w-[1000px] rounded-md shadow-lg bg-blue-700 opacity-0 invisible 
                           group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="rounded-md ring-1 ring-black ring-opacity-5">
-                    <div className="py-2 px-4">
+                    <div className="py-4 px-4">
                         <div className="flex gap-[1%] flex-wrap content-start">
-                            <div className="w-[30%] h-3/4 p-2">
+                            <div className="w-[30%] h-3/4">
                                 <div className="font-nunito text-[22px] text-white">
                                     Danh Mục Sản Phẩm
                                     
@@ -138,17 +138,17 @@ const DropdownMenu = ({ title, data }) => {
                                     ))}
                             </div>
                             <div className="grow h-3/4 border-l-[1px] border-gray-700">
-                                <div className="w-[100%] p-2">
+                                <div className="w-[100%] p-4">
                                     <div className="font-nunito text-[20px] text-white">{selectedCategory}</div>
                                     <div className="flex flex-wrap gap-4 space-x-4">
                                         {Object.keys(flattenedItems[selectedCategory]).map((subCategory, subIndex) =>(
-                                            <div key={subIndex} className="mt-2">
+                                            <div key={subIndex} className="mt-2 flex flex-col">
                                                 <div className="text-white font-semibold">{subCategory}</div>
                                                     {flattenedItems[selectedCategory][subCategory].map((subject, subjectIndex) => (
                                                         <a
                                                             key={subjectIndex}
                                                             href={subject.path}
-                                                            className="block p-1 text-sm text-white hover:text-yellow-500 transition-colors duration-150"
+                                                            className="w-full block p-2 text-sm text-white hover:text-yellow-500 transition-colors duration-150"
                                                         >
                                                             {subject.name}  {/* Đảm bảo hiển thị đúng tên của subject */}
                                                         </a>
@@ -209,7 +209,7 @@ export default function Navbar() {
                         <FontAwesomeIcon className="text-white" icon={faAngleDown} />
                     </DropdownMenu>
                                     
-                    <a href="/menu" className=" hover:text-yellow-500">
+                    <a href="/danh-sach-san-pham" className=" hover:text-yellow-500">
                        Sản Phẩm
                     </a>
                     <a href="/support" className=" hover:text-yellow-500">
@@ -243,7 +243,7 @@ export default function Navbar() {
                             Đăng Nhập
                         </a>
                         <CustomTransparentButton>
-                            <a>
+                            <a href="/gio-hang" >
                                 <FontAwesomeIcon icon={faCartShopping} size="lg" />
                             </a>
                         </CustomTransparentButton>

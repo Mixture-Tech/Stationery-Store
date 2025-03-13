@@ -85,7 +85,7 @@ export default function ProductList() {
     };
 
     return (
-        <div className="flex max-w-6xl mx-auto p-4 mt-8">
+        <div className="flex max-w-6xl mx-auto p-4 mt-16">
             {/* Sidebar */}
             <div className="w-1/4 p-4 bg-gray-100 rounded-lg mr-5 text-left">
                 <h2 className="font-bold text-md cursor-pointer hover:text-orange-500">NHÓM SẢN PHẨM</h2>
@@ -138,8 +138,8 @@ export default function ProductList() {
                 </div>
                 <div className="grid grid-cols-4 gap-4">
                     {products.map((product, index) => (
-                        <div key={index} className="border p-2 rounded-lg">
-                            <img src={product.image} alt={product.title} className="w-full cursor-pointer"/>
+                        <div key={index} className="border p-2 rounded-lg hover:border-blue-gray-900 group">
+                            <img src={product.image} alt={product.title} className="w-full cursor-pointer transform transition-transform duration-300 group-hover:scale-105"/>
                             <h3 className="text-sm font-semibold mt-2 cursor-pointer">{product.title}</h3>
                             <p className="text-red-500 font-bold">{product.price}</p>
                             <p className="text-gray-500 line-through text-sm">{product.oldPrice}</p>

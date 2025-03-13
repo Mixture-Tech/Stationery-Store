@@ -66,7 +66,7 @@ export default function Login(props) {
                             p-6 ">
                 {/* part image */}
                 <div className="md:w-1/3 w-1/3">
-                    <img src="https://placehold.co/1000x1000" alt="Login image" className=" w-[85%] h-auto animate-fade-in-left" />
+                    <img src="https://placehold.co/1200x1200" alt="Login image" className=" w-[85%] h-auto animate-fade-in-left" />
                 </div>
 
                 <div className=" border-2 rounde.propTypes = {
