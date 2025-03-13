@@ -1,55 +1,29 @@
-import axiosClient from "./axiosClient";
-import {setToken} from "../auth/auth";
+import {StorageKeys} from "../key/keys";
+import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 
-export const register = (registerRequest) => {
-    const url = "/auth/register";
-    return axiosClient.post(url, registerRequest);
+export const getUserInfo = () => {
+    const name = localStorage.getItem(StorageKeys.USER_NAME);
+    const role = localStorage.getItem(StorageKeys.USER_ROLE);
+    const token = Cookies.get(StorageKeys.ACCESS_TOKEN);
+    return {name, role, token};
 };
 
-export const verifyEmail = (registerRequest) => {
-    const url = "/auth/confirm-email";
-    return axiosClient.post(url, registerRequest);
+export const checkAuth = () => {
+    return !!Cookies.get(StorageKeys.ACCESS_TOKEN);
 };
 
-export const authenticate = async (authenticateRequest) => {
-    try{
-        const url = "auth/authenticate";
-        const response = await axiosClient.post(url, authenticateRequest);
-
-        const {access_token, name, role} = response.data;
-        setToken(access_token, name, role);
-
-        return response;
-    }catch(error){
-        console.error("Authenticate: ", error);
-        throw error;
-    }
-};
-
-export const getCurrentUser = async (request) => {
-    try{
-        const url = "auth/get-current-user";
-        const response = await axiosClient.get(url, request);
-
-        console.log(response);
-
-        const {name, role} = response.data;
-        setToken(request.token, name, role);
-
-        return response;
-    }catch(error){
-        console.error("Authenticate: ", error);
-        throw error;
-    }
-};
-
-export const forgotPassword = (forgotPasswordRequest) => {
-    const url = "auth/forgot-password";
-    return axiosClient.post(url, forgotPasswordRequest);
-};
-
-export const changePassword = (changePasswordRequest) => {
-    const url = "auth/change-password";
-    return axiosClient.post(url, changePasswordRequest);
+export const checkAdmin = () => {
+    console.log("role: " + localStorage.getItem(StorageKeys.USER_ROLE) == "ADMIN");
+    console.log("token: "+ localStorage.getItem(StorageKeys.ACCESS_TOKEN))
+    return !!Cookies.get(StorageKeys.ACCESS_TOKEN) && localStorage.getItem(StorageKeys.USER_ROLE) == "ADMIN"; 
 }
 
+export const setToken = (token, name, role) =>{
+    const decodedToken = jwtDecode(token);
+    const expirationTime = decodedToken.exp * 1000;
+
+    Cookies.set(StorageKeys.ACCESS_TOKEN, token, {expires: new Date(expirationTime)});
+    localStorage.setItem(StorageKeys.USER_NAME, name);
+    localStorage.setItem(StorageKeys.USER_ROLE, role);
+}
