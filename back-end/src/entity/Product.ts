@@ -1,45 +1,45 @@
-import { Column, Entity, PrimaryColumn, OneToMany, ManyToOne } from "typeorm";
+import { Column, Entity, PrimaryColumn, OneToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Order_Detail } from "./Order_Detail";
 import { Category } from "./Category";
 import { Cart } from "./Cart";
 
 @Entity("Product")
 export class Product{
-    @PrimaryColumn()
-    private id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
-    private name: string;
+    name: string;
 
     @Column()
-    private nums: number;
+    nums: number;
 
     @Column({type:"double"})
-    private price: number;
+    price: number;
 
     @Column({type:"text"})
-    private detail: string;
+    detail: string;
 
     @Column()
-    private link: string;
+    link: string;
 
     @Column({type:"double"})
-    private discount_price: number;
+    discount_price: number;
 
     @Column({type:"text"})
-    private description: string;
+    description: string;
+
+    @Column({ nullable: true })
+    image: string;    
 
     @Column()
-    private iamge: string;
-
-    @Column()
-    private discount: number
+    discount: number
 
     @Column({type:"bit"})
-    private hide: boolean;
+    hide: boolean;
 
     @Column()
-    private brand: string;
+    brand: string;
 
     @Column({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
     created_at: Date;

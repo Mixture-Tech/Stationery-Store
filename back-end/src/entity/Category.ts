@@ -5,16 +5,16 @@ import { Product } from "./Product";
 @Entity("category")
 export class Category {
     @PrimaryGeneratedColumn()
-    private id: number;
+    id: number;
 
     @Column()
-    private name_category: string;
+    name_category: string;
 
     @Column()
-    private link: string;
+    link: string;
  
     @Column({ type: "boolean"})
-    private hide: boolean;
+    hide: boolean;
 
     @ManyToOne(()=> Category_Parent, (category_parent)=> category_parent.category)
     cateogry_parent: Category_Parent
@@ -23,8 +23,8 @@ export class Category {
     product: Product[];
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    private created_at: Date;
+    created_at: Date;
     
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
-    private updated_at: Date;  
+    updated_at: Date;  
 }

@@ -8,19 +8,19 @@ import { Order_Detail } from "./Order_Detail";
 @Entity("order")
 export class Order {
     @PrimaryGeneratedColumn()
-    private id: number;
+    id: number;
 
     @Column({ type: "double" })
-    private total_price: number;
+    total_price: number;
 
     @Column({ length: 100 })
-    private status: string;
+    status: string;
 
     @Column({ type: "bit"})
-    private hide: boolean;
+    hide: boolean;
 
     @Column()
-    private paymentmethods: string;
+    paymentmethods: string;
 
     @Column({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
     created_at: Date;

@@ -6,7 +6,7 @@ import { Order } from "./Order";
 @Entity("district")
 export class District {
     @PrimaryGeneratedColumn()
-    id_district: number;
+    id: number;
 
     @Column({ type: "varchar", length: 255 })
     name: string;

@@ -1,6 +1,6 @@
 import { AppDataSource } from "../config/database";
 import { User } from "../entity/User";
-import { UserDTO } from "../dto/userDTO";
+import { UserDTO } from "../dto/UserDTO";
 import { Repository } from "typeorm";
 
 export class UserService{

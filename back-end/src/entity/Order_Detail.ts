@@ -8,7 +8,7 @@ import { Product} from "./Product";
 @Entity("order_detail")
 export class Order_Detail{
     @PrimaryGeneratedColumn()
-    private id: number;
+    id: number;
 
     @ManyToOne(() => Order, (order) => order.orderDetails)
     @JoinColumn({ name: "order_id" })

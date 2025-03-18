@@ -11,7 +11,7 @@ export class Province {
     name: string;
 
     @ManyToOne(() => Area, (area) => area.provinces)
-    @JoinColumn({ name: "id" }) 
+    @JoinColumn({ name: "areaId" }) 
     area: Area;
 
     @OneToMany(() => District, (district) => district.province)

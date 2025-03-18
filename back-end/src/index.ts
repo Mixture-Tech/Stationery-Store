@@ -5,7 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger';
 import { AppDataSource } from "./config/database";
 import { ApiPath } from "./const/ApiPath";
-import userRoutes from "./routes/userRouter";
+import userRoutes from "./routes/UserRouter";
 
 dotenv.config();
 
@@ -25,11 +25,12 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-AppDataSource.then(dataSource => {
-  dataSource.initialize().then(() => {
+AppDataSource
+  .then(() => {
       console.log("✅ Kết nối Database thành công!");
-  }).catch(err => console.error("❌ Lỗi kết nối Database:", err));
-});
+  })
+  .catch(err => console.error("❌ Lỗi kết nối Database:", err));
+
 
 app.get('/', (req:Request, res:Response) => {
     res.send('Hello World!');
