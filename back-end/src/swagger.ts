@@ -16,11 +16,9 @@ const swaggerSpec = swaggerJSDoc({
         ],
     },
     apis: [
-        `${__dirname}/routers/*.js`,
-        `${__dirname}/routers/*.ts`,
-        `${__dirname}/swagger.js`,
-        `${__dirname}/swagger.s`,
-    ]
+        `${__dirname}/controller/*.ts`, 
+        `${__dirname}/routes/*.ts`
+    ]    
 })
 
 export default swaggerSpec;

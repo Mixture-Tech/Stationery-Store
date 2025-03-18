@@ -32,9 +32,8 @@ AppDataSource
   .catch(err => console.error("❌ Lỗi kết nối Database:", err));
 
 
-app.get('/', (req:Request, res:Response) => {
-    res.send('Hello World!');
-});
+app.use("/api", userRoutes);
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.listen(port, () => {
     console.log(`Server started at http://localhost:${port}`);
