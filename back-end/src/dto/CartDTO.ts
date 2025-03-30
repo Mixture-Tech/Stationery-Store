@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Product } from "../entity/Product";
 import { User } from "../entity/User";
 
-export class Cart {
+export class CartDTO {
     id: number;
     product: Product;
     user: User;
