@@ -9,8 +9,8 @@ const SideBar = ({menu, setMenu}) => {
                 <div className="flex flex-col justify-center gap-6 w-[100%]">
                     {[
                         { icon: faUser, label: "User" },
-                        { icon: faFilm, label: "Film" },
-                        { icon: faGear, label: "System" },
+                        { icon: faFilm, label: "Category" },
+                        { icon: faGear, label: "Product" },
                         { icon: faDoorOpen, label: "SignOut" },
                     ].map((item, index) => (
                         <button
