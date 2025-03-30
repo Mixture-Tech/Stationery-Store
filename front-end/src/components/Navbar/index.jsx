@@ -103,7 +103,7 @@ export default function Navbar() {
                     </DropdownMenu>
                         
                     <DropdownMenu title="Quốc Gia" items={countries} />                
-                    <a href="/menu" className=" hover:text-yellow-500">
+                    <a href="/danh-sach-san-pham" className=" hover:text-yellow-500">
                         Phim mới
                     </a>
                     <a href="/contact" className=" hover:text-yellow-500">

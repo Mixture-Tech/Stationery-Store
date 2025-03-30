@@ -1,24 +1,40 @@
-import swaggerJSDoc from "swagger-jsdoc";
+import * as swaggerJSDoc from "swagger-jsdoc";
 
-const swaggerSpec = swaggerJSDoc({
-    definition: {
-        openapi: "3.0.0",
-        info: {
-            title: "API Documentation",
-            version: "1.0.0",
-            description: "API Documentation",
-        },
-        servers: [
-            {
-                url: "http://localhost:3000",
-                description: "Development server",
-            },
-        ],
+const swaggerDefinition = {
+    openapi: "3.1.0",
+    info: {
+        title: "Stationery Store API Documentation",
+        version: "1.0.0",
+        description: "API Documentation for Stationery Store",
     },
+    servers: [
+        {
+            url: "http://localhost:3000",
+            description: "Development server"
+        }
+    ],
+    components: {
+        securitySchemes: {
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT'
+            }
+        }
+    },
+    security: [{
+        bearerAuth: []
+    }]
+};
+
+const options = {
+    swaggerDefinition,
     apis: [
-        `${__dirname}/controller/*.ts`, 
-        `${__dirname}/routes/*.ts`
-    ]    
-})
+        "./src/controller/*.ts",
+        "./src/routes/*.ts"
+    ]
+};
+
+const swaggerSpec = swaggerJSDoc(options);
 
 export default swaggerSpec;

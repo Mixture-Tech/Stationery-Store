@@ -15,23 +15,23 @@ async function runSeed() {
     console.log("🌱 Seeding database...");
 
     // Chờ `AppDataSource` khởi tạo xong
-    const dataSource = await AppDataSource;
-    await seedRoles(dataSource);    
-    await seedUsers(dataSource);
+    // const dataSource = await AppDataSource;
+    // await seedRoles(dataSource);    
+    // await seedUsers(dataSource);
 
-    await seedAreas(dataSource); 
-    await seedProvinces(dataSource);    
-    await seedDistricts(dataSource);    
+    // await seedAreas(dataSource); 
+    // await seedProvinces(dataSource);    
+    // await seedDistricts(dataSource);    
 
-    await seedCategory_Parents(dataSource);    
-    await seedCategories(dataSource);    
+    // await seedCategory_Parents(dataSource);    
+    // await seedCategories(dataSource);    
 
-    await seedProducts(dataSource);    
-    await seedOrders(dataSource);    
+    // await seedProducts(dataSource);    
+    // await seedOrders(dataSource);    
 
-    await seedOrderDetails(dataSource);    
+    // await seedOrderDetails(dataSource);    
     
-    await seedCarts(dataSource);    
+    // await seedCarts(dataSource);    
 
     console.log("✅ Seeding complete!");
     process.exit();

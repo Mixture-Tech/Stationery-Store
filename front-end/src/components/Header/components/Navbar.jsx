@@ -209,7 +209,7 @@ export default function Navbar() {
                         <FontAwesomeIcon className="text-white" icon={faAngleDown} />
                     </DropdownMenu>
                                     
-                    <a href="/menu" className=" hover:text-yellow-500">
+                    <a href="/danh-sach-san-pham" className=" hover:text-yellow-500">
                        Sản Phẩm
                     </a>
                     <a href="/support" className=" hover:text-yellow-500">

@@ -85,7 +85,7 @@ export default function ProductList() {
     };
 
     return (
-        <div className="flex max-w-6xl mx-auto p-4 mt-8">
+        <div className="flex max-w-6xl mx-auto p-4 mt-16">
             {/* Sidebar */}
             <div className="w-1/4 p-4 bg-gray-100 rounded-lg mr-5 text-left">
                 <h2 className="font-bold text-md cursor-pointer hover:text-orange-500">NHÓM SẢN PHẨM</h2>
