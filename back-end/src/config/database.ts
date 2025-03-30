@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 import { User } from "../entity/User";
-import mysql from "mysql2/promise";
+import * as mysql from "mysql2/promise";
 import { Role } from "../entity/Role";
 import { Area } from "../entity/Area";
 import { Category_Parent } from "../entity/Category_Parent";
@@ -39,7 +39,7 @@ export async function initializeDatabase(): Promise<DataSource> {
         username: "root",
         password: "",
         database: DB_NAME,
-        synchronize: true, // Tự động đồng bộ schema
+        synchronize: false, // Tự động đồng bộ schema
         dropSchema: false, // Không xóa schema cũ mỗi khi khởi động (nên dùng trong production)
         logging: true,
         entities: [User, Role, Area, Category_Parent, Category, Province, District, Order, Product, Order_Detail, Cart],
