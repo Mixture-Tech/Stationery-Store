@@ -7,7 +7,7 @@ const CardUser = ({ users }) => {
         
         users.map((user) => (
             // Hiển thị các giá trị của user theo thứ tự mong muốn
-            <div key={user.id} className="grid grid-cols-5 gap-6 mt-2 border rounded-md place-items-center">
+            <div key={user.id} className="grid grid-cols-6 gap-6 mt-2 border rounded-md place-items-center">
                 <div key={`id-${user.id}`} className="w-full">
                     <div className="px-2 py-3 font-nunito text-gray-800 text-center">
                         {user.id}
@@ -26,6 +26,11 @@ const CardUser = ({ users }) => {
                 <div key={`createAt-${user.id}`} className="w-full">
                     <div className="px-2 py-3 font-nunito text-gray-800 text-center">
                         {user.createAt}
+                    </div>
+                </div>
+                <div key={`email-${user.id}`} className="w-full">
+                    <div className="px-2 py-3 font-nunito text-gray-800 text-center">
+                        {user.role}
                     </div>
                 </div>
                 <EditButton>

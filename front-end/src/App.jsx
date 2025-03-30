@@ -14,6 +14,10 @@ const MailTemplate = loadable(() => import("./pages/MailForm"));
 const Cart = loadable(() => import('./pages/Cart'));
 const Payment = loadable(() => import('./pages/Payment'));
 const Product = loadable(() => import("./pages/list_product"));
+
+//ADMIN
+const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
+const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
 export default function App() {
     return (
         <BrowserRouter>
@@ -79,6 +83,27 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Regiter title="Đăng Kí" />
+                            </Suspense>
+                        }
+                    />
+                </Route>
+                {/* ADMIN */}
+                <Route element={<BlankLayout />}>
+                    <Route
+                        path="/admin/login"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <LoginAdmin title="Đăng Nhập Admin" />
+                            </Suspense>
+                        }
+                    />
+                </Route>
+                <Route element={<BasicLayout />}>
+                    <Route
+                        path="/trang-chu-admin"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <DashBoard title="Trang Chu Admin" />
                             </Suspense>
                         }
                     />
