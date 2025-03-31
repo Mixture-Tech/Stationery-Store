@@ -27,3 +27,4 @@ backend/src/main/resources/.env
 node_modules/
 /backend/src/main/resources/static/avatar/
 /backend/src/main/resources/static/files/
+front-end/node_modules/
