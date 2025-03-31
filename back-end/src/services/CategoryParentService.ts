@@ -1,41 +1,83 @@
 import { AppDataSource } from "../config/database";
-import { Repository } from "typeorm";
 import { Category_Parent } from "../entity/Category_Parent";
-import { Category_ParentDTO } from "../dto/Category_PrarentDTO";
+import { Repository } from "typeorm";
+import { CategoryParentDTO } from "../dto/CategoryParentDTO";
 
-export class CategoryParentService {
+class CategoryParentService {
     private categoryParentRepository: Repository<Category_Parent>;
 
     constructor() {
-        AppDataSource.then((dataSource) => {
-            this.categoryParentRepository = dataSource.getRepository(Category_Parent);
-        }).catch((error) => {
-            console.error("Lỗi khi kết nối DB:", error);
+        this.initRepository();
+    }
+
+    private async initRepository() {
+        const dataSource = await AppDataSource;
+        this.categoryParentRepository = dataSource.getRepository(Category_Parent);
+    }
+
+    async getAll() {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        return await this.categoryParentRepository.find({
+            relations: ["categories"]
         });
     }
 
-    async createCategoryParent(categoryParentDTO: Category_ParentDTO): Promise<Category_Parent> {
-        const categoryParent = this.categoryParentRepository.create(categoryParentDTO);
+    async findById(id_parent: number) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        return await this.categoryParentRepository.findOne({
+            where: { id_parent },
+            relations: ["categories"]
+        });
+    }
+
+    async getByName(name_parent: string) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        return await this.categoryParentRepository.findOne({
+            where: { name_parent },
+            relations: ["categories"]
+        });
+    }
+
+    async createCategoryParent(categoryParentData: CategoryParentDTO) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        const categoryParent = this.categoryParentRepository.create(categoryParentData);
         return await this.categoryParentRepository.save(categoryParent);
     }
 
-    async getCategoryParentById(id: number): Promise<Category_Parent | null> {
-        return await this.categoryParentRepository.findOneBy({ id });
+    async updateCategoryParent(id_parent: number, categoryParentData: CategoryParentDTO) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        await this.categoryParentRepository.update(id_parent, categoryParentData);
+        return await this.findById(id_parent);
     }
 
-    async getAllCategoryParents(): Promise<Category_Parent[]> {
-        return await this.categoryParentRepository.find();
+    async deleteCategoryParent(id_parent: number) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        const result = await this.categoryParentRepository.delete(id_parent);
+        return result.affected ? true : false;
     }
 
-    async update(id: number, categoryParentDTO: Category_ParentDTO): Promise<Category_ParentDTO | null> {
-        const categoryParent = await this.categoryParentRepository.findOneBy({ id });
-        if (!categoryParent) return null;
-        Object.assign(categoryParent, categoryParentDTO);
-        return await this.categoryParentRepository.save(categoryParent);
-    }
-
-    async delete(id: number): Promise<boolean> {
-        await this.categoryParentRepository.delete(id);
-        return true;
+    async getCategoriesByParentId(id_parent: number) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        const categoryParent = await this.categoryParentRepository.findOne({
+            where: { id_parent },
+            relations: ["categories"]
+        });
+        return categoryParent?.categories || [];
     }
 }
+
+export default new CategoryParentService();

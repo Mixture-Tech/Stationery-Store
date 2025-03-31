@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const ProductCard = ({ src, title, genre, rating, subtitle }) => {
+const ProductCard = ({ src, name, nums, rating, price, discount }) => {
     const renderStars = (rating) => {
       if (rating === 0) {
         return <span className="text-gray-900 text-base font-nunito">Hết Hàng</span>; 
@@ -33,9 +33,9 @@ const ProductCard = ({ src, title, genre, rating, subtitle }) => {
     };
   
     return (
-      <div className="w-full h-auto rounded-lg overflow-hidden hover:shadow-lg shadow-xl hover:border-2 border-black flex flex-col mb-1">
+      <div className="w-[140px] h-auto rounded-lg overflow-hidden hover:shadow-lg shadow-xl hover:border-2 border-black flex flex-col mb-1">
         <div className="relative flex-grow">
-          <img src={src} alt="Movie Poster" className="w-full h-full object-cover hover:scale-110" />
+          <img src={src} alt="Movie Poster" className="w-full h-[120px] object-cover hover:scale-110" />
         </div>
         <div className="p-2 flex flex-col justify-between">
           <div>
@@ -43,11 +43,11 @@ const ProductCard = ({ src, title, genre, rating, subtitle }) => {
               {renderStars(rating)}
               {rating !== 0 && <span className="text-yellow-400 text-xs sm:text-sm mr-1 ml-3">{rating.toFixed(1)}</span>}
             </div>
-            <h2 className="text-gray-900 mb-2 text-xs font-nunito font-thin line-clamp-2 mt-2 h-4 ">{title}</h2>
+            <h2 className="text-gray-900 mb-2 text-xs font-nunito font-thin line-clamp-2 mt-2 h-4 ">{name}</h2>
           </div>
           <div className="flex flex-col gap-2 justify-between items-start">
-            <span className="text-red-500 text-xs font-nunito font-semibold border-2 border-transparent">{genre}</span>
-            <span className="text-black text-xs font-nunito font-thin border-2 border-transparent">{subtitle}</span>
+            <span className="text-red-500 text-xs font-nunito font-semibold border-2 border-transparent">Giảm: {discount}%</span>
+            <span className="text-black text-xs font-nunito font-thin border-2 border-transparent">{price}</span>
           </div>
         </div>
       </div>
@@ -55,10 +55,11 @@ const ProductCard = ({ src, title, genre, rating, subtitle }) => {
   };
   ProductCard.propTypes = {
     src: PropTypes.string.isRequired,     
-    title: PropTypes.string.isRequired, 
-    genre: PropTypes.string.isRequired,  
+    name: PropTypes.string.isRequired, 
+    nums: PropTypes.number.isRequired,   
     rating: PropTypes.number.isRequired,  
-    subtitle: PropTypes.string.isRequired,     
+    price: PropTypes.string.isRequired, 
+    discount: PropTypes.string.isRequired,    
   };
 
 export default ProductCard;

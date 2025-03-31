@@ -1,56 +1,86 @@
-import {Router} from "express";
-import { ApiPath } from "../const/ApiPath";
+import{ Router } from "express";
 import { ProductController } from "../controller/ProductController";
+import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = Router();
+const productController = new ProductController();
 
 /**
  * @swagger
- * /api/v1/products/search:
+ * /api/v1/products:
  *   get:
- *     summary: Tìm kiếm sản phẩm theo tên
+ *     summary: Lấy danh sách tất cả sản phẩm
  *     tags: [Products]
- *     parameters:
- *       - in: query
- *         name: name
- *         required: true
- *         schema:
- *           type: string
- *         description: Tên sản phẩm cần tìm
  *     responses:
  *       200:
- *         description: Trả về danh sách sản phẩm tìm được
- *       400:
- *         description: Tên sản phẩm không hợp lệ
+ *         description: Trả về danh sách sản phẩm
  */
-router.get(`${ApiPath.BaseApi}/products/search`, ProductController.getProductByName);
+router.get("/products", productController.getAll);
 
 /**
  * @swagger
- * /api/v1/products/category:
+ * /api/v1/products/{id}:
  *   get:
- *     summary: Tìm kiếm sản phẩm theo tên danh mục
+ *     summary: Lấy thông tin một sản phẩm theo ID
  *     tags: [Products]
  *     parameters:
- *       - in: query
- *         name: categoryName
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: ID của sản phẩm cần lấy thông tin
+ *     responses:
+ *       200:
+ *         description: Trả về thông tin sản phẩm
+ *       404:
+ *         description: Sản phẩm không tồn tại
+ */
+router.get("/products/:id", productController.getById);
+
+/**
+ * @swagger
+ * /api/v1/products/category/{categoryId}:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm theo danh mục
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: ID của danh mục
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách sản phẩm của danh mục
+ */
+router.get("/products/category/:categoryId", productController.getByCategoryId);
+
+/**
+ * @swagger
+ * /api/v1/products/brand/{brand}:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm theo thương hiệu
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: brand
  *         required: true
  *         schema:
  *           type: string
- *         description: Tên danh mục cần tìm
+ *         description: Tên thương hiệu
  *     responses:
  *       200:
- *         description: Trả về danh sách sản phẩm trong danh mục
- *       400:
- *         description: Tên danh mục không hợp lệ
+ *         description: Trả về danh sách sản phẩm của thương hiệu
  */
-router.get(`${ApiPath.BaseApi}/products/category`, ProductController.getProductByCategoryName);
+router.get("/products/brand/:brand", productController.getByBrand);
 
 /**
  * @swagger
  * /api/v1/products:
  *   post:
- *     summary: Tạo mới một product
+ *     summary: Tạo mới một sản phẩm
  *     tags: [Products]
  *     requestBody:
  *       required: true
@@ -60,48 +90,15 @@ router.get(`${ApiPath.BaseApi}/products/category`, ProductController.getProductB
  *             $ref: '#/components/schemas/ProductDTO'
  *     responses:
  *       201:
- *         description: Trả về thông tin product vừa được tạo
+ *         description: Trả về thông tin sản phẩm vừa được tạo
  */
-router.post(ApiPath.CREATE_PRODUCT, ProductController.createProduct);
-
-/**
- * @swagger
- * /api/v1/get-all-products:
- *   get:
- *     summary: Lấy danh sách tất cả product
- *     tags: [Products]
- *     responses:
- *       200:
- *         description: Trả về danh sách product
- */
-router.get(ApiPath.GET_ALL_PRODUCTS, ProductController.getAllProducts);
-
-/**
- * @swagger
- * /api/v1/products/{id}:
- *   get:
- *     summary: Lấy thông tin một product theo ID
- *     tags: [Products]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: number
- *         description: ID của product cần lấy thông tin
- *     responses:
- *       200:
- *         description: Trả về thông tin product
- *       404:
- *         description: Product không tồn tại
- */
-router.get(ApiPath.GET_PRODUCT_BY_ID, ProductController.getProductById);
+router.post("/products", authenticateToken, productController.create);
 
 /**
  * @swagger
  * /api/v1/products/{id}:
  *   put:
- *     summary: Cập nhật thông tin của product theo ID
+ *     summary: Cập nhật thông tin của sản phẩm theo ID
  *     tags: [Products]
  *     parameters:
  *       - in: path
@@ -109,7 +106,7 @@ router.get(ApiPath.GET_PRODUCT_BY_ID, ProductController.getProductById);
  *         required: true
  *         schema:
  *           type: number
- *         description: ID của product cần cập nhật
+ *         description: ID của sản phẩm cần cập nhật
  *     requestBody:
  *       required: true
  *       content:
@@ -118,17 +115,17 @@ router.get(ApiPath.GET_PRODUCT_BY_ID, ProductController.getProductById);
  *             $ref: '#/components/schemas/ProductDTO'
  *     responses:
  *       200:
- *         description: Trả về thông tin product đã được cập nhật
+ *         description: Trả về thông tin sản phẩm đã được cập nhật
  *       404:
- *         description: Product không tồn tại
+ *         description: Sản phẩm không tồn tại
  */
-router.put(ApiPath.UPDATE_PRODUCT, ProductController.updateProduct);
+router.put("/products/:id", authenticateToken, productController.update);
 
 /**
  * @swagger
  * /api/v1/products/{id}:
  *   delete:
- *     summary: Xóa product theo ID
+ *     summary: Xóa sản phẩm theo ID
  *     tags: [Products]
  *     parameters:
  *       - in: path
@@ -136,13 +133,13 @@ router.put(ApiPath.UPDATE_PRODUCT, ProductController.updateProduct);
  *         required: true
  *         schema:
  *           type: number
- *         description: ID của product cần xóa
+ *         description: ID của sản phẩm cần xóa
  *     responses:
  *       200:
- *         description: Thông báo xóa product thành công
+ *         description: Thông báo xóa sản phẩm thành công
  *       404:
- *         description: Product không tồn tại
+ *         description: Sản phẩm không tồn tại
  */
-router.delete(ApiPath.DELETE_PRODUCT, ProductController.deleteProduct);
+router.delete("/products/:id", authenticateToken, productController.delete);
 
 export default router;

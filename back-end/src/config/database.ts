@@ -12,7 +12,7 @@ import { Order_Detail } from "../entity/Order_Detail";
 import { District } from "../entity/District";
 import { Order } from "../entity/Order";
 
-const DB_NAME = "stationery-store";
+const DB_NAME = "stationery_store";
 
 // Sử dụng biến toàn cục để lưu instance
 let dataSourceInstance: DataSource | null = null;
@@ -28,7 +28,7 @@ export async function initializeDatabase(): Promise<DataSource> {
         port: 3306,
         user: "root",
         password: "",
-    });
+    }); 
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
     await connection.end();
 
@@ -46,7 +46,6 @@ export async function initializeDatabase(): Promise<DataSource> {
         migrations: [],
         subscribers: [],
     });
-
     await dataSource.initialize();
     dataSourceInstance = dataSource;
     return dataSource;
@@ -54,3 +53,4 @@ export async function initializeDatabase(): Promise<DataSource> {
 
 // Export DataSource dưới dạng Promise
 export const AppDataSource = initializeDatabase();
+

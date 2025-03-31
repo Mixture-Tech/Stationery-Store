@@ -1,27 +1,28 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { Province } from "./Province";
-import { Area } from "./Area";
 import { Order } from "./Order";
+import { Order_Detail } from "./Order_Detail";
 
 @Entity("district")
 export class District {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    id_district: number;
 
-    @Column({ type: "varchar", length: 255 })
+    @Column({ nullable: true })
     name: string;
 
-    @ManyToOne(() => Province, (province) => province.districts, { nullable: false })
-    @JoinColumn({ name: "province_id" })
-    province: Province;
+    @Column()
+    id_province: number;
 
-    @ManyToOne(() => Area, { nullable: false })
-    @JoinColumn({ name: "area_id" })
-    area: Area;
-
-    @Column({ type: "double" })
+    @Column({ type: "double", nullable: true })
     fee: number;
+
+    @ManyToOne(() => Province, (province) => province.districts)
+    province: Province;
 
     @OneToMany(() => Order, (order) => order.district)
     orders: Order[];
+
+    @OneToMany(() => Order_Detail, (orderDetail) => orderDetail.district)
+    orderDetails: Order_Detail[];
 }

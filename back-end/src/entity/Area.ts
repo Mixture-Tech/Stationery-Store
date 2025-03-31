@@ -1,15 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
 import { Province } from "./Province";
 
 @Entity("area")
 export class Area {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    id_area: number;
 
-    @Column({ type: "varchar", length: 255 })
+    @Column({ nullable: true })
     name: string;
 
     @OneToMany(() => Province, (province) => province.area)
     provinces: Province[];
-    
 }

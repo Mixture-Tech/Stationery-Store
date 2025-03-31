@@ -1,41 +1,43 @@
-import { AppDataSource } from "../config/database";
-import { Repository } from "typeorm";
+import { DataSource, EntityTarget } from "typeorm";
 import { Province } from "../entity/Province";
+import { BaseService } from "./BaseService";
 import { ProvinceDTO } from "../dto/ProvinceDTO";
 
-export class ProvinceService {
-    private provinceRepository: Repository<Province>;
+export class ProvinceService extends BaseService<Province, ProvinceDTO> {
+    constructor(entity: EntityTarget<Province>, dataSource: DataSource) {
+        super(entity, dataSource);
+    }
 
-    constructor() {
-        AppDataSource.then((dataSource) => {
-            this.provinceRepository = dataSource.getRepository(Province);
-        }).catch((error) => {
-            console.error("Lỗi khi kết nối DB:", error);
+    async findById(id_province: number): Promise<Province | null> {
+        return this.repository.findOne({ 
+            where: { id_province },
+            relations: ["area", "districts"]
+        });
+    }
+
+    async findByName(name: string): Promise<Province | null> {
+        return this.repository.findOne({ 
+            where: { name },
+            relations: ["area", "districts"]
+        });
+    }
+
+    async findByAreaId(id_area: number): Promise<Province[]> {
+        return this.repository.find({
+            where: { id_area },
+            relations: ["area", "districts"]
         });
     }
 
     async createProvince(provinceDTO: ProvinceDTO): Promise<Province> {
-        const province = this.provinceRepository.create(provinceDTO);
-        return await this.provinceRepository.save(province);
+        return this.create(provinceDTO);
     }
 
-    async getProvinceById(id: number): Promise<Province | null> {
-        return await this.provinceRepository.findOneBy({ id });
+    async updateProvince(id_province: number, provinceDTO: ProvinceDTO): Promise<Province | null> {
+        return this.update(id_province, provinceDTO);
     }
 
-    async getAllProvinces(): Promise<Province[]> {
-        return await this.provinceRepository.find({ relations: ["area", "districts"] });
-    }
-
-    async update(id: number, provinceDTO: ProvinceDTO): Promise<Province | null> {
-        const province = await this.provinceRepository.findOneBy({ id });
-        if (!province) return null;
-        Object.assign(province, provinceDTO);
-        return await this.provinceRepository.save(province);
-    }
-
-    async delete(id: number): Promise<boolean> {
-        const result = await this.provinceRepository.delete(id);
-        return result.affected !== 0;
+    async deleteProvince(id_province: number): Promise<boolean> {
+        return this.delete(id_province);
     }
 }

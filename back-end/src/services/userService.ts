@@ -1,58 +1,53 @@
-import { AppDataSource } from "../config/database";
 import { User } from "../entity/User";
 import { UserDTO } from "../dto/userDTO";
-import { Repository } from "typeorm";
+import { BaseService } from "./BaseService";
+import { AppDataSource } from "../config/database";
 
-export class UserService {
-    private userRepository: Repository<User>;
+export class UserService extends BaseService<User, UserDTO> {
+    private static instance: UserService;
 
-    constructor() {
-        this.initializeRepository();
+    private constructor(dataSource: any) {
+        super(User, dataSource);
     }
 
-    private async initializeRepository() {
-        try {
+    public static async getInstance(): Promise<UserService> {
+        if (!UserService.instance) {
             const dataSource = await AppDataSource;
-            this.userRepository = dataSource.getRepository(User);
-        } catch (error) {
-            console.error("Lỗi khi kết nối DB:", error);
-            throw error;
+            UserService.instance = new UserService(dataSource);
         }
+        return UserService.instance;
     }
 
-    private async ensureRepository() {
-        if (!this.userRepository) {
-            await this.initializeRepository();
-        }
+    async findById(id_user: number): Promise<User | null> {
+        return this.repository.findOne({ 
+            where: { id_user },
+            relations: ["role", "orders", "carts"]
+        });
+    }
+
+    async findByEmail(email: string): Promise<User | null> {
+        return this.repository.findOne({ 
+            where: { email },
+            relations: ["role"]
+        });
+    }
+
+    async findByUserName(user_name: string): Promise<User | null> {
+        return this.repository.findOne({ 
+            where: { user_name },
+            relations: ["role"]
+        });
     }
 
     async createUser(userDTO: UserDTO): Promise<User> {
-        await this.ensureRepository();
-        const user = this.userRepository.create(userDTO);
-        return await this.userRepository.save(user);
+        return this.create(userDTO);
     }
 
-    async getUserById(id: number): Promise<User | null> {
-        await this.ensureRepository();
-        return await this.userRepository.findOneBy({id});
+    async updateUser(id_user: number, userDTO: UserDTO): Promise<User | null> {
+        return this.update(id_user, userDTO);
     }
 
-    async getAllUsers(): Promise<User[]> {
-        await this.ensureRepository();
-        return await this.userRepository.find();
-    }
-
-    async update(id: number, userDTO: UserDTO): Promise<User | null> {
-        await this.ensureRepository();
-        const user = await this.userRepository.findOneBy({id});
-        if (!user) return null;
-        Object.assign(user, userDTO);
-        return await this.userRepository.save(user);
-    }
-
-    async delete(id: number): Promise<Boolean> {
-        await this.ensureRepository();
-        const result = await this.userRepository.delete(id);
-        return result.affected ? true : false;
+    async deleteUser(id_user: number): Promise<boolean> {
+        return this.delete(id_user);
     }
 }

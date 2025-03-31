@@ -1,50 +1,84 @@
 import { Request, Response } from "express";
+import { District } from "../entity/District";
 import { DistrictService } from "../services/DistrictService";
-import { DistrictDTO } from "../dto/DistrictDTO";
+import { AppDataSource } from "../config/database";
 
 export class DistrictController {
-    static async createDistrict(req: Request, res: Response): Promise<void> {
+    private districtService: DistrictService;
+
+    constructor() {
+        AppDataSource.then(dataSource => {
+            this.districtService = new DistrictService(District, dataSource);
+        });
+    }
+
+    getAll = async (req: Request, res: Response): Promise<void> => {
         try {
-            const districtDTO: DistrictDTO = req.body;
-            const district = await new DistrictService().createDistrict(districtDTO);
-            res.status(201).json(district);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            const districts = await this.districtService.getAll();
+            res.json(districts);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy danh sách quận/huyện", error });
         }
     }
 
-    static async getAllDistricts(req: Request, res: Response): Promise<void> {
+    getById = async (req: Request, res: Response): Promise<void> => {
         try {
-            const districts = await new DistrictService().getAllDistricts();
-            res.status(200).json(districts);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
-        }
-    }
-
-    static async getDistrictById(req: Request, res: Response): Promise<void> {
-        try {
-            const district = await new DistrictService().getDistrictById(parseInt(req.params.id));
+            const id = parseInt(req.params.id);
+            const district = await this.districtService.findById(id);
             if (!district) {
-                res.status(404).json({ message: "District not found" });
+                res.status(404).json({ message: "Không tìm thấy quận/huyện" });
                 return;
             }
-            res.status(200).json(district);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.json(district);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy thông tin quận/huyện", error });
         }
     }
 
-    static async deleteDistrict(req: Request, res: Response): Promise<void> {
+    getByProvinceId = async (req: Request, res: Response): Promise<void> => {
         try {
-            const isDeleted = await new DistrictService().delete(parseInt(req.params.id));
-            if (!isDeleted) {
-                res.status(404).json({ message: "District not found" });
+            const provinceId = parseInt(req.params.provinceId);
+            const districts = await this.districtService.findByProvinceId(provinceId);
+            res.json(districts);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy danh sách quận/huyện theo tỉnh/thành phố", error });
+        }
+    }
+
+    create = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const district = await this.districtService.createDistrict(req.body);
+            res.status(201).json(district);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi tạo quận/huyện mới", error });
+        }
+    }
+
+    update = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id = parseInt(req.params.id);
+            const district = await this.districtService.updateDistrict(id, req.body);
+            if (!district) {
+                res.status(404).json({ message: "Không tìm thấy quận/huyện" });
                 return;
             }
-            res.status(200).json({ message: "District deleted successfully" });
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.json(district);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi cập nhật quận/huyện", error });
+        }
+    }
+
+    delete = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id = parseInt(req.params.id);
+            const result = await this.districtService.deleteDistrict(id);
+            if (!result) {
+                res.status(404).json({ message: "Không tìm thấy quận/huyện" });
+                return;
+            }
+            res.json({ message: "Đã xóa quận/huyện thành công" });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi xóa quận/huyện", error });
         }
     }
 }

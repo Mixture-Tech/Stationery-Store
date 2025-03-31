@@ -1,107 +1,95 @@
 import { Request, Response } from "express";
+import { Product } from "../entity/Product";
 import { ProductService } from "../services/ProductService";
-import { ProductDTO } from "../dto/ProductDTO";
+import { AppDataSource } from "../config/database";
 
 export class ProductController {
-    static async createProduct(req: Request, res: Response): Promise<void> {
+    private productService: ProductService;
+
+    constructor() {
+        AppDataSource.then(dataSource => {
+            this.productService = new ProductService(Product, dataSource);
+        });
+    }
+
+    getAll = async (req: Request, res: Response): Promise<void> => {
         try {
-            const productDTO: ProductDTO = req.body;
-            const product = await new ProductService().createProduct(productDTO);
-            res.status(201).json(product);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            const products = await this.productService.getAll();
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy danh sách sản phẩm", error });
         }
     }
 
-    static async getAllProducts(req: Request, res: Response): Promise<void> {
-        try {
-            const products = await new ProductService().getAllProducts();
-            res.status(200).json(products);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
-        }
-    }
-
-    static async getProductById(req: Request, res: Response): Promise<void> {
+    getById = async (req: Request, res: Response): Promise<void> => {
         try {
             const id = parseInt(req.params.id);
-            if (isNaN(id)) {
-                res.status(400).json({ message: "ID không hợp lệ" });
-                return;
-            }
-            const product = await new ProductService().getProductById(id);
+            const product = await this.productService.findById(id);
             if (!product) {
                 res.status(404).json({ message: "Không tìm thấy sản phẩm" });
                 return;
             }
-            res.status(200).json(product);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.json(product);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy thông tin sản phẩm", error });
         }
     }
 
-    static async updateProduct(req: Request, res: Response): Promise<void> {
+    getByCategoryId = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const categoryId = parseInt(req.params.categoryId);
+            const products = await this.productService.findByCategoryId(categoryId);
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy danh sách sản phẩm theo danh mục", error });
+        }
+    }
+
+    getByBrand = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const brand = req.params.brand;
+            const products = await this.productService.findByBrand(brand);
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy danh sách sản phẩm theo thương hiệu", error });
+        }
+    }
+
+    create = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const product = await this.productService.createProduct(req.body);
+            res.status(201).json(product);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi tạo sản phẩm mới", error });
+        }
+    }
+
+    update = async (req: Request, res: Response): Promise<void> => {
         try {
             const id = parseInt(req.params.id);
-            if (isNaN(id)) {
-                res.status(400).json({ message: "ID không hợp lệ" });
-                return;
-            }
-            const productDTO: ProductDTO = req.body;
-            const updatedProduct = await new ProductService().update(id, productDTO);
-            if (!updatedProduct) {
+            const product = await this.productService.updateProduct(id, req.body);
+            if (!product) {
                 res.status(404).json({ message: "Không tìm thấy sản phẩm" });
                 return;
             }
-            res.status(200).json(updatedProduct);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.json(product);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi cập nhật sản phẩm", error });
         }
     }
 
-    static async deleteProduct(req: Request, res: Response): Promise<void> {
+    delete = async (req: Request, res: Response): Promise<void> => {
         try {
             const id = parseInt(req.params.id);
-            if (isNaN(id)) {
-                res.status(400).json({ message: "ID không hợp lệ" });
-                return;
-            }
-            const isDeleted = await new ProductService().delete(id);
-            if (!isDeleted) {
+            const result = await this.productService.deleteProduct(id);
+            if (!result) {
                 res.status(404).json({ message: "Không tìm thấy sản phẩm" });
                 return;
             }
-            res.status(200).json({ message: "Xóa sản phẩm thành công" });
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
-        }
-    }
-
-    static async getProductByName(req: Request, res: Response): Promise<void> {
-        try {
-            const { name } = req.query;
-            if (!name || typeof name !== 'string') {
-                res.status(400).json({ message: "Tên sản phẩm không hợp lệ" });
-                return;
-            }
-            const products = await new ProductService().getProductByName(name);
-            res.status(200).json(products);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
-        }
-    }
-
-    static async getProductByCategoryName(req: Request, res: Response): Promise<void> {
-        try {
-            const { categoryName } = req.query;
-            if (!categoryName || typeof categoryName !== 'string') {
-                res.status(400).json({ message: "Tên danh mục không hợp lệ" });
-                return;
-            }
-            const products = await new ProductService().getProductByCategoryName(categoryName);
-            res.status(200).json(products);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.json({ message: "Đã xóa sản phẩm thành công" });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi xóa sản phẩm", error });
         }
     }
 }
+
