@@ -1,13 +1,12 @@
-import { DataSource, EntityTarget } from "typeorm";
 import { User } from "../entity/User";
-import { BaseService } from "./BaseService";
 import { UserDTO } from "../dto/userDTO";
+import { BaseService } from "./BaseService";
 import { AppDataSource } from "../config/database";
 
 export class UserService extends BaseService<User, UserDTO> {
     private static instance: UserService;
 
-    constructor( dataSource: DataSource) {
+    private constructor(dataSource: any) {
         super(User, dataSource);
     }
 

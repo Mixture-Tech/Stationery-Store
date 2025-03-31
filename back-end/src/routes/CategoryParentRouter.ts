@@ -1,23 +1,20 @@
-import{ Router } from "express";
+import { Router } from "express";
 import { CategoryParentController } from "../controller/CategoryParentController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = Router();
 const categoryParentController = new CategoryParentController();
 
-// Lấy danh sách tất cả danh mục cha
-router.get("/", categoryParentController.getAll);
+// Public routes
+router.get("/category-parent", categoryParentController.getAll);
+router.get("/category-parent/:id", categoryParentController.getById);
 
-// Lấy thông tin một danh mục cha theo ID
-router.get("/:id", categoryParentController.getById);
+// Protected routes (yêu cầu xác thực)
+router.post("/category-parent", authenticateToken, categoryParentController.create);
+router.put("/category-parent/:id", authenticateToken, categoryParentController.update);
+router.delete("/category-parent/:id", authenticateToken, categoryParentController.delete);
 
-// Tạo danh mục cha mới (yêu cầu xác thực)
-router.post("/", authenticateToken, categoryParentController.create);
-
-// Cập nhật thông tin danh mục cha (yêu cầu xác thực)
-router.put("/:id", authenticateToken, categoryParentController.update);
-
-// Xóa danh mục cha (yêu cầu xác thực)
-router.delete("/:id", authenticateToken, categoryParentController.delete);
+// Route lấy danh sách category con theo parent ID
+router.get("/:id/categories", categoryParentController.getCategoriesByParentId);
 
 export default router; 

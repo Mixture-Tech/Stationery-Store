@@ -72,12 +72,6 @@ export default function Banner() {
                             <p className="text-white text-xl mb-4">
                                 {currentProduct.description}
                             </p>
-                            <p className="text-white text-2xl">
-                                {new Intl.NumberFormat('vi-VN', { 
-                                    style: 'currency', 
-                                    currency: 'VND' 
-                                }).format(currentProduct.price)}
-                            </p>
                         </div>
                     </div>
                 </div>

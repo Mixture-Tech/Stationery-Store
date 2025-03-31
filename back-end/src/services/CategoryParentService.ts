@@ -1,36 +1,83 @@
-import { DataSource, EntityTarget } from "typeorm";
+import { AppDataSource } from "../config/database";
 import { Category_Parent } from "../entity/Category_Parent";
-import { BaseService } from "./BaseService";
+import { Repository } from "typeorm";
 import { CategoryParentDTO } from "../dto/CategoryParentDTO";
 
-export class CategoryParentService extends BaseService<Category_Parent, CategoryParentDTO> {
-    constructor(entity: EntityTarget<Category_Parent>, dataSource: DataSource) {
-        super(entity, dataSource);
+class CategoryParentService {
+    private categoryParentRepository: Repository<Category_Parent>;
+
+    constructor() {
+        this.initRepository();
     }
 
-    async findById(id_parent: number): Promise<Category_Parent | null> {
-        return this.repository.findOne({ 
+    private async initRepository() {
+        const dataSource = await AppDataSource;
+        this.categoryParentRepository = dataSource.getRepository(Category_Parent);
+    }
+
+    async getAll() {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        return await this.categoryParentRepository.find({
+            relations: ["categories"]
+        });
+    }
+
+    async findById(id_parent: number) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        return await this.categoryParentRepository.findOne({
             where: { id_parent },
             relations: ["categories"]
         });
     }
 
-    async findByName(name_parent: string): Promise<Category_Parent | null> {
-        return this.repository.findOne({ 
+    async getByName(name_parent: string) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        return await this.categoryParentRepository.findOne({
             where: { name_parent },
             relations: ["categories"]
         });
     }
 
-    async createCategoryParent(categoryParentDTO: CategoryParentDTO): Promise<Category_Parent> {
-        return this.create(categoryParentDTO);
+    async createCategoryParent(categoryParentData: CategoryParentDTO) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        const categoryParent = this.categoryParentRepository.create(categoryParentData);
+        return await this.categoryParentRepository.save(categoryParent);
     }
 
-    async updateCategoryParent(id_parent: number, categoryParentDTO: CategoryParentDTO): Promise<Category_Parent | null> {
-        return this.update(id_parent, categoryParentDTO);
+    async updateCategoryParent(id_parent: number, categoryParentData: CategoryParentDTO) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        await this.categoryParentRepository.update(id_parent, categoryParentData);
+        return await this.findById(id_parent);
     }
 
-    async deleteCategoryParent(id_parent: number): Promise<boolean> {
-        return this.delete(id_parent);
+    async deleteCategoryParent(id_parent: number) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        const result = await this.categoryParentRepository.delete(id_parent);
+        return result.affected ? true : false;
+    }
+
+    async getCategoriesByParentId(id_parent: number) {
+        if (!this.categoryParentRepository) {
+            await this.initRepository();
+        }
+        const categoryParent = await this.categoryParentRepository.findOne({
+            where: { id_parent },
+            relations: ["categories"]
+        });
+        return categoryParent?.categories || [];
     }
 }
+
+export default new CategoryParentService();

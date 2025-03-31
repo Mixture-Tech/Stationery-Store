@@ -3,7 +3,7 @@ import axiosClient from './axiosClient';
 export const productApi = {
     // Lấy danh sách tất cả sản phẩm
     getAllProducts: () => {
-        return axiosClient.get('api/v1/products');
+        return axiosClient.get('products');
     },
 
     // Lấy thông tin sản phẩm theo ID

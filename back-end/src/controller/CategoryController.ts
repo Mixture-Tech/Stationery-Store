@@ -1,84 +1,72 @@
 import { Request, Response } from "express";
-import { Category } from "../entity/Category";
-import { CategoryService } from "../services/CategoryService";
-import { AppDataSource } from "../config/database";
+import CategoryService from "../services/CategoryService";
 
-export class CategoryController {
-    private categoryService: CategoryService;
-
-    constructor() {
-        AppDataSource.then(dataSource => {
-            this.categoryService = new CategoryService(Category, dataSource);
-        });
-    }
-
-    getAll = async (req: Request, res: Response): Promise<void> => {
+class CategoryController {
+    async getAll(req: Request, res: Response): Promise<void> {
         try {
-            const categories = await this.categoryService.getAll();
+            const categories = await CategoryService.getAll();
             res.json(categories);
         } catch (error) {
-            res.status(500).json({ message: "Lỗi khi lấy danh sách danh mục", error });
+            res.status(500).json({ message: "Lỗi server", error });
         }
     }
 
-    getById = async (req: Request, res: Response): Promise<void> => {
+    async getById(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const category = await this.categoryService.findById(id);
+            const category = await CategoryService.getById(id);
             if (!category) {
                 res.status(404).json({ message: "Không tìm thấy danh mục" });
                 return;
             }
             res.json(category);
         } catch (error) {
-            res.status(500).json({ message: "Lỗi khi lấy thông tin danh mục", error });
+            res.status(500).json({ message: "Lỗi server", error });
         }
     }
 
-    getByParentId = async (req: Request, res: Response): Promise<void> => {
+    async getByParentId(req: Request, res: Response): Promise<void> {
         try {
             const parentId = parseInt(req.params.parentId);
-            const categories = await this.categoryService.findByParentId(parentId);
+            const categories = await CategoryService.getByParentId(parentId);
             res.json(categories);
         } catch (error) {
-            res.status(500).json({ message: "Lỗi khi lấy danh sách danh mục con", error });
+            res.status(500).json({ message: "Lỗi server", error });
         }
     }
 
-    create = async (req: Request, res: Response): Promise<void> => {
+    async create(req: Request, res: Response): Promise<void> {
         try {
-            const category = await this.categoryService.createCategory(req.body);
+            const category = await CategoryService.create(req.body);
             res.status(201).json(category);
         } catch (error) {
-            res.status(500).json({ message: "Lỗi khi tạo danh mục mới", error });
+            res.status(500).json({ message: "Lỗi server", error });
         }
     }
 
-    update = async (req: Request, res: Response): Promise<void> => {
+    async update(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const category = await this.categoryService.updateCategory(id, req.body);
+            const category = await CategoryService.update(id, req.body);
             if (!category) {
                 res.status(404).json({ message: "Không tìm thấy danh mục" });
                 return;
             }
             res.json(category);
         } catch (error) {
-            res.status(500).json({ message: "Lỗi khi cập nhật danh mục", error });
+            res.status(500).json({ message: "Lỗi server", error });
         }
     }
 
-    delete = async (req: Request, res: Response): Promise<void> => {
+    async delete(req: Request, res: Response): Promise<void> {
         try {
             const id = parseInt(req.params.id);
-            const result = await this.categoryService.deleteCategory(id);
-            if (!result) {
-                res.status(404).json({ message: "Không tìm thấy danh mục" });
-                return;
-            }
-            res.json({ message: "Đã xóa danh mục thành công" });
+            await CategoryService.delete(id);
+            res.json({ message: "Xóa danh mục thành công" });
         } catch (error) {
-            res.status(500).json({ message: "Lỗi khi xóa danh mục", error });
+            res.status(500).json({ message: "Lỗi server", error });
         }
     }
 }
+
+export default new CategoryController();

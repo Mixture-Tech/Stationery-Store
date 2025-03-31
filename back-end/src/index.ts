@@ -5,6 +5,8 @@ import * as swaggerJsdoc from "swagger-jsdoc";
 import swaggerOptions from "./config/swagger";
 import userRouter from "./routes/userRouter";
 import productRouter from "./routes/ProductRouter";
+import categoryRouter from "./routes/CategoryRouter";
+import categoryParentRouter from "./routes/CategoryParentRouter";
 import { AppDataSource } from "./config/database";
 
 const app = express();
@@ -28,6 +30,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes with /v1 prefix
 app.use("/api/v1", userRouter);
 app.use("/api/v1", productRouter);
+app.use("/api/v1", categoryRouter);
+app.use("/api/v1", categoryParentRouter);
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;

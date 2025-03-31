@@ -1,9 +1,8 @@
-import{ Router } from "express";
-import { CategoryController } from "../controller/CategoryController";
+import { Router } from "express";
+import CategoryController from "../controller/CategoryController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = Router();
-const categoryController = new CategoryController();
 
 /**
  * @swagger
@@ -15,7 +14,7 @@ const categoryController = new CategoryController();
  *       200:
  *         description: Trả về danh sách danh mục
  */
-router.get("/categories", categoryController.getAll);
+router.get("/categories", CategoryController.getAll);
 
 /**
  * @swagger
@@ -36,7 +35,7 @@ router.get("/categories", categoryController.getAll);
  *       404:
  *         description: Danh mục không tồn tại
  */
-router.get("/categories/:id", categoryController.getById);
+router.get("/categories/:id", CategoryController.getById);
 
 /**
  * @swagger
@@ -55,7 +54,7 @@ router.get("/categories/:id", categoryController.getById);
  *       200:
  *         description: Trả về danh sách danh mục con
  */
-router.get("/categories/parent/:parentId", categoryController.getByParentId);
+router.get("/categories/parent/:parentId", CategoryController.getByParentId);
 
 /**
  * @swagger
@@ -73,7 +72,7 @@ router.get("/categories/parent/:parentId", categoryController.getByParentId);
  *       201:
  *         description: Trả về thông tin danh mục vừa được tạo
  */
-router.post("/categories", authenticateToken, categoryController.create);
+router.post("/categories", authenticateToken, CategoryController.create);
 
 /**
  * @swagger
@@ -100,7 +99,7 @@ router.post("/categories", authenticateToken, categoryController.create);
  *       404:
  *         description: Danh mục không tồn tại
  */
-router.put("/categories/:id", authenticateToken, categoryController.update);
+router.put("/categories/:id", authenticateToken, CategoryController.update);
 
 /**
  * @swagger
@@ -121,6 +120,6 @@ router.put("/categories/:id", authenticateToken, categoryController.update);
  *       404:
  *         description: Danh mục không tồn tại
  */
-router.delete("/categories/:id", authenticateToken, categoryController.delete);
+router.delete("/categories/:id", authenticateToken, CategoryController.delete);
 
 export default router; 
