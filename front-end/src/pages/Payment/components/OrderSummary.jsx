@@ -26,7 +26,7 @@ export default function OrderSummary() {
                     <Typography>Tổng cộng</Typography>
                     <Typography>97.36</Typography>
                 </Box>
-                <Button variant="contained" color="success" fullWidth>
+                <Button variant="contained" color="primary" fullWidth>
                     Tiếp tục thanh toán
                 </Button>
                 <Button variant="text" color="error" fullWidth>

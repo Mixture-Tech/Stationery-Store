@@ -12,9 +12,6 @@ export default function Payment() {
 
     return (
         <Container maxWidth="md" sx={{ mt: 12 }}>
-            <Typography variant="h4" fontWeight="bold" gutterBottom>
-                Cửa Hàng Của Tôi
-            </Typography>
             <Button variant="text" color="primary" sx={{ mb: 2 }} onClick={() => navigate("/gio-hang")}>
                 ← Quay lại giỏ hàng
             </Button>
