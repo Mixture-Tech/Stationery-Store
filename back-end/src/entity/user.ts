@@ -1,38 +1,44 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 import { Role } from "./Role";
 import { Order } from "./Order";
 import { Cart } from "./Cart";
 
-@Entity("user")
+@Entity()
 export class User {
-    @PrimaryColumn()
-    id_user: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-    @Column()
-    user_name: string;
+    @Column({ length: 255 })
+    name: string;
 
-    @Column({ nullable: true })
+    @Column({ length: 255, unique: true })
     email: string;
 
-    @Column({ nullable: true })
+    @Column({ length: 255 })
     password: string;
 
-    @Column({ nullable: true })
+    @Column({ length: 255, nullable: true })
     address: string;
 
-    @Column({ length: 10, nullable: true })
+    @Column({ type: "char", length: 10, nullable: true })
     phone: string;
 
-    @Column({ type: "bit", width: 1, default: 0 })
+    @Column({ type: "bit"})
     hide: boolean;
 
-    @Column({ type: "bit", width: 1, nullable: true })
+    @Column({ type: "bit", nullable: true })
     gender: boolean;
 
-    @Column()
-    id_role: number;
+    @ManyToOne(() => Role, (role) => role.users, { nullable: false })
+    role: Role;
 
-    @Column({ nullable: true })
+    @OneToMany(() => Order, (order)=> order.user, { nullable: false })
+    orders: Order[];
+
+    @OneToMany(() => Cart, (cart)=> cart.user, { nullable: false })
+    carts: Cart[];
+
+    @Column({ length: 255, nullable: true })
     avatar: string;
 
     @CreateDateColumn()
@@ -41,15 +47,6 @@ export class User {
     @UpdateDateColumn()
     update_at: Date;
 
-    @DeleteDateColumn()
+    @Column({ type: "datetime", nullable: true })
     delete_at: Date;
-
-    @ManyToOne(() => Role, (role) => role.id_role)
-    role: Role;
-
-    @OneToMany(() => Order, (order) => order.user)
-    orders: Order[];
-
-    @OneToMany(() => Cart, (cart) => cart.user)
-    carts: Cart[];
 }
