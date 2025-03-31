@@ -1,44 +1,38 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 import { Role } from "./Role";
 import { Order } from "./Order";
 import { Cart } from "./Cart";
 
-@Entity()
+@Entity("user")
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    id_user: number;
 
-    @Column({ length: 255 })
-    name: string;
+    @Column()
+    user_name: string;
 
-    @Column({ length: 255, unique: true })
+    @Column({ nullable: true })
     email: string;
 
-    @Column({ length: 255 })
+    @Column({ nullable: true })
     password: string;
 
-    @Column({ length: 255, nullable: true })
+    @Column({ nullable: true })
     address: string;
 
-    @Column({ type: "char", length: 10, nullable: true })
+    @Column({ length: 10, nullable: true })
     phone: string;
 
-    @Column({ type: "bit"})
+    @Column({ type: "bit", width: 1, default: 0 })
     hide: boolean;
 
-    @Column({ type: "bit", nullable: true })
+    @Column({ type: "bit", width: 1, nullable: true })
     gender: boolean;
 
-    @ManyToOne(() => Role, (role) => role.users, { nullable: false })
-    role: Role;
+    @Column()
+    id_role: number;
 
-    @OneToMany(() => Order, (order)=> order.user, { nullable: false })
-    orders: Order[];
-
-    @OneToMany(() => Cart, (cart)=> cart.user, { nullable: false })
-    carts: Cart[];
-
-    @Column({ length: 255, nullable: true })
+    @Column({ nullable: true })
     avatar: string;
 
     @CreateDateColumn()
@@ -47,6 +41,15 @@ export class User {
     @UpdateDateColumn()
     update_at: Date;
 
-    @Column({ type: "datetime", nullable: true })
+    @DeleteDateColumn()
     delete_at: Date;
-}
+
+    @ManyToOne(() => Role, (role) => role.id_role)
+    role: Role;
+
+    @OneToMany(() => Order, (order) => order.user)
+    orders: Order[];
+
+    @OneToMany(() => Cart, (cart) => cart.user)
+    carts: Cart[];
+} 
