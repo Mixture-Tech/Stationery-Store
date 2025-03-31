@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
 import { Category } from "./Category";
 import { Order_Detail } from "./Order_Detail";
 import { Cart } from "./Cart";
@@ -51,6 +51,7 @@ export class Product {
     hide: boolean;
 
     @ManyToOne(() => Category, (category) => category.products)
+    @JoinColumn({ name: "id_category", referencedColumnName: "id_category" })
     category: Category;
 
     @OneToMany(() => Order_Detail, (orderDetail) => orderDetail.product)

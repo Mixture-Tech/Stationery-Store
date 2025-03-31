@@ -26,4 +26,3 @@ export class District {
     @OneToMany(() => Order_Detail, (orderDetail) => orderDetail.district)
     orderDetails: Order_Detail[];
 }
-ư

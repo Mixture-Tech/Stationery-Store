@@ -2,10 +2,21 @@ import { DataSource, EntityTarget } from "typeorm";
 import { User } from "../entity/User";
 import { BaseService } from "./BaseService";
 import { UserDTO } from "../dto/userDTO";
+import { AppDataSource } from "../config/database";
 
 export class UserService extends BaseService<User, UserDTO> {
-    constructor(entity: EntityTarget<User>, dataSource: DataSource) {
-        super(entity, dataSource);
+    private static instance: UserService;
+
+    constructor( dataSource: DataSource) {
+        super(User, dataSource);
+    }
+
+    public static async getInstance(): Promise<UserService> {
+        if (!UserService.instance) {
+            const dataSource = await AppDataSource;
+            UserService.instance = new UserService(dataSource);
+        }
+        return UserService.instance;
     }
 
     async findById(id_user: number): Promise<User | null> {

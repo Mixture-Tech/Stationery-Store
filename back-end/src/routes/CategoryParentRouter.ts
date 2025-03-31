@@ -1,8 +1,8 @@
-import express from "express";
+import{ Router } from "express";
 import { CategoryParentController } from "../controller/CategoryParentController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 const categoryParentController = new CategoryParentController();
 
 // Lấy danh sách tất cả danh mục cha

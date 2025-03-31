@@ -1,36 +1,54 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/AuthService";
 
-interface JwtPayload {
-    id: number;
-    email: string;
-    role: string;
-}
-
-// Mở rộng interface Request để thêm thuộc tính user
 declare global {
     namespace Express {
         interface Request {
-            user?: JwtPayload;
+            user?: {
+                id: number;
+                email: string;
+                role: string;
+            };
         }
     }
 }
 
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const authenticateToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
     try {
-        const authHeader = req.headers.authorization;
+        const authHeader = req.headers["authorization"];
         const token = authHeader && authHeader.split(" ")[1];
 
         if (!token) {
-            res.status(401).json({ message: "Token không được cung cấp" });
+            res.status(401).json({ message: "Không có token" });
             return;
         }
 
-        const decoded = new AuthService().verifyToken(token) as JwtPayload;
-        req.user = decoded;
+        const authService = await AuthService.getInstance();
+        const user = await authService.verifyToken(token);
+
+        if (!user) {
+            res.status(403).json({ message: "Token không hợp lệ" });
+            return;
+        }
+
+        if (!user.role?.name) {
+            res.status(403).json({ message: "Người dùng không có quyền" });
+            return;
+        }
+
+        req.user = {
+            id: user.id_user,
+            email: user.email,
+            role: user.role.name
+        };
+
         next();
-    } catch (error: any) {
-        res.status(401).json({ message: error.message });
+    } catch (error) {
+        res.status(403).json({ message: "Token không hợp lệ" });
         return;
     }
 }; 

@@ -1,8 +1,8 @@
-import express from "express";
+import{ Router } from "express";
 import { DistrictController } from "../controller/DistrictController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 const districtController = new DistrictController();
 
 // Lấy danh sách tất cả quận/huyện

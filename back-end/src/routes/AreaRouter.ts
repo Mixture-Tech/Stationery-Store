@@ -1,8 +1,8 @@
-import express from "express";
+import{ Router } from "express";
 import { AreaController } from "../controller/AreaController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 const areaController = new AreaController();
 
 // Lấy danh sách tất cả khu vực

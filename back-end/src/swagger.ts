@@ -1,7 +1,7 @@
 import * as swaggerJSDoc from "swagger-jsdoc";
 
 const swaggerDefinition = {
-    openapi: "3.1.0",
+    openapi: "3.0.3",
     info: {
         title: "Stationery Store API Documentation",
         version: "1.0.0",

@@ -1,8 +1,8 @@
-import express from "express";
+import{ Router } from "express";
 import { ProductController } from "../controller/ProductController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 const productController = new ProductController();
 
 /**
