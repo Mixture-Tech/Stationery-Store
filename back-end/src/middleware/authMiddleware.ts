@@ -1,19 +1,36 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/AuthService";
 
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
+interface JwtPayload {
+    id: number;
+    email: string;
+    role: string;
+}
+
+// Mở rộng interface Request để thêm thuộc tính user
+declare global {
+    namespace Express {
+        interface Request {
+            user?: JwtPayload;
+        }
+    }
+}
+
+export const authenticateToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const authHeader = req.headers.authorization;
         const token = authHeader && authHeader.split(" ")[1];
 
         if (!token) {
-            return res.status(401).json({ message: "Token không được cung cấp" });
+            res.status(401).json({ message: "Token không được cung cấp" });
+            return;
         }
 
-        const decoded = new AuthService().verifyToken(token);
+        const decoded = new AuthService().verifyToken(token) as JwtPayload;
         req.user = decoded;
         next();
     } catch (error: any) {
-        return res.status(401).json({ message: error.message });
+        res.status(401).json({ message: error.message });
+        return;
     }
 }; 

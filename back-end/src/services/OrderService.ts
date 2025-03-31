@@ -1,47 +1,56 @@
-import { AppDataSource } from "../config/database";
-import { Repository } from "typeorm";
+import { DataSource, EntityTarget } from "typeorm";
 import { Order } from "../entity/Order";
+import { BaseService } from "./BaseService";
 import { OrderDTO } from "../dto/OrderDTO";
 import { Order_Detail } from "../entity/Order_Detail";
 import { Order_DetailDTO } from "../dto/Order_DetailDTO";
 
-export class OrderService {
-    private orderRepository: Repository<Order>;
+export class OrderService extends BaseService<Order, OrderDTO> {
     private orderDetailRepository: Repository<Order_Detail>;
 
-    constructor() {
-        AppDataSource.then((dataSource) => {
-            this.orderRepository = dataSource.getRepository(Order);
-            this.orderDetailRepository = dataSource.getRepository(Order_Detail);
-        }).catch((error) => {
-            console.error("Lỗi khi kết nối DB:", error);
+    constructor(entity: EntityTarget<Order>, dataSource: DataSource) {
+        super(entity, dataSource);
+        this.orderDetailRepository = dataSource.getRepository(Order_Detail);
+    }
+
+    async findById(id_order: number): Promise<Order | null> {
+        return this.repository.findOne({ 
+            where: { id_order },
+            relations: ["user", "district", "orderDetails"]
         });
     }
 
-    // Order Methods
+    async findByUserId(id_user: number): Promise<Order[]> {
+        return this.repository.find({
+            where: { id_user },
+            relations: ["user", "district", "orderDetails"]
+        });
+    }
+
+    async findByDistrictId(id_district: number): Promise<Order[]> {
+        return this.repository.find({
+            where: { id_district },
+            relations: ["user", "district", "orderDetails"]
+        });
+    }
+
+    async findByStatus(status: string): Promise<Order[]> {
+        return this.repository.find({
+            where: { status },
+            relations: ["user", "district", "orderDetails"]
+        });
+    }
+
     async createOrder(orderDTO: OrderDTO): Promise<Order> {
-        const order = this.orderRepository.create(orderDTO);
-        return await this.orderRepository.save(order);
+        return this.create(orderDTO);
     }
 
-    async getOrderById(id: number): Promise<Order | null> {
-        return await this.orderRepository.findOneBy({ id });
+    async updateOrder(id_order: number, orderDTO: OrderDTO): Promise<Order | null> {
+        return this.update(id_order, orderDTO);
     }
 
-    async getAllOrders(): Promise<Order[]> {
-        return await this.orderRepository.find();
-    }
-
-    async updateOrder(id: number, orderDTO: OrderDTO): Promise<OrderDTO | null> {
-        const order = await this.orderRepository.findOneBy({ id });
-        if (!order) return null;
-        Object.assign(order, orderDTO);
-        return await this.orderRepository.save(order);
-    }
-
-    async deleteOrder(id: number): Promise<boolean> {
-        await this.orderRepository.delete(id);
-        return true;
+    async deleteOrder(id_order: number): Promise<boolean> {
+        return this.delete(id_order);
     }
 
     // Order Detail Methods

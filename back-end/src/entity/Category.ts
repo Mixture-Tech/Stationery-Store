@@ -1,30 +1,33 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Category_Parent } from "./Category_Parent";
 import { Product } from "./Product";
 
 @Entity("category")
 export class Category {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    id_category: number;
 
-    @Column()
+    @Column({ nullable: true })
     name_category: string;
 
-    @Column()
+    @Column({ nullable: true })
     link: string;
- 
-    @Column({ type: "boolean"})
+
+    @Column({ type: "bit", width: 1, default: 0 })
     hide: boolean;
 
-    @ManyToOne(()=> Category_Parent, (category_parent)=> category_parent.category)
-    cateogry_parent: Category_Parent
+    @Column({ nullable: true })
+    id_parent: number;
 
-    @OneToMany(()=> Product, (product)=> product.category)
-    product: Product[];
+    @CreateDateColumn()
+    create_at: Date;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    created_at: Date;
-    
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
-    updated_at: Date;  
+    @UpdateDateColumn()
+    update_at: Date;
+
+    @ManyToOne(() => Category_Parent, (categoryParent) => categoryParent.categories)
+    categoryParent: Category_Parent;
+
+    @OneToMany(() => Product, (product) => product.category)
+    products: Product[];
 }

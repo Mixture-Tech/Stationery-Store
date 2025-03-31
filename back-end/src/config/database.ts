@@ -12,7 +12,7 @@ import { Order_Detail } from "../entity/Order_Detail";
 import { District } from "../entity/District";
 import { Order } from "../entity/Order";
 
-const DB_NAME = "stationery-store";
+const DB_NAME = "stationery_store";
 
 // Sử dụng biến toàn cục để lưu instance
 let dataSourceInstance: DataSource | null = null;

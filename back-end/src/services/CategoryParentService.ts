@@ -1,41 +1,36 @@
-import { AppDataSource } from "../config/database";
-import { Repository } from "typeorm";
+import { DataSource, EntityTarget } from "typeorm";
 import { Category_Parent } from "../entity/Category_Parent";
-import { Category_ParentDTO } from "../dto/Category_PrarentDTO";
+import { BaseService } from "./BaseService";
+import { CategoryParentDTO } from "../dto/CategoryParentDTO";
 
-export class CategoryParentService {
-    private categoryParentRepository: Repository<Category_Parent>;
+export class CategoryParentService extends BaseService<Category_Parent, CategoryParentDTO> {
+    constructor(entity: EntityTarget<Category_Parent>, dataSource: DataSource) {
+        super(entity, dataSource);
+    }
 
-    constructor() {
-        AppDataSource.then((dataSource) => {
-            this.categoryParentRepository = dataSource.getRepository(Category_Parent);
-        }).catch((error) => {
-            console.error("Lỗi khi kết nối DB:", error);
+    async findById(id_parent: number): Promise<Category_Parent | null> {
+        return this.repository.findOne({ 
+            where: { id_parent },
+            relations: ["categories"]
         });
     }
 
-    async createCategoryParent(categoryParentDTO: Category_ParentDTO): Promise<Category_Parent> {
-        const categoryParent = this.categoryParentRepository.create(categoryParentDTO);
-        return await this.categoryParentRepository.save(categoryParent);
+    async findByName(name_parent: string): Promise<Category_Parent | null> {
+        return this.repository.findOne({ 
+            where: { name_parent },
+            relations: ["categories"]
+        });
     }
 
-    async getCategoryParentById(id: number): Promise<Category_Parent | null> {
-        return await this.categoryParentRepository.findOneBy({ id });
+    async createCategoryParent(categoryParentDTO: CategoryParentDTO): Promise<Category_Parent> {
+        return this.create(categoryParentDTO);
     }
 
-    async getAllCategoryParents(): Promise<Category_Parent[]> {
-        return await this.categoryParentRepository.find();
+    async updateCategoryParent(id_parent: number, categoryParentDTO: CategoryParentDTO): Promise<Category_Parent | null> {
+        return this.update(id_parent, categoryParentDTO);
     }
 
-    async update(id: number, categoryParentDTO: Category_ParentDTO): Promise<Category_ParentDTO | null> {
-        const categoryParent = await this.categoryParentRepository.findOneBy({ id });
-        if (!categoryParent) return null;
-        Object.assign(categoryParent, categoryParentDTO);
-        return await this.categoryParentRepository.save(categoryParent);
-    }
-
-    async delete(id: number): Promise<boolean> {
-        await this.categoryParentRepository.delete(id);
-        return true;
+    async deleteCategoryParent(id_parent: number): Promise<boolean> {
+        return this.delete(id_parent);
     }
 }

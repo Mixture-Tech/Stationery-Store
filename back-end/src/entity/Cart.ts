@@ -1,24 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { User } from "./User";
+import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
 import { Product } from "./Product";
+import { User } from "./User";
 
-@Entity()
+@Entity("cart")
 export class Cart {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    id_cart: number;
 
-    @ManyToOne(() => Product, (product) => product.carts)
-    product: Product;
+    @Column()
+    id_user: number;
+
+    @Column()
+    id_product: number;
+
+    @Column({ nullable: true })
+    quantity: number;
+
+    @Column({ type: "bit", width: 1, default: 0 })
+    hide: boolean;
 
     @ManyToOne(() => User, (user) => user.carts)
     user: User;
 
-    @Column({ type: "int", nullable: false })
-    quantity: number;
-
-    @Column({ type: "double", nullable: false })
-    total_price: number;
-
-    @Column({ type: "boolean", default: false })
-    hide: boolean;
+    @ManyToOne(() => Product, (product) => product.carts)
+    product: Product;
 }

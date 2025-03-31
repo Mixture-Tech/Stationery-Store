@@ -1,41 +1,36 @@
-import { AppDataSource } from "../config/database";
-import { Repository } from "typeorm";
+import { DataSource, EntityTarget } from "typeorm";
 import { Area } from "../entity/Area";
+import { BaseService } from "./BaseService";
 import { AreaDTO } from "../dto/AreaDTO";
 
-export class AreaService {
-    private areaRepository: Repository<Area>;
+export class AreaService extends BaseService<Area, AreaDTO> {
+    constructor(entity: EntityTarget<Area>, dataSource: DataSource) {
+        super(entity, dataSource);
+    }
 
-    constructor() {
-        AppDataSource.then((dataSource) => {
-            this.areaRepository = dataSource.getRepository(Area);
-        }).catch((error) => {
-            console.error("Lỗi khi kết nối DB:", error);
+    async findById(id_area: number): Promise<Area | null> {
+        return this.repository.findOne({ 
+            where: { id_area },
+            relations: ["provinces"]
+        });
+    }
+
+    async findByName(name: string): Promise<Area | null> {
+        return this.repository.findOne({ 
+            where: { name },
+            relations: ["provinces"]
         });
     }
 
     async createArea(areaDTO: AreaDTO): Promise<Area> {
-        const area = this.areaRepository.create(areaDTO);
-        return await this.areaRepository.save(area);
+        return this.create(areaDTO);
     }
 
-    async getAreaById(id: number): Promise<Area | null> {
-        return await this.areaRepository.findOneBy({ id });
+    async updateArea(id_area: number, areaDTO: AreaDTO): Promise<Area | null> {
+        return this.update(id_area, areaDTO);
     }
 
-    async getAllAreas(): Promise<Area[]> {
-        return await this.areaRepository.find();
-    }
-
-    async update(id: number, areaDTO: AreaDTO): Promise<AreaDTO | null> {
-        const area = await this.areaRepository.findOneBy({ id });
-        if (!area) return null;
-        Object.assign(area, areaDTO);
-        return await this.areaRepository.save(area);
-    }
-
-    async delete(id: number): Promise<boolean> {
-        const result = await this.areaRepository.delete(id);
-        return result.affected !== 0;
+    async deleteArea(id_area: number): Promise<boolean> {
+        return this.delete(id_area);
     }
 }

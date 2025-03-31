@@ -1,26 +1,26 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Category } from "./Category";
 
 @Entity("category_parent")
-export class Category_Parent{
-    @PrimaryGeneratedColumn()
-    id: number;
+export class Category_Parent {
+    @PrimaryColumn()
+    id_parent: number;
 
-    @Column({ type: "varchar", length: 255 })
-    name: string;
+    @Column({ nullable: true })
+    name_parent: string;
 
-    @Column({ type: "varchar", length: 10 })
+    @Column({ length: 20, nullable: true })
     link: string;
 
-    @Column({ type: "bit"})
+    @Column({ type: "bit", width: 1, default: 0 })
     hide: boolean;
 
-    @OneToMany(()=> Category, (category=> category.cateogry_parent))
-    category: Category[];
+    @CreateDateColumn()
+    create_at: Date;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    created_at: Date;
-    
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
-    updated_at: Date;
+    @UpdateDateColumn()
+    update_at: Date;
+
+    @OneToMany(() => Category, (category) => category.categoryParent)
+    categories: Category[];
 }

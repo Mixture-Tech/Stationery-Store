@@ -1,34 +1,43 @@
-import { AppDataSource } from "../config/database";
-import { Repository } from "typeorm";
+import { DataSource, EntityTarget } from "typeorm";
 import { District } from "../entity/District";
+import { BaseService } from "./BaseService";
 import { DistrictDTO } from "../dto/DistrictDTO";
 
-export class DistrictService {
-    private districtRepository: Repository<District>;
+export class DistrictService extends BaseService<District, DistrictDTO> {
+    constructor(entity: EntityTarget<District>, dataSource: DataSource) {
+        super(entity, dataSource);
+    }
 
-    constructor() {
-        AppDataSource.then((dataSource) => {
-            this.districtRepository = dataSource.getRepository(District);
-        }).catch((error) => {
-            console.error("Lỗi khi kết nối DB:", error);
+    async findById(id_district: number): Promise<District | null> {
+        return this.repository.findOne({ 
+            where: { id_district },
+            relations: ["province", "orders", "orderDetails"]
+        });
+    }
+
+    async findByName(name: string): Promise<District | null> {
+        return this.repository.findOne({ 
+            where: { name },
+            relations: ["province"]
+        });
+    }
+
+    async findByProvinceId(id_province: number): Promise<District[]> {
+        return this.repository.find({
+            where: { id_province },
+            relations: ["province"]
         });
     }
 
     async createDistrict(districtDTO: DistrictDTO): Promise<District> {
-        const district = this.districtRepository.create(districtDTO);
-        return await this.districtRepository.save(district);
+        return this.create(districtDTO);
     }
 
-    async getDistrictById(id: number): Promise<District | null> {
-        return await this.districtRepository.findOneBy({ id });
+    async updateDistrict(id_district: number, districtDTO: DistrictDTO): Promise<District | null> {
+        return this.update(id_district, districtDTO);
     }
 
-    async getAllDistricts(): Promise<District[]> {
-        return await this.districtRepository.find();
-    }
-
-    async delete(id: number): Promise<boolean> {
-        const result = await this.districtRepository.delete(id);
-        return result.affected !== 0;
+    async deleteDistrict(id_district: number): Promise<boolean> {
+        return this.delete(id_district);
     }
 }

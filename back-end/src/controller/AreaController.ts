@@ -1,64 +1,74 @@
 import { Request, Response } from "express";
+import { Area } from "../entity/Area";
 import { AreaService } from "../services/AreaService";
-import { AreaDTO } from "../dto/AreaDTO";
+import { AppDataSource } from "../config/database";
 
 export class AreaController {
-    static async createArea(req: Request, res: Response): Promise<void> {
+    private areaService: AreaService;
+
+    constructor() {
+        AppDataSource.then(dataSource => {
+            this.areaService = new AreaService(Area, dataSource);
+        });
+    }
+
+    getAll = async (req: Request, res: Response): Promise<void> => {
         try {
-            const areaDTO: AreaDTO = req.body;
-            const area = await new AreaService().createArea(areaDTO);
-            res.status(201).json(area);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            const areas = await this.areaService.getAll();
+            res.json(areas);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy danh sách khu vực", error });
         }
     }
 
-    static async getAllAreas(req: Request, res: Response): Promise<void> {
+    getById = async (req: Request, res: Response): Promise<void> => {
         try {
-            const areas = await new AreaService().getAllAreas();
-            res.status(200).json(areas);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
-        }
-    }
-
-    static async getAreaById(req: Request, res: Response): Promise<void> {
-        try {
-            const area = await new AreaService().getAreaById(parseInt(req.params.id));
+            const id = parseInt(req.params.id);
+            const area = await this.areaService.findById(id);
             if (!area) {
-                res.status(404).json({ message: "Area not found" });
+                res.status(404).json({ message: "Không tìm thấy khu vực" });
                 return;
             }
-            res.status(200).json(area);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.json(area);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi lấy thông tin khu vực", error });
         }
     }
 
-    static async updateArea(req: Request, res: Response): Promise<void> {
+    create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const areaDTO: AreaDTO = req.body;
-            const updatedArea = await new AreaService().update(parseInt(req.params.id), areaDTO);
-            if (!updatedArea) {
-                res.status(404).json({ message: "Area not found" });
-                return;
-            }
-            res.status(200).json(updatedArea);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            const area = await this.areaService.createArea(req.body);
+            res.status(201).json(area);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi tạo khu vực mới", error });
         }
     }
 
-    static async deleteArea(req: Request, res: Response): Promise<void> {
+    update = async (req: Request, res: Response): Promise<void> => {
         try {
-            const isDeleted = await new AreaService().delete(parseInt(req.params.id));
-            if (!isDeleted) {
-                res.status(404).json({ message: "Area not found" });
+            const id = parseInt(req.params.id);
+            const area = await this.areaService.updateArea(id, req.body);
+            if (!area) {
+                res.status(404).json({ message: "Không tìm thấy khu vực" });
                 return;
             }
-            res.status(200).json({ message: "Area deleted successfully" });
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.json(area);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi cập nhật khu vực", error });
+        }
+    }
+
+    delete = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id = parseInt(req.params.id);
+            const result = await this.areaService.deleteArea(id);
+            if (!result) {
+                res.status(404).json({ message: "Không tìm thấy khu vực" });
+                return;
+            }
+            res.json({ message: "Đã xóa khu vực thành công" });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi xóa khu vực", error });
         }
     }
 }

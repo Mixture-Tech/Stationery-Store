@@ -1,14 +1,16 @@
-import { Router } from "express";
+import express from "express";
 import { UserController } from "../controller/userController";
+import { authenticateToken } from "../middleware/authMiddleware";
 import { ApiPath } from "../const/ApiPath";
 
-const router = Router();
+const router = express.Router();
+const userController = new UserController();
 
 /**
  * @swagger
- * /api/v1/create-user:
+ * /api/v1/users:
  *   post:
- *     summary: Tạo một user mới
+ *     summary: Tạo mới một người dùng
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -18,27 +20,27 @@ const router = Router();
  *             $ref: '#/components/schemas/UserDTO'
  *     responses:
  *       201:
- *         description: Trả về thông tin user vừa được tạo
+ *         description: Trả về thông tin người dùng vừa được tạo
  */
-router.post(ApiPath.CREATE_USER, UserController.createUser);
+router.post("/users", authenticateToken, userController.createUser);
 
 /**
  * @swagger
- * /api/v1/get-all-users:
+ * /api/v1/users:
  *   get:
- *     summary: Lấy danh sách tất cả user
+ *     summary: Lấy danh sách tất cả người dùng
  *     tags: [Users]
  *     responses:
  *       200:
- *         description: Trả về danh sách user
+ *         description: Trả về danh sách người dùng
  */
-router.get(ApiPath.GET_ALL_USERS, UserController.getAllUsers);
+router.get("/users", authenticateToken, userController.getAllUsers);
 
 /**
  * @swagger
- * /api/v1/get-user-by-id/{id}:
+ * /api/v1/users/{id}:
  *   get:
- *     summary: Lấy thông tin một user theo ID
+ *     summary: Lấy thông tin một người dùng theo ID
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -46,20 +48,20 @@ router.get(ApiPath.GET_ALL_USERS, UserController.getAllUsers);
  *         required: true
  *         schema:
  *           type: number
- *         description: ID của user
+ *         description: ID của người dùng cần lấy thông tin
  *     responses:
  *       200:
- *         description: Trả về thông tin user
+ *         description: Trả về thông tin người dùng
  *       404:
- *         description: User không tồn tại
+ *         description: Người dùng không tồn tại
  */
-router.get(ApiPath.GET_USER_BY_ID, UserController.getUserById);
+router.get("/users/:id", authenticateToken, userController.getUserById);
 
 /**
  * @swagger
- * /api/v1/update-user/{id}:
+ * /api/v1/users/{id}:
  *   put:
- *     summary: Cập nhật thông tin user theo ID
+ *     summary: Cập nhật thông tin của người dùng theo ID
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -67,7 +69,7 @@ router.get(ApiPath.GET_USER_BY_ID, UserController.getUserById);
  *         required: true
  *         schema:
  *           type: number
- *         description: ID của user cần cập nhật
+ *         description: ID của người dùng cần cập nhật
  *     requestBody:
  *       required: true
  *       content:
@@ -76,17 +78,17 @@ router.get(ApiPath.GET_USER_BY_ID, UserController.getUserById);
  *             $ref: '#/components/schemas/UserDTO'
  *     responses:
  *       200:
- *         description: Trả về thông tin user đã được cập nhật
+ *         description: Trả về thông tin người dùng đã được cập nhật
  *       404:
- *         description: User không tồn tại
+ *         description: Người dùng không tồn tại
  */
-router.put(ApiPath.UPDATE_USER, UserController.updateUser);
+router.put("/users/:id", authenticateToken, userController.updateUser);
 
 /**
  * @swagger
- * /api/v1/delete-user/{id}:
+ * /api/v1/users/{id}:
  *   delete:
- *     summary: Xóa một user theo ID
+ *     summary: Xóa người dùng theo ID
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -94,13 +96,14 @@ router.put(ApiPath.UPDATE_USER, UserController.updateUser);
  *         required: true
  *         schema:
  *           type: number
- *         description: ID của user cần xóa
+ *         description: ID của người dùng cần xóa
  *     responses:
  *       200:
- *         description: Trả về trạng thái xóa user
+ *         description: Thông báo xóa người dùng thành công
  *       404:
- *         description: User không tồn tại
+ *         description: Người dùng không tồn tại
  */
-router.delete(ApiPath.DELETE_USER, UserController.deleteUser);
+router.delete("/users/:id", authenticateToken, userController.deleteUser);
 
 export default router;
+

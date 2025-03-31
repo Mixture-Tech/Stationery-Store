@@ -1,35 +1,38 @@
-import { data } from "autoprefixer";
-import axiosClient from "./axiosClient";
+import axiosClient from './axiosClient';
 
-const productApi = {
-    getAllProduct(id){
-        const url = "/product/retrieve";
-        return axiosClient.get(url);
+export const productApi = {
+    // Lấy danh sách tất cả sản phẩm
+    getAllProducts: () => {
+        return axiosClient.get('/products');
     },
 
-    getProductByID(){
-        const url = "/product/retrieveID";
-        return axiosClient.get(url, {id});
+    // Lấy thông tin sản phẩm theo ID
+    getProductById: (id) => {
+        return axiosClient.get(`/products/${id}`);
     },
 
-    createProduct(data){
-        const url = "/product/create";
-        return axiosClient.post(url, data);
+    // Tạo sản phẩm mới
+    createProduct: (productData) => {
+        return axiosClient.post('/products', productData);
     },
 
-    updateProduct(data){
-        const url = "/product/update";
-        return axiosClient.put(url, data);
+    // Cập nhật thông tin sản phẩm
+    updateProduct: (id, productData) => {
+        return axiosClient.put(`/products/${id}`, productData);
     },
 
-    deleteProduct(id){
-        const url = "/product/delete/${id}";
-        return axiosClient.delete(url, {id});
+    // Xóa sản phẩm
+    deleteProduct: (id) => {
+        return axiosClient.delete(`/products/${id}`);
     },
 
-    findProductByTitle(params){
-        const url = "/product/title";
-        return axiosClient.get(ur, {params});
+    // Tìm kiếm sản phẩm theo tên
+    searchProducts: (name) => {
+        return axiosClient.get(`/products/search?name=${name}`);
+    },
+
+    // Lấy sản phẩm theo danh mục
+    getProductsByCategory: (categoryId) => {
+        return axiosClient.get(`/products/category/${categoryId}`);
     }
-}
-export default productApi;
+};

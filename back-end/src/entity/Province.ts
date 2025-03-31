@@ -1,17 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, PrimaryColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { Area } from "./Area";
 import { District } from "./District";
 
 @Entity("province")
 export class Province {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn()
+    id_province: number;
 
-    @Column({ type: "varchar", length: 255 })
+    @Column({ nullable: true })
     name: string;
 
+    @Column()
+    id_area: number;
+
     @ManyToOne(() => Area, (area) => area.provinces)
-    @JoinColumn({ name: "areaId" }) 
     area: Area;
 
     @OneToMany(() => District, (district) => district.province)
