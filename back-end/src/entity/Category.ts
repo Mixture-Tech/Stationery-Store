@@ -13,7 +13,7 @@ export class Category {
     @Column({ nullable: true })
     link: string;
 
-    @Column({ type: "bit", width: 1, default: 0 })
+    @Column({ type: "bit", width: 1, default: () => "b'0'" })
     hide: boolean;
 
     @Column({ name: "id_parent", nullable: true })

@@ -27,6 +27,9 @@ app.use(express.json());
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Cấu hình để phục vụ file tĩnh (ảnh)
+app.use('/assets', express.static('assets'));
+
 // Routes with /v1 prefix
 app.use("/api/v1", userRouter);
 app.use("/api/v1", productRouter);

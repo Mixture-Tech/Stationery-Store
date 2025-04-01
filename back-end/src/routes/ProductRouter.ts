@@ -7,6 +7,30 @@ const productController = new ProductController();
 
 /**
  * @swagger
+ * /api/v1/products/upload-image:
+ *   post:
+ *     summary: Upload ảnh sản phẩm
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Trả về đường dẫn của ảnh đã upload
+ *       500:
+ *         description: Lỗi khi upload ảnh
+ */
+router.post("/products/upload-image", productController.uploadImage);
+
+/**
+ * @swagger
  * /api/v1/products:
  *   get:
  *     summary: Lấy danh sách tất cả sản phẩm
@@ -111,8 +135,9 @@ router.get("/products/name/:name", productController.getByName);
  *       201:
  *         description: Trả về thông tin sản phẩm vừa được tạo
  */
-router.post("/products", authenticateToken, productController.create);
+// router.post("/products", authenticateToken, productController.create);
 
+router.post("/products", productController.create);
 /**
  * @swagger
  * /api/v1/products/{id}:

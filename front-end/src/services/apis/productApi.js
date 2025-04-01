@@ -39,5 +39,17 @@ export const productApi = {
     searchProducts: (name) => {
         const url = `/products/name/${encodeURIComponent(name)}`;
         return axiosClient.get(url);
-    }
+    },
+
+    uploadImage: (file) => {
+        const formData = new FormData();
+        formData.append('image', file); // Key 'image' phải khớp với upload.single('image') ở backend
+    
+        return axiosClient.post('/products/upload-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+    
 };

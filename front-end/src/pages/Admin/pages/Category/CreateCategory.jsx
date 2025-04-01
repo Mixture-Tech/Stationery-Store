@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faImage, faUpload } from '@fortawesome/free-solid-svg-icons';
 
-const CreateCategory = () => {
+export default function CreateCategory () {
     const [formData, setFormData] = useState({
         name: '',
         hide: 0,
@@ -115,5 +115,3 @@ const CreateCategory = () => {
         </div>
     );
 };
-
-export default CreateCategory; 

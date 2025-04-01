@@ -23,7 +23,7 @@ export class User {
     @Column({ length: 10, nullable: true })
     phone: string;
 
-    @Column({ type: "bit", width: 1, default: 0 })
+    @Column({ type: "bit", width: 1, default: () => "b'0'" })
     hide: boolean;
 
     @Column({ type: "bit", width: 1, nullable: true })
