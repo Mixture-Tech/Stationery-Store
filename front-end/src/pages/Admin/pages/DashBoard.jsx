@@ -111,7 +111,7 @@ const DashBoard = () => {
                             {/* Action Category (menu === 1) */}
                             {menu === 1 && activeTab === 'viewAll' && (
                                 <div className="flex flex-col w-full">
-                                    <SearchBox width="25%" />
+                                    <SearchBox width="15%" />
                                     {/* Hàng tiêu đề (Header) */}
                                     <div className="grid grid-cols-4 gap-4 bg-gray-200 rounded-md place-items-center">
                                         {[
@@ -140,7 +140,7 @@ const DashBoard = () => {
                                 <div className="flex flex-col w-full">
                                     <SearchBox width="15%" />
                                     {/* Hàng tiêu đề (Header) */}
-                                    <div className="grid grid-cols-7 gap-4 bg-gray-200 rounded-md place-items-center">
+                                    <div className="grid grid-cols-[0.3fr_1.6fr_0.7fr_0.5fr_0.5fr_0.5fr_0.9fr] gap-4 bg-gray-200 rounded-md place-items-center">
                                         {[
                                             { label: "ID" },
                                             { label: "Tên" },

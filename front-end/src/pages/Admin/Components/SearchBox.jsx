@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
 
-const SearchBox = ({ width = "15%" }) => {
+const SearchBox = ({ width = "10%" }) => {
     const [isFocused, setIsFocused] = useState(false);
 
     return (

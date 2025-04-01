@@ -268,7 +268,7 @@ export default function Navbar() {
                             Đăng Nhập
                         </a>
                         <CustomTransparentButton>
-                            <a>
+                            <a href="/gio-hang">
                                 <FontAwesomeIcon icon={faCartShopping} size="lg" />
                             </a>
                         </CustomTransparentButton>

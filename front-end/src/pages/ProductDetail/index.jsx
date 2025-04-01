@@ -69,7 +69,7 @@ const ProductDetail = () => {
                         </Button>
                     </div>
                     <div className="mt-4 text-left">
-                        <h2 className="font-bold text-md mb-3">Chính sách ưu đãi của Fahasa</h2>
+                        <h2 className="font-bold text-md mb-3">Chính sách ưu đãi của Mixture</h2>
                         <h3 className="text-sm mb-2 before:content-['•'] before:mr-2"><strong>Thời gian giao hàng:</strong> Giao nhanh và uy tín</h3>
                         <h3 className="text-sm mb-2 before:content-['•'] before:mr-2"><strong>Chính sách đổi trả:</strong> Đổi trả miễn phí toàn quốc</h3>
                         <h3 className="text-sm mb-4 before:content-['•'] before:mr-2"><strong>Chính sách khách sỉ:</strong> Ưu đãi khi mua số lượng lớn</h3>

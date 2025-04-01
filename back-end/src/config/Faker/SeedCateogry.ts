@@ -31,6 +31,7 @@ export async function seedCategories(dataSource: DataSource) {
   const categories = [];
   for (let i = 0; i < categoryNames.length; i++) {
     const name_category = categoryNames[i];
+    // @ts-ignore
     const category = categoryRepository.create({
       name_category,
       link: faker.helpers.slugify(name_category).toLowerCase(),
