@@ -41,12 +41,15 @@ const Home = () => {
                                     .sort(() => Math.random() - 0.5)
                                     .slice(0, 10)
                                     .map(product => ({
+                                        id: product.id_product,
                                         src: product.image || "https://placehold.co/1200x1000",
                                         name: product.name,
                                         price: `${product.price} VND`,
                                         nums: product.nums || 0,
+                                        discountPrice: product.discount_price,
                                         discount: `${product.discount || 0}`,
-                                        rating: Math.floor(Math.random() * 5) + 1
+                                        rating: Math.floor(Math.random() * 5) + 1,
+                                        categoryName: product.category.name_category,
                                     }));
                                 return {
                                     name: category.name_category,
@@ -63,20 +66,29 @@ const Home = () => {
                 );
 
                 setCategoryData(processedData);
-
+                const allCategory = await categoryApi.getAll();
                 // Lấy tất cả sản phẩm cho SuggestProduct
                 const allProductsResponse = await productApi.getAllProducts();
                 const allProducts = allProductsResponse
                     .sort(() => Math.random() - 0.5)
                     .slice(0, 20)
                     .map(product => ({
+                        id: product.id_product,
                         src: product.image || "https://placehold.co/1200x1000",
                         name: product.name,
-                        price: `${product.price} VND`,
+                        price: `${product.price} đ`,
                         nums: product.nums || 0,
+                        discountPrice: product.discount_price,
                         discount: `${product.discount || 0}`,
-                        rating: Math.floor(Math.random() * 5) + 1
+                        rating: Math.floor(Math.random() * 5) + 1,
+                        categoryName: Array.isArray(allCategory)
+                            ? allCategory
+                                .filter(category => category.id_category === product.id_category)
+                                .map(category => category.name_category)
+                                .join(", ")
+                            : "Chưa có danh mục"
                     }));
+
                 setSuggestProducts(allProducts);
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);

@@ -34,6 +34,7 @@ export async function seedDistricts(dataSource: DataSource) {
         "Huyện Thạch Thất",
         "Huyện Hoài Đức"]
     for (let i = 0; i < districtName.length; i++) {
+        // @ts-ignore
         const district = districtRepository.create({
             name: districtName[i],
             fee: faker.number.int({ min: 100000, max: 1000000 }),
