@@ -26,12 +26,12 @@ const CardCategory = ({ categories }) => {
           <div className="grid grid-cols-4 gap-2 mt-2 border rounded-md place-items-center">
             <div className="w-1/2">
               <div className="px-2 py-3 font-nunito text-gray-800 text-center">
-                {category.id}
+                {category.id_category}
               </div>
             </div>
             <div className="w-full">
               <div className="px-2 py-3 font-nunito text-gray-800 text-center">
-                {category.name}
+                {category.name_category}
               </div>
             </div>
             <div className="w-full">

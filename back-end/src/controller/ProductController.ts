@@ -91,5 +91,15 @@ export class ProductController {
             res.status(500).json({ message: "Lỗi khi xóa sản phẩm", error });
         }
     }
+
+    getByName = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const name = req.params.name;
+            const products = await this.productService.findByName(name);
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi tìm kiếm sản phẩm theo tên", error });
+        }
+    }
 }
 

@@ -31,14 +31,14 @@ const CardProduct = ({ products }) => {
       {products.map((product) => (
         <div key={product.id}>
           {/* Hàng thông tin sản phẩm */}
-          <div className="grid grid-cols-7 gap-2 mt-2 border rounded-md place-items-center">
-            <div className="w-1/2">
+          <div className="grid grid-cols-[0.3fr_1.6fr_0.7fr_0.5fr_0.5fr_0.5fr_0.9fr] gap-2 mt-2 border rounded-md place-items-center">
+            <div className="w-full">
               <div className="px-2 py-3 font-nunito text-gray-800 text-center">
-                {product.id}
+                {product.id_product}
               </div>
             </div>
             <div className="w-full">
-              <div className="px-2 py-3 font-nunito text-gray-800 text-center">
+              <div className="px-2 py-3 text-[14px] font-nunito text-gray-800 text-center">
                 {product.name}
               </div>
             </div>
@@ -62,7 +62,7 @@ const CardProduct = ({ products }) => {
                 {product.brand}
               </div>
             </div>
-            <div className="w-[100%] flex justify-center">
+            <div className="w-full flex justify-center">
               <EditButton>
                 <FontAwesomeIcon className="text-white" icon={faAngleDown} />
               </EditButton>

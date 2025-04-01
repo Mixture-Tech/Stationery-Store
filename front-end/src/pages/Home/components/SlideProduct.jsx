@@ -43,19 +43,23 @@ export default function SlideProduct({title, categories}) {
                 slidesToShow: productsLength,
                 slidesToScroll: 1,
                 arrows: false,
+                centerMode: false,
+                variableWidth: true,
                 responsive: [
                     {
                         breakpoint: 1024,
                         settings: {
                             slidesToShow: Math.min(3, productsLength),
-                            slidesToScroll: 1
+                            slidesToScroll: 1,
+                            variableWidth: true
                         }
                     },
                     {
                         breakpoint: 768,
                         settings: {
                             slidesToShow: Math.min(2, productsLength),
-                            slidesToScroll: 1
+                            slidesToScroll: 1,
+                            variableWidth: true
                         }
                     }
                 ]
@@ -69,6 +73,7 @@ export default function SlideProduct({title, categories}) {
                 slidesToShow: 5,
                 slidesToScroll: slidesToScroll,
                 arrows: false,
+                centerMode: false,
                 responsive: [
                     {
                         breakpoint: 1024,
@@ -112,7 +117,8 @@ export default function SlideProduct({title, categories}) {
                     {categories[tab]?.products.length > 0 ? (
                         <Slider ref={sliderRef} {...getSliderSettings()}>
                             {categories[tab]?.products.map((product, index) => (
-                                <div key={index} className="px-4">
+                                <div key={index} className={`${categories[tab]?.products.length < 5 ? 'pr-3' : 'pr-6'}`} 
+                                     style={{ width: categories[tab]?.products.length < 5 ? '150px' : '140px' }}>
                                     <ProductCard {...product} />
                                 </div>
                             ))}
@@ -133,11 +139,12 @@ SlideProduct.propTypes = {
     categories: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         products: PropTypes.arrayOf(PropTypes.shape({
-            src: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            genre: PropTypes.string.isRequired,
-            rating: PropTypes.number.isRequired,
-            subtitle: PropTypes.string.isRequired
+            src: PropTypes.string.isRequired,     
+            name: PropTypes.string.isRequired, 
+            nums: PropTypes.number.isRequired,   
+            rating: PropTypes.number.isRequired,  
+            price: PropTypes.string.isRequired, 
+            discount: PropTypes.string.isRequired,   
         })).isRequired
     })).isRequired
 };
