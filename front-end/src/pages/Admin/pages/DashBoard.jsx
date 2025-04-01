@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SideBar from "../Components/SideBar";
 import SubSidebar from "../Components/SubSidebar";
@@ -9,34 +9,61 @@ import CreateCategory from "../Components/CreateCategory";
 import CreateUser from "../Components/CreateUser";
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import CardCategory from "../Components/CardCategory";
-
-const users = [
-    {id:1, name: "Nguyen Van A", email: "khai@nguyen.com", createAt: "12:30 PM", role: "ADMIN"},
-    {id:2, name: "Nguyen Van A", email: "khai@nguyen.com", createAt: "12:30 PM", role: "USER"},
-    {id:3, name: "Nguyen Van A", email: "khai@nguyen.com", createAt: "12:30 PM", role: "USER"},
-    {id:4, name: "Nguyen Van A", email: "khai@nguyen.com", createAt: "12:30 PM", role: "USER"},
-    {id:5, name: "Nguyen Van A", email: "khai@nguyen.com", createAt: "12:30 PM", role: "USER"},
-    {id:6, name: "Nguyen Van A", email: "khai@nguyen.com", createAt: "12:30 PM", role: "USER"},
-    {id:7, name: "Nguyen Van A", email: "khai@nguyen.com", createAt: "12:30 PM", role: "USER"},
-];
-const products = [
-    { id: 1, name: "Sách giáo khoa", nums: 3, price: 3, brand: "Kim Long", hide: 0 }, 
-    { id: 2, name: "Bút bi", nums: 3, price: 5, brand: "Kim Long", hide: 1 }, 
-    { id: 3, name: "Vở học sinh", nums: 3, price: 15, brand: "Kim Long", hide: 1 }, 
-    { id: 4, name: "Thước kẻ", nums: 3, price: 8, brand: "Kim Long", hide: 0 }
-];
-
-const categories = [
-    { id: 1, name: "Sách giáo khoa", hide: 0 }, 
-    { id: 2, name: "Bút bi", hide: 1 }, 
-    { id: 3, name: "Vở học sinh",  hide: 1 }, 
-    { id: 4, name: "Thước kẻ", hide: 0 }
-];
+import { categoryApi } from "../../../services/apis/categoryApi";
+import { productApi } from "../../../services/apis/productApi";
+import { userApi } from "../../../services/apis/userApi";
+import SearchBox from "../Components/SearchBox";
 
 const DashBoard = () => {
     const [menu, setMenu] = useState(0);
     const [isFocused, setIsFocused] = useState(false);
     const [activeTab, setActiveTab] = useState('viewAll');
+    const [categories, setCategories] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+    const [loadingUsers, setLoadingUsers] = useState(true);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await categoryApi.getAll();
+                setCategories(response);
+            } catch (error) {
+                console.error('Lỗi khi lấy danh sách categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const fetchProducts = async () => {
+            try {
+                const response = await productApi.getAllProducts();
+                setProducts(response);
+            } catch (error) {
+                console.error('Lỗi khi lấy danh sách products:', error);
+            } finally {
+                setLoadingProducts(false);
+            }
+        };
+
+        const fetchUsers = async () => {
+            try {
+                const response = await userApi.getAllUsers();
+                setUsers(response);
+            } catch (error) {
+                console.error('Lỗi khi lấy danh sách users:', error);
+            } finally {
+                setLoadingUsers(false);
+            }
+        };
+
+        fetchCategories();
+        fetchProducts();
+        fetchUsers();
+        
+    }, []);
 
     // Hàm xử lý khi click vào menu
     const handleMenuChange = (newMenu) => {
@@ -47,7 +74,7 @@ const DashBoard = () => {
     return (
         <main>
             <div className="container min-h-screen mt-16">
-                <div className="flex gap-[1%] flex-wrap content-start p-6">
+                <div className="flex gap-[1%] p-6">
                     {/* Sidebar */}
                     <SideBar menu={menu} setMenu={handleMenuChange}></SideBar>
 
@@ -57,32 +84,12 @@ const DashBoard = () => {
                     )}
 
                     {/* Content */}
-                    <div className="grow h-full">
-                        <div className="w-[100%] min-h-screen p-6 bg-white shadow-lg border-2 rounded-xl">
+                    <div className="flex-1">
+                        <div className="w-full min-h-screen p-4 bg-white shadow-lg border-2 rounded-xl">
                             {/* Action User (menu === 0) */}
                             {menu === 0 && activeTab === 'viewAll' && (
                                 <div className="flex flex-col w-full">
-                                    <div className="w-[15%]">
-                                        <div className={` mb-4 relative transition-all duration-300 ${isFocused ? 'shadow-lg' : 'shadow-md'}`}>
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <FontAwesomeIcon 
-                                                    icon={faMagnifyingGlass} 
-                                                    className={`w-5 h-5 transition-colors duration-300 ${isFocused ? 'text-Dark-Blue-300' : 'text-gray-400'}`}
-                                                />
-                                            </div>
-                                            <input 
-                                            type="search" 
-                                            id="default-search" 
-                                            className="block w-full p-2 pl-12 text-sm rounded-lg 
-                                                        bg-white
-                                                        transition-all duration-300 ease-in-out" 
-                                            placeholder="Search..." 
-                                            required 
-                                            onFocus={() => setIsFocused(true)}
-                                            onBlur={() => setIsFocused(false)}
-                                            />
-                                        </div>
-                                    </div>
+                                    <SearchBox width="15%" />
                                     {/* Hàng tiêu đề (Header) */}
                                     <div className="grid grid-cols-6 gap-6 bg-gray-200 rounded-md">
                                         {["ID", "Tên", "Email", "Create At", "Role","Action"].map((label, index) => (
@@ -91,34 +98,20 @@ const DashBoard = () => {
                                             </div>
                                         ))}
                                     </div>
-                                    <CardUser users={users}/>
+                                    {loadingUsers ? (
+                                        <div className="text-center py-4">Đang tải...</div>
+                                    ) : users.length === 0 ? (
+                                        <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu người dùng</div>
+                                    ) : (
+                                        <CardUser users={users}/>
+                                    )}
                                 </div>
                             )}
 
                             {/* Action Category (menu === 1) */}
                             {menu === 1 && activeTab === 'viewAll' && (
                                 <div className="flex flex-col w-full">
-                                    <div className="w-[15%]">
-                                        <div className={` mb-4 relative transition-all duration-300 ${isFocused ? 'shadow-lg' : 'shadow-md'}`}>
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <FontAwesomeIcon 
-                                                    icon={faMagnifyingGlass} 
-                                                    className={`w-5 h-5 transition-colors duration-300 ${isFocused ? 'text-Dark-Blue-300' : 'text-gray-400'}`}
-                                                />
-                                            </div>
-                                            <input 
-                                            type="search" 
-                                            id="default-search" 
-                                            className="block w-full p-2 pl-12 text-sm rounded-lg 
-                                                        bg-white
-                                                        transition-all duration-300 ease-in-out" 
-                                            placeholder="Search..." 
-                                            required 
-                                            onFocus={() => setIsFocused(true)}
-                                            onBlur={() => setIsFocused(false)}
-                                            />
-                                        </div>
-                                    </div>
+                                    <SearchBox width="25%" />
                                     {/* Hàng tiêu đề (Header) */}
                                     <div className="grid grid-cols-4 gap-4 bg-gray-200 rounded-md place-items-center">
                                         {[
@@ -132,35 +125,20 @@ const DashBoard = () => {
                                             </div>
                                         ))}
                                     </div>
-                                    {/* TODO: Add CategoryCard component here */}
-                                    <CardCategory categories={categories}/>
+                                    {loading ? (
+                                        <div className="text-center py-4">Đang tải...</div>
+                                    ) : categories.length === 0 ? (
+                                        <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu danh mục</div>
+                                    ) : (
+                                        <CardCategory categories={categories}/>
+                                    )}
                                 </div>
                             )}
 
                             {/* Action Product (menu === 2) */}
                             {menu === 2 && activeTab === 'viewAll' && (
                                 <div className="flex flex-col w-full">
-                                    <div className="w-[15%]">
-                                        <div className={` mb-4 relative transition-all duration-300 ${isFocused ? 'shadow-lg' : 'shadow-md'}`}>
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <FontAwesomeIcon 
-                                                    icon={faMagnifyingGlass} 
-                                                    className={`w-5 h-5 transition-colors duration-300 ${isFocused ? 'text-Dark-Blue-300' : 'text-gray-400'}`}
-                                                />
-                                            </div>
-                                            <input 
-                                            type="search" 
-                                            id="default-search" 
-                                            className="block w-full p-2 pl-12 text-sm rounded-lg 
-                                                        bg-white
-                                                        transition-all duration-300 ease-in-out" 
-                                            placeholder="Search..." 
-                                            required 
-                                            onFocus={() => setIsFocused(true)}
-                                            onBlur={() => setIsFocused(false)}
-                                            />
-                                        </div>
-                                    </div>
+                                    <SearchBox width="15%" />
                                     {/* Hàng tiêu đề (Header) */}
                                     <div className="grid grid-cols-7 gap-4 bg-gray-200 rounded-md place-items-center">
                                         {[
@@ -177,7 +155,13 @@ const DashBoard = () => {
                                             </div>
                                         ))}
                                     </div>
-                                    <CardProduct products={products}/>   
+                                    {loadingProducts ? (
+                                        <div className="text-center py-4">Đang tải...</div>
+                                    ) : products.length === 0 ? (
+                                        <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu sản phẩm</div>
+                                    ) : (
+                                        <CardProduct products={products}/>   
+                                    )}
                                 </div>
                             )}
 

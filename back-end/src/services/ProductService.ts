@@ -1,4 +1,4 @@
-import { DataSource, EntityTarget } from "typeorm";
+import { DataSource, EntityTarget, Like } from "typeorm";
 import { Product } from "../entity/Product";
 import { BaseService } from "./BaseService";
 import { ProductDTO } from "../dto/ProductDTO";
@@ -15,9 +15,11 @@ export class ProductService extends BaseService<Product, ProductDTO> {
         });
     }
 
-    async findByName(name: string): Promise<Product | null> {
-        return this.repository.findOne({ 
-            where: { name },
+    async findByName(name: string): Promise<Product[]> {
+        return this.repository.find({
+            where: {
+                name: Like(`%${name}%`)
+            },
             relations: ["category"]
         });
     }

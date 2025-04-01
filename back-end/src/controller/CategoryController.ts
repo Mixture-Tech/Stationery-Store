@@ -67,6 +67,20 @@ class CategoryController {
             res.status(500).json({ message: "Lỗi server", error });
         }
     }
+
+    async getCategoryByName(req: Request, res: Response): Promise<void> {
+        try {
+            const name = req.params.name;
+            const category = await CategoryService.getCategoryByName(name);
+            if (!category) {
+                res.status(404).json({ message: "Không tìm thấy danh mục" });
+                return;
+            }
+            res.json(category);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error });
+        }
+    }
 }
 
 export default new CategoryController();

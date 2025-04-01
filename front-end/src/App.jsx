@@ -13,11 +13,15 @@ const Home = loadable(() => import("./pages/Home"));
 const MailTemplate = loadable(() => import("./pages/MailForm"));
 const Cart = loadable(() => import('./pages/Cart'));
 const Payment = loadable(() => import('./pages/Payment'));
-const Product = loadable(() => import("./pages/list_product"));
+const ListProduct = loadable(() => import("./pages/list_product"));
+const AboutUs = loadable(() => import("./pages/AboutUs"));
+const ProductDetail = loadable(() => import("./pages/ProductDetail/index.jsx"));
 
 //ADMIN
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
+
+
 export default function App() {
     return (
         <BrowserRouter>
@@ -38,7 +42,15 @@ export default function App() {
                         path="/danh-sach-san-pham"
                         element={
                             <Suspense fallback={<CircularProgress />}>
-                                <Product title="Danh sách sản phẩm" />
+                                <ListProduct title="Danh sách sản phẩm" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/danh-sach-san-pham/:subject"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <ListProduct title="Danh sách sản phẩm" />
                             </Suspense>
                         }
                     />
@@ -57,6 +69,22 @@ export default function App() {
                                 <CartProvider>
                                     <Cart title="Giỏ hàng" />
                                 </CartProvider>
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/ve-chung-toi"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <AboutUs title="Về chúng tôi" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/chi-tiet-san-pham"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <ProductDetail title="Chi tiết sản phẩm" />
                             </Suspense>
                         }
                     />

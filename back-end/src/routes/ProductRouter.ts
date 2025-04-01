@@ -36,7 +36,7 @@ router.get("/products", productController.getAll);
  *       404:
  *         description: Sản phẩm không tồn tại
  */
-router.get("/products/:id", productController.getById);
+router.get("/products/id/:id", productController.getById);
 
 /**
  * @swagger
@@ -75,6 +75,25 @@ router.get("/products/category/:categoryId", productController.getByCategoryId);
  *         description: Trả về danh sách sản phẩm của thương hiệu
  */
 router.get("/products/brand/:brand", productController.getByBrand);
+
+/**
+ * @swagger
+ * /api/v1/products/search/{name}:
+ *   get:
+ *     summary: Tìm kiếm sản phẩm theo tên
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Tên sản phẩm cần tìm kiếm
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách sản phẩm tìm được
+ */
+router.get("/products/name/:name", productController.getByName);
 
 /**
  * @swagger

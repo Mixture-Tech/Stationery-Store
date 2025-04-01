@@ -23,11 +23,16 @@ export const categoryApi = {
 
     // Cập nhật category
     update: (id, data) => {
-        return axiosClient.put(`/categories/${id}`, data);
+        return axiosClient.put(`/categories/id/${id}`, data);
     },
 
     // Xóa category
     delete: (id) => {
         return axiosClient.delete(`/categories/${id}`);
+    },
+
+    // Lấy category theo tên
+    getCategoryByName: (categoryName) => {
+        return axiosClient.get(`/categories/name/${categoryName}`);
     }
 }; 

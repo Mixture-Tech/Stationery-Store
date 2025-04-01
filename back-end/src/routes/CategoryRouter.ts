@@ -120,6 +120,27 @@ router.put("/categories/:id", authenticateToken, CategoryController.update);
  *       404:
  *         description: Danh mục không tồn tại
  */
-router.delete("/categories/:id", authenticateToken, CategoryController.delete);
+router.delete("/categories/id/:id", authenticateToken, CategoryController.delete);
+
+/**
+ * @swagger
+ * /api/v1/categories/:name:
+ *   get:
+ *     summary: Lấy thông tin một danh mục theo tên
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: name
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Tên của danh mục cần lấy thông tin
+ *     responses:
+ *       200:
+ *         description: Trả về thông tin danh mục
+ *       404:
+ *         description: Danh mục không tồn tại
+ */
+router.get("/categories/name/:name", CategoryController.getCategoryByName);
 
 export default router; 

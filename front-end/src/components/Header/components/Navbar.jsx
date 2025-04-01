@@ -9,8 +9,9 @@ import PropTypes from 'prop-types';
 import { CustomTransparentButton } from "../../Forms/Button/customColor";
 import { categoryParentApi } from '../../../services/apis/CategoryParentApi';
 import { categoryApi } from '../../../services/apis/categoryApi';
+import { useNavigate } from 'react-router-dom';
 
-const DropdownMenu = ({ title, data }) => {
+const DropdownMenu = ({ title, data, navigate }) => {
     const flattenData = (data) => {
         if (!data || Object.keys(data).length === 0) {
             return {};
@@ -92,44 +93,49 @@ const DropdownMenu = ({ title, data }) => {
                                     <div className="flex flex-col gap-4">
                                         {(() => {
                                             const subCategories = Object.keys(flattenedItems[selectedCategory] || {});
-                                            const midPoint = Math.ceil(subCategories.length / 2);
-                                            const firstRow = subCategories.slice(0, midPoint);
-                                            const secondRow = subCategories.slice(midPoint);
-
+                                            
                                             return (
                                                 <>
-                                                    <div className="flex gap-4">
-                                                        {firstRow.map((subCategory, subIndex) => (
-                                                            <div key={subIndex} className="mt-2">
+                                                    {subCategories.map((subCategory, subIndex) => {
+                                                        const subjects = flattenedItems[selectedCategory]?.[subCategory] || [];
+                                                        const midPoint = Math.ceil(subjects.length / 2);
+                                                        const firstRowSubjects = subjects.slice(0, midPoint);
+                                                        const secondRowSubjects = subjects.slice(midPoint);
+
+                                                        return (
+                                                            <div key={subIndex} className="flex flex-col gap-2">
                                                                 <div className="text-white font-semibold">{subCategory}</div>
-                                                                {(flattenedItems[selectedCategory]?.[subCategory] || []).map((subject, subjectIndex) => (
-                                                                    <a
-                                                                        key={subjectIndex}
-                                                                        href={subject.path}
-                                                                        className="block p-1 text-sm text-white hover:text-yellow-500 transition-colors duration-150"
-                                                                    >
-                                                                        {subject.name}
-                                                                    </a>
-                                                                ))}
+                                                                <div className="grid grid-cols-2 gap-x-2">
+                                                                    <div className="flex flex-col">
+                                                                        {firstRowSubjects.map((subject, subjectIndex) => (
+                                                                            <div
+                                                                                key={subjectIndex}
+                                                                                onClick={() => navigate('/danh-sach-san-pham', { 
+                                                                                    state: { categoryName: subject.name } 
+                                                                                })}
+                                                                                className="block p-1 text-sm text-white hover:text-yellow-500 transition-colors duration-150 cursor-pointer"
+                                                                            >
+                                                                                {subject.name}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                    <div className="flex flex-col">
+                                                                        {secondRowSubjects.map((subject, subjectIndex) => (
+                                                                            <div
+                                                                                key={subjectIndex}
+                                                                                onClick={() => navigate('/danh-sach-san-pham', { 
+                                                                                    state: { categoryName: subject.name } 
+                                                                                })}
+                                                                                className="block p-1 text-sm text-white hover:text-yellow-500 transition-colors duration-150 cursor-pointer"
+                                                                            >
+                                                                                {subject.name}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                    <div className="flex gap-4">
-                                                        {secondRow.map((subCategory, subIndex) => (
-                                                            <div key={subIndex} className="mt-2">
-                                                                <div className="text-white font-semibold">{subCategory}</div>
-                                                                {(flattenedItems[selectedCategory]?.[subCategory] || []).map((subject, subjectIndex) => (
-                                                                    <a
-                                                                        key={subjectIndex}
-                                                                        href={subject.path}
-                                                                        className="block p-1 text-sm text-white hover:text-yellow-500 transition-colors duration-150"
-                                                                    >
-                                                                        {subject.name}
-                                                                    </a>
-                                                                ))}
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                                        );
+                                                    })}
                                                 </>
                                             );
                                         })()}
@@ -146,13 +152,25 @@ const DropdownMenu = ({ title, data }) => {
 
 DropdownMenu.propTypes = {
     title: PropTypes.string.isRequired,
-    data: PropTypes.object.isRequired
+    data: PropTypes.object.isRequired,
+    navigate: PropTypes.func.isRequired
 };
 
 export default function Navbar() {
     const [isFocused, setIsFocused] = useState(false);
     const [categories, setCategories] = useState([]);
     const [categoryData, setCategoryData] = useState({});
+    const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate('/danh-sach-san-pham', { 
+                state: { searchQuery: searchQuery.trim() } 
+            });
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -176,7 +194,7 @@ export default function Navbar() {
 
                         // Tạo cấu trúc dữ liệu cho menu
                         processedData[parent.name_parent] = {
-                            "Danh mục con": categories.reduce((acc, category) => {
+                            "": categories.reduce((acc, category) => {
                                 acc[category.name_category] = {
                                     "Sản phẩm": {
                                         [category.name_category]: `/danh-muc/${parent.name_parent.toLowerCase()}/${category.name_category.toLowerCase()}`
@@ -211,34 +229,38 @@ export default function Navbar() {
                         </a>
                     </div>
 
-                    <DropdownMenu title="Danh Mục" data={categoryData} />
+                    <DropdownMenu title="Danh Mục" data={categoryData} navigate={navigate} />
                                     
-                    <a href="/danh-sach-san-pham" className=" hover:text-yellow-500">
+                    <div onClick={() => navigate('/danh-sach-san-pham')} className="cursor-pointer hover:text-yellow-500">
                        Sản Phẩm
-                    </a>
-                    <a href="/support" className=" hover:text-yellow-500">
+                    </div>
+                    <a href="/ve-chung-toi" className=" hover:text-yellow-500">
                         About Us
                     </a>
                     <div className={`w-[20%] relative transition-all duration-300 ${isFocused ? 'shadow-lg' : 'shadow-md'}`}>
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <FontAwesomeIcon 
-                                icon={faMagnifyingGlass} 
-                                className={`w-5 h-5 transition-colors duration-300 ${isFocused ? 'text-Dark-Blue-300' : 'text-gray-400'}`}
+                        <form onSubmit={handleSearch} className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FontAwesomeIcon 
+                                    icon={faMagnifyingGlass} 
+                                    className={`w-5 h-5 transition-colors duration-300 ${isFocused ? 'text-Dark-Blue-300' : 'text-gray-400'}`}
+                                />
+                            </div>
+                            <input 
+                                type="search" 
+                                id="default-search" 
+                                className="block w-full p-1 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg 
+                                        bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                                        transition-all duration-300 ease-in-out
+                                        dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                                        dark:text-white dark:focus:ring-blue-500 dark:focus:border-Dark-Blue-400" 
+                                placeholder="Tìm kiếm sản phẩm..." 
+                                required 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => setIsFocused(false)}
                             />
-                        </div>
-                        <input 
-                            type="search" 
-                            id="default-search" 
-                            className="block w-full p-1 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg 
-                                    bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                                    transition-all duration-300 ease-in-out
-                                    dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
-                                    dark:text-white dark:focus:ring-blue-500 dark:focus:border-Dark-Blue-400" 
-                            placeholder="Search..." 
-                            required 
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                        />
+                        </form>
                     </div>
                     <div className="relative justify-center items-center flex flex-row">                 
                         <a href="/dang-nhap" className="hover:bg-slate-500 

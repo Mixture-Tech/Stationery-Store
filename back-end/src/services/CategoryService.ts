@@ -70,6 +70,13 @@ class CategoryService {
         }
         return await this.categoryRepository.delete(id_category);
     }
+
+    async getCategoryByName(name: string) {
+        if (!this.categoryRepository) {
+            await this.initRepository();
+        }
+        return await this.categoryRepository.findOne({ where: { name_category: name } });
+    }
 }
 
 export default new CategoryService();

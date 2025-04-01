@@ -3,12 +3,12 @@ import axiosClient from './axiosClient';
 export const productApi = {
     // Lấy danh sách tất cả sản phẩm
     getAllProducts: () => {
-        return axiosClient.get('products');
+        return axiosClient.get('/products');
     },
 
     // Lấy thông tin sản phẩm theo ID
     getProductById: (id) => {
-        return axiosClient.get(`/products/${id}`);
+        return axiosClient.get(`/products/id/${id}`);
     },
 
     // Tạo sản phẩm mới
@@ -26,13 +26,18 @@ export const productApi = {
         return axiosClient.delete(`/products/${id}`);
     },
 
-    // Tìm kiếm sản phẩm theo tên
-    searchProducts: (name) => {
-        return axiosClient.get(`/products/search?name=${name}`);
-    },
-
     // Lấy sản phẩm theo danh mục
     getProductsByCategory: (categoryId) => {
         return axiosClient.get(`/products/category/${categoryId}`);
+    },
+
+    // Lấy sản phẩm theo subject
+    getProductsByName: (subject) => {
+        return axiosClient.get(`/products/name/${subject}`);
+    },
+
+    searchProducts: (name) => {
+        const url = `/products/name/${encodeURIComponent(name)}`;
+        return axiosClient.get(url);
     }
 };
