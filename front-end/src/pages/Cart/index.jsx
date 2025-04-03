@@ -6,14 +6,15 @@ import TableHeader from "./components/TableHeader";
 import Item from "./components/Item";
 import OrderSummary from "./components/OrderSummary";
 import { CartContext } from "../../context/CartContext";
-import cartService from "../../services/apis/cartApi";
-
+import { getCart, updateCartItem, removeFromCart } from "../../services/apis/cartApi";
+import { toast } from "react-toastify";
+import { productApi } from '../../services/apis/ProductApi';
 const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemove }) {
     return (
         <div className="flex flex-col w-full px-40 mt-10">
             <TableHeader />
             {items.map((item) => (
-                <Item key={item.id} item={item} onQuantityChange={onQuantityChange} onRemove={onRemove} />
+                <Item key={item.id_product} item={item} onQuantityChange={onQuantityChange} onRemove={onRemove} />
             ))}
         </div>
     );
@@ -22,11 +23,10 @@ const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemov
 Table.propTypes = {
     items: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            imagePath: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            description: PropTypes.string.isRequired,
-            price: PropTypes.number.isRequired,
+            id_product: PropTypes.number.isRequired,
+            productImage: PropTypes.string.isRequired,
+            productName: PropTypes.string.isRequired,
+            productPrice: PropTypes.number.isRequired,
             quantity: PropTypes.number.isRequired,
         }),
     ).isRequired,
@@ -73,7 +73,7 @@ const Carousel = React.memo(function Carousel({ items }) {
         <div className="container relative w-full mx-auto">
             <div className="flex flex-row items-center justify-center w-full gap-4 py-10 overflow-hidden rounded-lg">
                 {visibleItems.map((item, index) => (
-                    <ItemCarousel key={index} image={item.imagePath} title={item.title} price={item.price} />
+                    <ItemCarousel key={index} image={item.image} title={item.name} price={item.price} />
                 ))}
             </div>
             <button
@@ -106,25 +106,55 @@ const Carousel = React.memo(function Carousel({ items }) {
 Carousel.propTypes = {
     items: PropTypes.arrayOf(
         PropTypes.shape({
-            image: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            price: PropTypes.string.isRequired,
+            productImage: PropTypes.string.isRequired,
+            productName: PropTypes.string.isRequired,
+            productPrice: PropTypes.string.isRequired,
         }),
     ).isRequired,
 };
 
 export default function Cart() {
     const { cart, removeFromCart, updateCartItemQuantity } = useContext(CartContext);
-    console.log(cart);
+    const [cartItems, setCartItems] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [popularProducts, setPopularProducts] = useState([]);
 
     useEffect(() => {
-        const response = cartService.getCart();
-        setPopularProducts(response);
+        const fetchPopularProducts = async () => {
+            try {
+                const response = await productApi.getAllProducts();
+                const allProducts = response;
+                // Lấy ngẫu nhiên 5 sản phẩm
+                const randomProducts = allProducts
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 5);
+                setPopularProducts(randomProducts);
+            } catch (error) {
+                console.error("Error fetching popular products:", error);
+            }
+        };
+
+        fetchPopularProducts();
+    }, []);
+
+    useEffect(() => {
+        const fetchCart = async () => {
+            try {
+                setLoading(true);
+                const response = await getCart();
+                setCartItems(response);
+            } catch (error) {
+                toast.error("Không thể tải dữ liệu giỏ hàng");
+                console.error("Error fetching cart:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCart();
     }, []);
 
     const DELIVERY_FEE = 15000;
-
     const [discountCode, setDiscountCode] = useState("");
 
     useEffect(() => {
@@ -141,29 +171,54 @@ export default function Cart() {
     };
 
     const calculateOrderTotal = useMemo(() => {
-        return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-    }, [cart]);
+        return cartItems.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    }, [cartItems]);
 
     const handleQuantityChange = useCallback(
-        (id, newQuantity) => {
+        async (id_product, newQuantity) => {
             if (newQuantity < 1) return;
-            updateCartItemQuantity(id, newQuantity);
-            sessionStorage.setItem(`cart-item-${id}-quantity`, newQuantity);
+            try {
+                await updateCartItem(id_product, newQuantity);
+                setCartItems(prevItems =>
+                    prevItems.map(item =>
+                        item.id_product === id_product ? { ...item, quantity: newQuantity } : item
+                    )
+                );
+                toast.success("Cập nhật số lượng thành công");
+            } catch (error) {
+                toast.error("Không thể cập nhật số lượng");
+                console.error("Error updating quantity:", error);
+            }
         },
-        [updateCartItemQuantity],
+        []
     );
 
     const handleRemoveItem = useCallback(
-        (id) => {
-            removeFromCart(id);
+        async (id_product) => {
+            try {
+                await removeFromCart(id_product);
+                setCartItems(prevItems => prevItems.filter(item => item.id_product !== id_product));
+                toast.success("Xóa sản phẩm khỏi giỏ hàng thành công");
+            } catch (error) {
+                toast.error("Không thể xóa sản phẩm");
+                console.error("Error removing item:", error);
+            }
         },
-        [removeFromCart],
+        []
     );
 
     const total = useMemo(() => {
         const discountedTotal = calculateOrderTotal - calculateOrderTotal * (discountCode ? 0.1 : 0);
         return discountedTotal + DELIVERY_FEE;
     }, [calculateOrderTotal, discountCode]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center w-full h-screen">
+                <div className="w-16 h-16 border-4 border-Coral-Pink-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center justify-center w-full pt-20">
@@ -175,7 +230,7 @@ export default function Cart() {
                 </div>
             </div>
 
-            <Table items={cart} onQuantityChange={handleQuantityChange} onRemove={handleRemoveItem} />
+            <Table items={cartItems} onQuantityChange={handleQuantityChange} onRemove={handleRemoveItem} />
 
             <div className="flex flex-row items-center justify-end w-full px-40 mt-4">
                 <div className="flex flex-row px-2 py-2 border-2 rounded-lg border-Coral-Pink-500">
@@ -191,7 +246,7 @@ export default function Cart() {
             </div>
             <div className="w-full px-40 mt-5">
                 <OrderSummary
-                    cart={cart}
+                    cart={cartItems}
                     order={calculateOrderTotal}
                     offers={discountCode}
                     delivery={DELIVERY_FEE}

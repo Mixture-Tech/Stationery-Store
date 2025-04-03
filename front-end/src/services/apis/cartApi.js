@@ -7,14 +7,13 @@ export const getCart = async () => {
         if (!token) {
             throw new Error("Chưa đăng nhập");
         }
-
         const response = await axiosClient.get("/cart/get-cart-by-user", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
-
-        return response.data;
+        console.log('response cart: ', response);
+        return response;
     } catch (error) {
         throw error.response?.data || error.message;
     }

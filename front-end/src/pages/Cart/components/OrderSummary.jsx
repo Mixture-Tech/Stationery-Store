@@ -13,7 +13,7 @@ const OrderSummary = ({ order, offers, delivery, total, cart }) => {
                     orderDetails: {
                         cart: cart,
                         subtotal: order,
-                        discountCode: offers,
+                        discountCode: offers = '0%',
                         deliveryFee: delivery,
                         total: total,
                     },
