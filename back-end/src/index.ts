@@ -8,7 +8,8 @@ import productRouter from "./routes/ProductRouter";
 import categoryRouter from "./routes/CategoryRouter";
 import categoryParentRouter from "./routes/CategoryParentRouter";
 import { AppDataSource } from "./config/database";
-
+import authRouter from "./routes/AuthRouter";
+import cartRouter from "./routes/CartRouter";
 const app = express();
 
 // CORS configuration
@@ -32,6 +33,8 @@ app.use("/api/v1", userRouter);
 app.use("/api/v1", productRouter);
 app.use("/api/v1", categoryRouter);
 app.use("/api/v1", categoryParentRouter);
+app.use("/api/v1", authRouter);
+app.use("/api/v1", cartRouter);
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;

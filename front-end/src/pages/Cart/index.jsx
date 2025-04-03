@@ -6,7 +6,7 @@ import TableHeader from "./components/TableHeader";
 import Item from "./components/Item";
 import OrderSummary from "./components/OrderSummary";
 import { CartContext } from "../../context/CartContext";
-import useProducts from "../../hooks/useProduct";
+import cartService from "../../services/apis/cartApi";
 
 const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemove }) {
     return (
@@ -116,7 +116,13 @@ Carousel.propTypes = {
 export default function Cart() {
     const { cart, removeFromCart, updateCartItemQuantity } = useContext(CartContext);
     console.log(cart);
-    const { popularProducts } = useProducts();
+    const [popularProducts, setPopularProducts] = useState([]);
+
+    useEffect(() => {
+        const response = cartService.getCart();
+        setPopularProducts(response);
+    }, []);
+
     const DELIVERY_FEE = 15000;
 
     const [discountCode, setDiscountCode] = useState("");

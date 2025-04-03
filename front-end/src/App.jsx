@@ -16,6 +16,7 @@ const Payment = loadable(() => import('./pages/Payment'));
 const ListProduct = loadable(() => import("./pages/list_product"));
 const AboutUs = loadable(() => import("./pages/AboutUs"));
 const ProductDetail = loadable(() => import("./pages/ProductDetail/index.jsx"));
+const VerifyEmail = loadable(() => import("./pages/Auth/VerifyEmail"));
 
 //ADMIN
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
@@ -111,6 +112,14 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Regiter title="Đăng Kí" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/xac-nhan-email"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <VerifyEmail title="Xác Nhận Email" />
                             </Suspense>
                         }
                     />

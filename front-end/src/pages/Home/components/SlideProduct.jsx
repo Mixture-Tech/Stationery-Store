@@ -135,16 +135,16 @@ export default function SlideProduct({title, categories}) {
 }
 
 SlideProduct.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     categories: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
+        name: PropTypes.string,
         products: PropTypes.arrayOf(PropTypes.shape({
-            src: PropTypes.string.isRequired,     
-            name: PropTypes.string.isRequired, 
-            nums: PropTypes.number.isRequired,   
-            rating: PropTypes.number.isRequired,  
-            price: PropTypes.string.isRequired, 
-            discount: PropTypes.string.isRequired,   
-        })).isRequired
-    })).isRequired
+            src: PropTypes.string,     
+            name: PropTypes.string, 
+            nums: PropTypes.number,   
+            rating: PropTypes.number,  
+            price: PropTypes.string, 
+            discount: PropTypes.string,   
+        }))
+    }))
 };

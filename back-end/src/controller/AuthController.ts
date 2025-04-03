@@ -6,16 +6,14 @@ export class AuthController {
     static async register(req: Request, res: Response): Promise<void> {
         try {
             const userDTO: UserDTO = req.body;
-            const { user, token } = await new AuthService().register(userDTO);
+            const authService = await AuthService.getInstance();
+            const { user } = await authService.register(userDTO);
             
             res.status(201).json({
-                message: "Đăng ký thành công",
+                message: "Vui lòng kiểm tra email để xác thực tài khoản",
                 user: {
-                    id: user.id,
-                    email: user.email,
-                    role: user.role
-                },
-                token
+                    email: user.email
+                }
             });
         } catch (error: any) {
             res.status(400).json({ message: error.message });
@@ -31,12 +29,13 @@ export class AuthController {
                 return;
             }
 
-            const { user, token } = await new AuthService().login(email, password);
+            const authService = await AuthService.getInstance();
+            const { user, token } = await authService.login(email, password);
             
             res.status(200).json({
                 message: "Đăng nhập thành công",
                 user: {
-                    id: user.id,
+                    id_user: user.id_user,
                     email: user.email,
                     role: user.role
                 },
@@ -44,6 +43,30 @@ export class AuthController {
             });
         } catch (error: any) {
             res.status(401).json({ message: error.message });
+        }
+    }
+
+    static async verifyOTP(req: Request, res: Response): Promise<void> {
+        console.log("Request body:", req.body);
+        console.log("Request headers:", req.headers);
+        try {
+            const { email, otp } = req.body;
+            
+            if (!email || !otp) {
+                console.log("Thiếu dữ liệu:", { email, otp });
+                res.status(400).json({ message: "Email và mã OTP là bắt buộc" });
+                return;
+            }
+
+            const authService = await AuthService.getInstance();
+            await authService.verifyOTP(email, otp);
+            
+            res.status(200).json({
+                message: "Xác thực email thành công"
+            });
+        } catch (error: any) {
+            console.log("Lỗi:", error);
+            res.status(400).json({ message: error.message });
         }
     }
 
@@ -56,7 +79,8 @@ export class AuthController {
                 return;
             }
 
-            await new AuthService().logout(token);
+            const authService = await AuthService.getInstance();
+            await authService.logout(token);
             res.status(200).json({ message: "Đăng xuất thành công" });
         } catch (error: any) {
             res.status(401).json({ message: error.message });

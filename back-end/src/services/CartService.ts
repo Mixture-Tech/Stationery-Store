@@ -1,40 +1,94 @@
 import { AppDataSource } from "../config/database";
 import { Cart } from "../entity/Cart";
-import { CartDTO } from "../dto/CartDTO";
-import { Repository } from "typeorm";
+import { Product } from "../entity/Product";
+import { User } from "../entity/User";
 
 export class CartService {
-    private cartRepository: Repository<Cart>;
-    constructor() {
-        AppDataSource.then((dataSource) => {
-            this.cartRepository = dataSource.getRepository(Cart);
-        }).catch((error) => {
-            console.error("Lỗi khi kết nối DB:", error);
+    private static instance: CartService;
+    private cartRepository = (async () => (await AppDataSource).getRepository(Cart))();
+    private productRepository = (async () => (await AppDataSource).getRepository(Product))();
+    private userRepository = (async () => (await AppDataSource).getRepository(User))();
+
+    private constructor() {}
+
+    public static getInstance(): CartService {
+        if (!CartService.instance) {
+            CartService.instance = new CartService();
+        }
+        return CartService.instance;
+    }
+
+    async getCartByUserId(userId: number) {
+        const cartRepo = await this.cartRepository;
+        return await cartRepo.find({
+            where: { user: { id_user: userId } },
+            relations: ["product"]
         });
     }
 
-    async createCart(CartDTO: CartDTO): Promise<Cart> {
-        const cart = this.cartRepository.create(CartDTO);
-        return await this.cartRepository.save(cart);
+    async addToCart(userId: number, productId: number, quantity: number) {
+        const userRepo = await this.userRepository;
+        const productRepo = await this.productRepository;
+        const cartRepo = await this.cartRepository;
+
+        const user = await userRepo.findOne({ where: { id_user: userId } });
+        const product = await productRepo.findOne({ where: { id_product: productId } });
+
+        if (!user || !product) {
+            throw new Error("User hoặc Product không tồn tại");
+        }
+
+        let cartItem = await cartRepo.findOne({
+            where: {
+                user: { id_user: userId },
+                product: { id_product: productId }
+            }
+        });
+
+        if (cartItem) {
+            cartItem.quantity += quantity;
+        } else {
+            cartItem = cartRepo.create({
+                user,
+                product,
+                quantity
+            });
+        }
+
+        return await cartRepo.save(cartItem);
     }
 
-    async getCartById(id: number): Promise<Cart | null> {
-        return await this.cartRepository.findOneBy({id});
+    async updateCartItem(userId: number, productId: number, quantity: number) {
+        const cartRepo = await this.cartRepository;
+        const cartItem = await cartRepo.findOne({
+            where: {
+                user: { id_user: userId },
+                product: { id_product: productId }
+            }
+        });
+
+        if (!cartItem) {
+            throw new Error("Sản phẩm không tồn tại trong giỏ hàng");
+        }
+
+        cartItem.quantity = quantity;
+        return await cartRepo.save(cartItem);
     }
 
-    async getAllCarts(): Promise<Cart[]> {
-        return await this.cartRepository.find();
-    }
+    async removeFromCart(userId: number, productId: number) {
+        const cartRepo = await this.cartRepository;
+        const cartItem = await cartRepo.findOne({
+            where: {
+                user: { id_user: userId },
+                product: { id_product: productId }
+            }
+        });
 
-    async update(id: number, CartDTO: CartDTO): Promise<Cart | null> {
-        const cart = await this.cartRepository.findOneBy({id});
-        if (!cart) return null;
-        Object.assign(cart, CartDTO);
-        return await this.cartRepository.save(cart);
-    }
+        if (!cartItem) {
+            throw new Error("Sản phẩm không tồn tại trong giỏ hàng");
+        }
 
-    async delete(id: number): Promise<Boolean>{
-        const result  = await this.cartRepository.delete(id);
+        await cartRepo.remove(cartItem);
         return true;
     }
 }

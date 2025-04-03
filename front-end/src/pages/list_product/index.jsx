@@ -196,7 +196,7 @@ export default function ListProduct() {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-4 gap-4">
+                            <div className="grid grid-cols-5 gap-4">
                                 {currentProducts.map((product, index) => (
                                     <div key={index} className="border p-2 rounded-lg w-[220px] cursor-pointer"
                                          onClick={() => navigate('/chi-tiet-san-pham', { 
