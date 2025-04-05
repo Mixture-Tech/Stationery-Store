@@ -51,9 +51,9 @@ const ProductCard = ({ id, src, name, rating, price, discount, discountPrice, ca
     };
 
     return (
-        <div className="w-[190px] h-auto rounded-lg overflow-hidden hover:shadow-lg shadow-xl hover:border-2 border-black flex flex-col mb-1">
+        <div className="w-[145px] group h-auto rounded-lg overflow-hidden hover:shadow-2xl shadow-xl flex flex-col mb-1">
             <div className="relative flex-grow" onClick={handleProductClick}>  {/* Thêm onClick */}
-                <img src={src} alt="Product" className="w-full h-[120px] object-cover hover:scale-110" />
+                <img src={src} alt="Product" className="w-full h-[120px] object-cover group-hover:scale-110 transition duration-200" />
             </div>
             <div className="p-2 flex flex-col justify-between">
                 <div>

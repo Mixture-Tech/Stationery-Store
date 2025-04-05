@@ -20,9 +20,9 @@ const SuggestProduct = ({products}) => {
                     <span className="text-white text-2xl">👍</span> 
                 </div>
             </div>
-            <div className="flex flex-wrap p-2">
+            <div className="flex flex-wrap p-6">
                 {products.slice(0, displayCount).map((product, index) => (
-                    <div key={index} className="px-2 w-[22%] mb-4 shadow-lg">
+                    <div key={index} className="px-2 w-[20%] mb-2">
                         <ProductCard {...product}/>
                     </div>
                 ))}

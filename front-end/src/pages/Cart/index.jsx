@@ -9,12 +9,21 @@ import { CartContext } from "../../context/CartContext";
 import { getCart, updateCartItem, removeFromCart } from "../../services/apis/cartApi";
 import { toast } from "react-toastify";
 import { productApi } from '../../services/apis/ProductApi';
-const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemove }) {
+import { useNavigate } from "react-router-dom";
+
+const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemove, selectedItems, onSelectItem, selectAll, onSelectAll }) {
     return (
         <div className="flex flex-col w-full px-40 mt-10">
-            <TableHeader />
+            <TableHeader selectAll={selectAll} onSelectAll={onSelectAll} />
             {items.map((item) => (
-                <Item key={item.id_product} item={item} onQuantityChange={onQuantityChange} onRemove={onRemove} />
+                <Item 
+                    key={item.id_product} 
+                    item={item} 
+                    onQuantityChange={onQuantityChange} 
+                    onRemove={onRemove} 
+                    selected={selectedItems.includes(item.id_product)} 
+                    onSelectItem={onSelectItem} 
+                />
             ))}
         </div>
     );
@@ -32,16 +41,20 @@ Table.propTypes = {
     ).isRequired,
     onQuantityChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
+    selectedItems: PropTypes.arrayOf(PropTypes.number).isRequired,
+    onSelectItem: PropTypes.func.isRequired,
+    selectAll: PropTypes.bool.isRequired,
+    onSelectAll: PropTypes.func.isRequired,
 };
 
 const ItemCarousel = React.memo(function ItemCarousel({ image, title, price }) {
     const formattedPrice = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
     return (
-        <div className="flex flex-col items-start justify-center w-48">
+        <div className="flex flex-col items-start justify-center w-48 shadow p-2">
             <img className="object-cover w-48 h-48 rounded-lg" src={image} alt={title} />
             <p className="mt-2 mb-2 text-lg font-bold h-14 line-clamp-2 hover:line-clamp-none">{title}</p>
             <p className="my-3 text-sm text-Light-Apricot-500">{formattedPrice}</p>
-            <button className="w-full px-3 py-2 font-semibold text-white rounded-lg bg-Coral-Pink-500 hover:bg-Coral-Pink-300">
+            <button className="w-full px-3 py-2 font-semibold text-white rounded-lg bg-indigo-600 hover:bg-indigo-500">
                 Đặt hàng ngay
             </button>
         </div>
@@ -80,13 +93,13 @@ const Carousel = React.memo(function Carousel({ items }) {
                 onClick={prevSlide}
                 className="absolute w-10 h-10 p-2 transition-all transform -translate-y-1/2 rounded-full bg-Coral-Pink-500 left-15 top-1/2 hover:bg-opacity-75"
             >
-                <FontAwesomeIcon icon={faChevronLeft} className="w-6 h-6 text-white" />
+                <FontAwesomeIcon icon={faChevronLeft} className="w-6 h-6 text-indigo-600" />
             </button>
             <button
                 onClick={nextSlide}
                 className="absolute right-0 w-10 h-10 p-2 transition-all transform -translate-y-1/2 rounded-full bg-Coral-Pink-500 top-1/2 hover:bg-opacity-75"
             >
-                <FontAwesomeIcon icon={faChevronRight} className="w-6 h-6 text-white" />
+                <FontAwesomeIcon icon={faChevronRight} className="w-6 h-6 text-indigo-600" />
             </button>
             <div className="absolute flex flex-row w-full gap-2 transform -translate-x-1/2 bottom-2 left-[97%]">
                 {items.map((_, i) => (
@@ -114,10 +127,13 @@ Carousel.propTypes = {
 };
 
 export default function Cart() {
-    const { cart, removeFromCart, updateCartItemQuantity } = useContext(CartContext);
+    const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [popularProducts, setPopularProducts] = useState([]);
+    const [discountCode, setDiscountCode] = useState("");
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
 
     useEffect(() => {
         const fetchPopularProducts = async () => {
@@ -155,7 +171,6 @@ export default function Cart() {
     }, []);
 
     const DELIVERY_FEE = 15000;
-    const [discountCode, setDiscountCode] = useState("");
 
     useEffect(() => {
         const storedDiscountCode = sessionStorage.getItem("dicountCode");
@@ -196,21 +211,50 @@ export default function Cart() {
     const handleRemoveItem = useCallback(
         async (id_product) => {
             try {
+                // Gọi API để xóa sản phẩm khỏi database
                 await removeFromCart(id_product);
+                
+                // Cập nhật state local sau khi xóa thành công
                 setCartItems(prevItems => prevItems.filter(item => item.id_product !== id_product));
+                
+                // Cập nhật selectedItems để loại bỏ sản phẩm đã xóa
+                setSelectedItems(prev => prev.filter(id => id !== id_product));
+                
+                // Kiểm tra nếu không còn sản phẩm nào được chọn, tắt selectAll
+                if (selectedItems.length === 1 && selectedItems[0] === id_product) {
+                    setSelectAll(false);
+                }
+
                 toast.success("Xóa sản phẩm khỏi giỏ hàng thành công");
             } catch (error) {
                 toast.error("Không thể xóa sản phẩm");
                 console.error("Error removing item:", error);
             }
         },
-        []
+        [selectedItems]
     );
 
     const total = useMemo(() => {
         const discountedTotal = calculateOrderTotal - calculateOrderTotal * (discountCode ? 0.1 : 0);
         return discountedTotal + DELIVERY_FEE;
     }, [calculateOrderTotal, discountCode]);
+
+    const handleSelectAll = (checked) => {
+        setSelectAll(checked);
+        if (checked) {
+            setSelectedItems(cartItems.map(item => item.id_product));
+        } else {
+            setSelectedItems([]);
+        }
+    };
+
+    const handleSelectItem = (id_product, checked) => {
+        if (checked) {
+            setSelectedItems(prev => [...prev, id_product]);
+        } else {
+            setSelectedItems(prev => prev.filter(id => id !== id_product));
+        }
+    };
 
     if (loading) {
         return (
@@ -230,7 +274,15 @@ export default function Cart() {
                 </div>
             </div>
 
-            <Table items={cartItems} onQuantityChange={handleQuantityChange} onRemove={handleRemoveItem} />
+            <Table 
+                items={cartItems} 
+                onQuantityChange={handleQuantityChange} 
+                onRemove={handleRemoveItem}
+                selectedItems={selectedItems}
+                onSelectItem={handleSelectItem}
+                selectAll={selectAll}
+                onSelectAll={handleSelectAll}
+            />
 
             <div className="flex flex-row items-center justify-end w-full px-40 mt-4">
                 <div className="flex flex-row px-2 py-2 border-2 rounded-lg border-Coral-Pink-500">

@@ -198,7 +198,7 @@ export default function ListProduct() {
                         <>
                             <div className="grid grid-cols-5 gap-4">
                                 {currentProducts.map((product, index) => (
-                                    <div key={index} className="border p-2 rounded-lg w-[220px] cursor-pointer"
+                                    <div key={index} className="border p-2 rounded-lg w-[180px] cursor-pointer shadow  hover:shadow-2xl group"
                                          onClick={() => navigate('/chi-tiet-san-pham', { 
                                              state: { 
                                                  productId: product.id,
@@ -213,7 +213,7 @@ export default function ListProduct() {
                                         <img 
                                             src={product.image} 
                                             alt={product.title} 
-                                            className="w-full h-[160px]"
+                                            className="w-full h-[160px] transform scale-90 group-hover:scale-100 transition duration-200"
                                         />
                                         <h3 className="text-sm font-semibold mt-2">
                                             {product.title}
