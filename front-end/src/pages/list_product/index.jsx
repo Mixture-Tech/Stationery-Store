@@ -16,6 +16,7 @@ export default function ListProduct() {
     const navigate = useNavigate();
     const categoryName = location.state?.categoryName;
     const searchQuery = location.state?.searchQuery;
+    const [priceFilter, setPriceFilter] = useState(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -52,6 +53,24 @@ export default function ListProduct() {
                     setCategory(null); // Reset category khi xem tất cả sản phẩm
                     productsData = await productApi.getAllProducts();
                 }
+
+                // Lọc sản phẩm theo khoảng giá
+                if (priceFilter) {
+                    productsData = productsData.filter(product => {
+                        const productPrice = parseFloat(product.price.replace(/[^\d]/g, ''));
+                        switch (priceFilter) {
+                            case 'under40k':
+                                return productPrice < 40000;
+                            case '40kTo120k':
+                                return productPrice >= 40000 && productPrice <= 120000;
+                            case 'above120k':
+                                return productPrice > 120000;
+                            default:
+                                return true;
+                        }
+                    });
+                }
+
                 console.log(productsData);
                 const formattedProducts = productsData.map(product => ({
                     id: product.id_product,
@@ -78,7 +97,7 @@ export default function ListProduct() {
         };
 
         fetchProducts();
-    }, [categoryName, searchQuery]);
+    }, [categoryName, searchQuery, priceFilter]);
 
     // Tính toán sản phẩm cho trang hiện tại
     const indexOfLastProduct = currentPage * productsPerPage;
@@ -119,15 +138,15 @@ export default function ListProduct() {
                             <div className="space-y-2">
                                 {allCategories.map((cat) => (
                                     <label key={cat.id_category} className="flex items-center">
-                                        <input 
-                                            type="checkbox" 
+                                        <input
+                                            type="checkbox"
                                             className="mr-2"
                                             checked={category?.id_category === cat.id_category}
                                             onChange={() => {
                                                 setCategory(cat);
                                                 setCurrentPage(1); // Reset về trang 1 khi chọn category mới
-                                                navigate('/danh-sach-san-pham', { 
-                                                    state: { categoryName: cat.name_category } 
+                                                navigate('/danh-sach-san-pham', {
+                                                    state: {categoryName: cat.name_category}
                                                 });
                                             }}
                                         />
@@ -140,16 +159,57 @@ export default function ListProduct() {
                             <h3 className="font-medium mb-2">Khoảng Giá</h3>
                             <div className="space-y-2">
                                 <label className="flex items-center">
-                                    <input type="checkbox" className="mr-2"/>
+                                    <input
+                                        type="radio"
+                                        className="mr-2"
+                                        name="priceFilter"
+                                        checked={priceFilter === 'under40k'}
+                                        onChange={() => {
+                                            setPriceFilter('under40k');
+                                            setCurrentPage(1); // Reset về trang 1 khi chọn khoảng giá
+                                        }}
+                                    />
                                     Dưới 40.000đ
                                 </label>
                                 <label className="flex items-center">
-                                    <input type="checkbox" className="mr-2"/>
+                                    <input
+                                        type="radio"
+                                        className="mr-2"
+                                        name="priceFilter"
+                                        checked={priceFilter === '40kTo120k'}
+                                        onChange={() => {
+                                            setPriceFilter('40kTo120k');
+                                            setCurrentPage(1); // Reset về trang 1 khi chọn khoảng giá
+                                        }}
+                                    />
                                     40.000đ - 120.000đ
                                 </label>
                                 <label className="flex items-center">
-                                    <input type="checkbox" className="mr-2"/>
+                                    <input
+                                        type="radio"
+                                        className="mr-2"
+                                        name="priceFilter"
+                                        checked={priceFilter === 'above120k'}
+                                        onChange={() => {
+                                            setPriceFilter('above120k');
+                                            setCurrentPage(1); // Reset về trang 1 khi chọn khoảng giá
+                                        }}
+                                    />
                                     Trên 120.000đ
+                                </label>
+                                {/* Thêm radio button "Tất cả" để hiển thị toàn bộ sản phẩm */}
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        className="mr-2"
+                                        name="priceFilter"
+                                        checked={priceFilter === null}
+                                        onChange={() => {
+                                            setPriceFilter(null);
+                                            setCurrentPage(1); // Reset về trang 1 khi chọn "Tất cả"
+                                        }}
+                                    />
+                                    Tất cả
                                 </label>
                             </div>
                         </div>
@@ -175,12 +235,12 @@ export default function ListProduct() {
                         <div className="flex items-center gap-4">
                             <label>
                                 Sắp xếp theo:
-                                <select 
-                                    className="ml-2 p-1 border rounded" 
+                                <select
+                                    className="ml-2 p-1 border rounded"
                                     value={sortOption}
                                     onChange={(e) => setSortOption(e.target.value)}
                                 >
-                                    <option>Bán Chạy Tuần</option>
+                                    <option>Mặc định</option>
                                     <option>Giá Thấp Đến Cao</option>
                                     <option>Giá Cao Đến Thấp</option>
                                 </select>

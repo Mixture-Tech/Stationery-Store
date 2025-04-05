@@ -19,6 +19,8 @@ const ProductDetail = () => {
         return <div className="text-center py-8">Không tìm thấy sản phẩm</div>;
     }
 
+    console.log(product);
+
     return (
         <div className="max-w-full p-4 mt-14">
             <div className="flex flex-col md:flex-row gap-6">
@@ -109,6 +111,22 @@ const ProductDetail = () => {
                             <tr>
                                 <td className="py-2 font-semibold text-gray-600">Mã sản phẩm</td>
                                 <td className="py-2">{product.productId}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Tên sản phẩm</td>
+                                <td className="py-2">{product.productName}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Giá gốc</td>
+                                <td className="py-2">{product.productOldPrice}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Khuyến mãi</td>
+                                <td className="py-2">{product.productDiscount}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Giá khuyến mãi</td>
+                                <td className="py-2">{product.productPrice}</td>
                             </tr>
                             <tr>
                                 <td className="py-2 font-semibold text-gray-600">Danh mục</td>

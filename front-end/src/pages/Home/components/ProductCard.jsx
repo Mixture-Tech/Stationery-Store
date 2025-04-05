@@ -51,7 +51,7 @@ const ProductCard = ({ id, src, name, rating, price, discount, discountPrice, ca
     };
 
     return (
-        <div className="w-[140px] h-auto rounded-lg overflow-hidden hover:shadow-lg shadow-xl hover:border-2 border-black flex flex-col mb-1">
+        <div className="w-[140px] h-auto rounded-lg overflow-hidden hover:shadow-lg shadow-xl hover:border-2 border-black flex flex-col mb-1 cursor-pointer"> {/* Thêm class cursor-pointer */}
             <div className="relative flex-grow" onClick={handleProductClick}>  {/* Thêm onClick */}
                 <img src={src} alt="Product" className="w-full h-[120px] object-cover hover:scale-110" />
             </div>
@@ -65,7 +65,7 @@ const ProductCard = ({ id, src, name, rating, price, discount, discountPrice, ca
                 </div>
                 <div className="flex flex-col gap-2 justify-between items-start">
                     <span className="text-red-500 text-xs font-nunito font-semibold border-2 border-transparent">Giảm: {discount}%</span>
-                    <span className="text-black text-xs font-nunito font-thin border-2 border-transparent">{price}</span>
+                    <span className="text-black text-xs font-nunito font-thin border-2 border-transparent">{discountPrice} đ</span>
                 </div>
             </div>
         </div>
