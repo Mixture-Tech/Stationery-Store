@@ -22,8 +22,11 @@ export const productApi = {
     },
 
     // Xóa sản phẩm
-    deleteProduct: (id) => {
-        return axiosClient.delete(`/products/${id}`);
+    // deleteProduct: (id) => {
+    //     return axiosClient.delete(`/products/${id}`);
+    // },
+    hideProduct: (id) => {
+        return axiosClient.put(`/products/${id}/hide`);
     },
 
     // Lấy sản phẩm theo danh mục

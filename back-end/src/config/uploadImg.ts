@@ -2,14 +2,16 @@ import * as multer from 'multer';
 import * as path from 'path';
 import * as fs from 'fs';
 
-// Định nghĩa đường dẫn lưu ảnh
-const uploadPath = path.join(__dirname, '../assets/img/Products/');
+// Định nghĩa đường dẫn lưu ảnh (sử dụng path.resolve thay vì path.join)
+const uploadPath = path.resolve(__dirname, '../assets/img/Products/');
 
 // Khởi tạo thư mục lưu ảnh nếu chưa tồn tại
 const initializeUploadDirectory = (): void => {
     if (!fs.existsSync(uploadPath)) {
         fs.mkdirSync(uploadPath, { recursive: true });
         console.log(`Đã tạo thư mục: ${uploadPath}`);
+    } else {
+        console.log(`Thư mục đã tồn tại: ${uploadPath}`);
     }
 };
 
@@ -38,7 +40,7 @@ const upload = multer({
         if (extname && mimetype) {
             cb(null, true);
         } else {
-            cb(new Error('Chỉ chấp nhận file ảnh (jpeg, jpg, png, gif') as any, false);
+            cb(new Error('Chỉ chấp nhận file ảnh (jpeg, jpg, png, gif)') as any, false);
         }
     },
     limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn kích thước file (5MB)

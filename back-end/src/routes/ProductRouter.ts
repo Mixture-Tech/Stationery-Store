@@ -163,7 +163,7 @@ router.post("/products", productController.create);
  *       404:
  *         description: Sản phẩm không tồn tại
  */
-router.put("/products/:id", authenticateToken, productController.update);
+router.put("/products/:id", productController.update);
 
 /**
  * @swagger
@@ -185,5 +185,26 @@ router.put("/products/:id", authenticateToken, productController.update);
  *         description: Sản phẩm không tồn tại
  */
 router.delete("/products/:id", authenticateToken, productController.delete);
+
+/**
+ * @swagger
+ * /api/v1/products/{id}/hide:
+ *   put:
+ *     summary: Ẩn sản phẩm theo ID (xóa mềm)
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: ID của sản phẩm cần ẩn
+ *     responses:
+ *       200:
+ *         description: Thông báo ẩn sản phẩm thành công
+ *       404:
+ *         description: Sản phẩm không tồn tại
+ */
+router.put("/products/:id/hide", productController.hide);
 
 export default router;

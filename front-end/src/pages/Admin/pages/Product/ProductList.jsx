@@ -4,37 +4,49 @@ import ProductCard from "../../Components/CardProduct";
 import Pagination from "../../Components/Pagination";
 import { productApi } from "../../../../services/apis/productApi";
 import { ITEMS_PER_PAGE } from "../../../../util/constants";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function ProductList() {
+export default function ProductList({ onEditProduct }) { // Nhận onEditProduct từ props
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await productApi.getAllProducts();
-                setProducts(response);
-                setTotalPages(Math.ceil(response.length / ITEMS_PER_PAGE));
-            } catch (error) {
-                console.error('Lỗi khi lấy danh sách products:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchProducts();
     }, []);
 
-    // Phân trang dữ liệu sản phẩm
-    const getCurrentPageData = () => {
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-        const endIndex = startIndex + ITEMS_PER_PAGE;
-        return products.slice(startIndex, endIndex);
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await productApi.getAllProducts();
+            const formattedResponse = response.map(product => ({
+                ...product,
+                price: Number(product.price),
+                discount: Number(product.discount),
+                nums: Number(product.nums),
+                hide: Number(product.hide),
+            }));
+            setProducts(formattedResponse);
+            setTotalPages(Math.ceil(response.length / ITEMS_PER_PAGE));
+        } catch (error) {
+            console.error('Lỗi khi lấy danh sách products:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Xử lý thay đổi trang
+    const handleProductDelete = () => {
+        setProducts(products);
+    };
+
+    const getCurrentPageData = (productsData = products, page = currentPage) => {
+        const startIndex = (page - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        return productsData.slice(startIndex, endIndex);
+    };
+
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
@@ -42,7 +54,6 @@ export default function ProductList() {
     return (
         <div className="flex flex-col w-full">
             <SearchBox width="15%" />
-            {/* Hàng tiêu đề (Header) */}
             <div className="grid grid-cols-[0.3fr_2fr_0.7fr_0.4fr_0.6fr_0.4fr_0.6fr_0.9fr] gap-2 bg-gray-200 rounded-md place-items-center">
                 {[
                     { label: "ID" },
@@ -66,9 +77,11 @@ export default function ProductList() {
                 <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu sản phẩm</div>
             ) : (
                 <>
-                    <ProductCard products={getCurrentPageData()} />
-                    
-                    {/* Sử dụng component Pagination */}
+                    <ProductCard 
+                        products={getCurrentPageData()} 
+                        onProductDelete={handleProductDelete}
+                        onEditProduct={onEditProduct} // Truyền onEditProduct xuống CardProduct
+                    />
                     <Pagination 
                         currentPage={currentPage}
                         totalPages={totalPages}
@@ -77,6 +90,7 @@ export default function ProductList() {
                     />
                 </>
             )}
+            <ToastContainer />
         </div>
     );
 }

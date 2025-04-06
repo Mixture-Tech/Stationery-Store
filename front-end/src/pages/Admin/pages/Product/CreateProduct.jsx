@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faImage, faUpload } from '@fortawesome/free-solid-svg-icons';
@@ -6,28 +7,30 @@ import { categoryApi } from "../../../../services/apis/categoryApi";
 import { productApi } from "../../../../services/apis/productApi";
 
 export default function CreateProduct() {
+    const navigate = useNavigate();
     const [productData, setProductData] = useState({
         name: '',
         price: '',
         discount: 0,
         hide: 0,
         nums: '',
-        image: '', // Đây sẽ là URL của ảnh sau khi upload
+        image: '',
         id_category: ''
     });
     const [previewImage, setPreviewImage] = useState(null);
     const [categories, setCategories] = useState([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [imageFile, setImageFile] = useState(null); // Lưu file ảnh tạm thời
+    const [imageFile, setImageFile] = useState(null);
 
+    // Fetch danh mục sản phẩm
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const response = await categoryApi.getAll();
                 setCategories(response);
             } catch (error) {
-                console.error('Error fetching categories:', error);
+                console.error('Lỗi khi tải danh mục sản phẩm:', error);
                 toast.error('Không thể tải danh mục sản phẩm');
             } finally {
                 setLoadingCategories(false);
@@ -41,15 +44,15 @@ export default function CreateProduct() {
         const { name, value } = e.target;
         setProductData(prev => ({
             ...prev,
-            [name]: name === "hide" ? Number(value) : value
+            [name]: name === "hide" ? Number(value) : 
+                    (name === "price" || name === "nums" || name === "discount") ? Number(value) : value
         }));
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setImageFile(file); // Lưu file để upload sau
-            // Tạo URL để preview ảnh
+            setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewImage(reader.result);
@@ -61,52 +64,43 @@ export default function CreateProduct() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-    
+
         try {
             let imageUrl = '';
-    
-            // Upload ảnh nếu có file được chọn
             if (imageFile) {
-                console.log('File ảnh:', imageFile); // Thêm log để kiểm tra
                 const uploadResponse = await productApi.uploadImage(imageFile);
                 imageUrl = uploadResponse.imageUrl;
-                console.log('Đường dẫn ảnh:', imageUrl);
-            } else {
-                console.log('Không có file ảnh được chọn');
             }
-    
-            // Cập nhật productData với URL của ảnh
+
             const finalProductData = {
                 ...productData,
                 image: imageUrl || '',
             };
-    
+
             await productApi.createProduct(finalProductData);
-    
             toast.success('Tạo sản phẩm thành công!');
-            setProductData({
-                name: '',
-                price: '',
-                discount: 0,
-                hide: 0,
-                nums: '',
-                image: '',
-                id_category: ''
-            });
-            setPreviewImage(null);
-            setImageFile(null);
+            setTimeout(() => {
+                navigate('/trang-chu-admin'); // Điều hướng về dashboard admin
+            }, 1500);
         } catch (error) {
             toast.error('Tạo sản phẩm thất bại!');
-            console.log('Error creating product:', error);
+            console.error('Lỗi khi tạo sản phẩm:', error);
         } finally {
             setLoading(false);
         }
     };
 
+    if (loadingCategories) {
+        return (
+            <div className="w-full flex justify-center items-center p-8">
+                <div className="text-lg font-medium">Đang tải dữ liệu...</div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full max-w-2xl mx-auto p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Upload ảnh */}
                 <div className="flex flex-col items-center space-y-4">
                     <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
                         {previewImage ? (
@@ -134,27 +128,20 @@ export default function CreateProduct() {
                     </label>
                 </div>
 
-                {/* Tên sản phẩm */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tên sản phẩm
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tên sản phẩm</label>
                     <input
                         type="text"
                         name="name"
-                        id="name"
                         value={productData.name}
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-blue-500"
                         required
                     />
                 </div>
-                
-                {/* Danh mục sản phẩm */}
+
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="id_category">
-                        Danh mục sản phẩm
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="id_category">Danh mục sản phẩm</label>
                     <select
                         id="id_category"
                         name="id_category"
@@ -164,26 +151,18 @@ export default function CreateProduct() {
                         required
                     >
                         <option value="">Chọn danh mục</option>
-                        {loadingCategories ? (
-                            <option disabled>Đang tải...</option>
-                        ) : (
-                            categories.map(category => (
-                                <option key={category.id_category} value={category.id_category}>
-                                    {category.name_category}
-                                </option>
-                            ))
-                        )}
+                        {categories.map(category => (
+                            <option key={category.id_category} value={category.id_category}>
+                                {category.name_category}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
-                {/* Giá */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Giá
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Giá</label>
                     <input
                         type="number"
-                        id="price"
                         name="price"
                         value={productData.price}
                         onChange={handleInputChange}
@@ -192,11 +171,8 @@ export default function CreateProduct() {
                     />
                 </div>
 
-                {/* Giảm giá */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                       Giảm giá
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Giảm giá</label>
                     <input
                         type="number"
                         name="discount"
@@ -207,15 +183,11 @@ export default function CreateProduct() {
                     />
                 </div>
 
-                {/* Hàng tồn */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Hàng tồn
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Hàng tồn</label>
                     <input
                         type="number"
                         name="nums"
-                        id="nums"
                         value={productData.nums}
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-blue-500"
@@ -223,14 +195,10 @@ export default function CreateProduct() {
                     />
                 </div>
 
-                {/* Trạng thái ẩn/hiện */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Trạng thái
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
                     <select
                         name="hide"
-                        id="hide"
                         value={productData.hide}
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-blue-500"
@@ -240,14 +208,13 @@ export default function CreateProduct() {
                     </select>
                 </div>
 
-                {/* Nút submit */}
-                <div className="flex justify-center">
+                <div className="flex justify-center space-x-4">
                     <button
                         type="submit"
                         className="bg-navy-blue-500 text-white px-6 py-2 rounded-md hover:bg-navy-blue-600 transition-colors duration-300"
                         disabled={loading}
                     >
-                        {loading ? 'Đang thêm...' : 'Thêm sản phẩm'}
+                        {loading ? 'Đang tạo...' : 'Tạo sản phẩm'}
                     </button>
                 </div>
             </form>

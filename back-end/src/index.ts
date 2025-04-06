@@ -4,6 +4,7 @@ import * as swaggerUi from "swagger-ui-express";
 import * as swaggerJsdoc from "swagger-jsdoc";
 import swaggerOptions from "./config/swagger";
 import userRouter from "./routes/userRouter";
+import * as path from "path";
 import productRouter from "./routes/ProductRouter";
 import categoryRouter from "./routes/CategoryRouter";
 import categoryParentRouter from "./routes/CategoryParentRouter";
@@ -23,12 +24,19 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Đảm bảo đường dẫn tệp tĩnh chính xác
+const assetsPath = path.resolve(__dirname, '../src/assets');
+console.log("Đường dẫn thư mục assets:", assetsPath);
+
+// Cấu hình để phục vụ file tĩnh (ảnh) với logging
+app.use('/assets', (req, res, next) => {
+    console.log(`Yêu cầu tệp tĩnh: ${req.url}`);
+    next();
+}, express.static(assetsPath));
+
 // Swagger
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Cấu hình để phục vụ file tĩnh (ảnh)
-app.use('/assets', express.static('assets'));
 
 // Routes with /v1 prefix
 app.use("/api/v1", userRouter);
@@ -43,7 +51,8 @@ AppDataSource.then((dataSource) => {
     console.log("✅ Data Source has been initialized!");
     app.listen(PORT, () => {
         console.log(`✅ Server is running on port ${PORT}`);
+        console.log(`✅ Assets được phục vụ từ: ${assetsPath}`);
     });
 }).catch((error: Error) => {
     console.log("❌ Error during Data Source initialization:", error);
-}); 
+});

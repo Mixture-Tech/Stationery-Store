@@ -111,4 +111,18 @@ export class ProductController {
             res.status(500).json({ message: "Lỗi khi tìm kiếm sản phẩm theo tên", error });
         }
     };
+
+    hide = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id = parseInt(req.params.id);
+            const result = await this.productService.hideProduct(id);
+            if (!result) {
+                res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+                return;
+            }
+            res.json({ message: "Đã ẩn sản phẩm thành công" });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi ẩn sản phẩm", error });
+        }
+    };
 }

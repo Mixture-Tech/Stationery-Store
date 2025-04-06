@@ -5,6 +5,7 @@ import SubSidebar from "../Components/SubSidebar";
 import CardUser from "../Components/CardUser";
 import CardProduct from "../Components/CardProduct";
 import CreateProduct from "./Product/CreateProduct.jsx";
+import EditProduct from "./Product/EditProduct.jsx"; // Thêm import EditProduct
 import CreateCategory from "./Category/CreateCategory.jsx";
 import CreateUser from "../Components/CreateUser";
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
@@ -16,61 +17,22 @@ import SearchBox from "../Components/SearchBox";
 import ProductList from "./Product/ProductList.jsx"; 
 import CategoryList from "./Category/CategoryList.jsx";
 
-export default function DashBoard (){
+export default function DashBoard() {
     const [menu, setMenu] = useState(0);
-    // const [isFocused, setIsFocused] = useState(false);
     const [activeTab, setActiveTab] = useState('viewAll');
-    // const [categories, setCategories] = useState([]);
-    // const [products, setProducts] = useState([]);
-    // const [users, setUsers] = useState([]);
-    // const [loading, setLoading] = useState(true);
-    // const [loadingProducts, setLoadingProducts] = useState(true);
-    // const [loadingUsers, setLoadingUsers] = useState(true);
-
-    // useEffect(() => {
-    //     const fetchCategories = async () => {
-    //         try {
-    //             const response = await categoryApi.getAll();
-    //             setCategories(response);
-    //         } catch (error) {
-    //             console.error('Lỗi khi lấy danh sách categories:', error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     const fetchProducts = async () => {
-    //         try {
-    //             const response = await productApi.getAllProducts();
-    //             setProducts(response);
-    //         } catch (error) {
-    //             console.error('Lỗi khi lấy danh sách products:', error);
-    //         } finally {
-    //             setLoadingProducts(false);
-    //         }
-    //     };
-
-    //     const fetchUsers = async () => {
-    //         try {
-    //             const response = await userApi.getAllUsers();
-    //             setUsers(response);
-    //         } catch (error) {
-    //             console.error('Lỗi khi lấy danh sách users:', error);
-    //         } finally {
-    //             setLoadingUsers(false);
-    //         }
-    //     };
-
-    //     fetchCategories();
-    //     fetchProducts();
-    //     fetchUsers();
-        
-    // }, []);
+    const [selectedProductId, setSelectedProductId] = useState(null); // Thêm state để lưu productId
 
     // Hàm xử lý khi click vào menu
     const handleMenuChange = (newMenu) => {
         setMenu(newMenu);
         setActiveTab('viewAll'); // Reset về viewAll khi chuyển menu
+        setSelectedProductId(null); // Reset productId khi chuyển menu
+    };
+
+    // Hàm xử lý khi chọn chỉnh sửa sản phẩm
+    const handleEditProduct = (productId) => {
+        setActiveTab('edit');
+        setSelectedProductId(productId);
     };
 
     return (
@@ -95,7 +57,9 @@ export default function DashBoard (){
                             {menu === 1 && activeTab === 'viewAll' && <CategoryList />}
 
                             {/* Product Management */}
-                            {menu === 2 && activeTab === 'viewAll' && <ProductList />}
+                            {menu === 2 && activeTab === 'viewAll' && (
+                                <ProductList onEditProduct={handleEditProduct} /> // Truyền hàm handleEditProduct
+                            )}
 
                             {/* Create Forms */}
                             {activeTab === 'create' && (
@@ -110,10 +74,18 @@ export default function DashBoard (){
                                     {menu === 2 && <CreateProduct />}
                                 </div>
                             )}
+
+                            {/* Edit Product */}
+                            {menu === 2 && activeTab === 'edit' && selectedProductId && (
+                                <div className="flex flex-col w-full">
+                                    <h2 className="text-2xl font-bold mb-4">Chỉnh sửa sản phẩm</h2>
+                                    <EditProduct productId={selectedProductId} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
         </main>
     );
-};
+}

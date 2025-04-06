@@ -4,6 +4,7 @@ import { BaseService } from "./BaseService";
 import { ProductDTO } from "../dto/ProductDTO";
 import { Request } from 'express';
 import { uploadConfig } from "../config/uploadImg";
+import { Category } from "../entity/Category";
 
 
 export class ProductService extends BaseService<Product, ProductDTO> {
@@ -48,11 +49,54 @@ export class ProductService extends BaseService<Product, ProductDTO> {
     }
 
     async updateProduct(id_product: number, productDTO: ProductDTO): Promise<Product | null> {
-        return this.update(id_product, productDTO);
+        try {
+            // Tìm entity theo id_product
+            const entity = await this.repository.findOneBy({ id_product });
+            if (!entity) {
+                console.log(`Không tìm thấy sản phẩm với id_product: ${id_product}`);
+                return null;
+            }
+    
+            // Chuẩn hóa DTO để khớp với entity Product
+            const sanitizedDTO = {
+                name: productDTO.name ?? entity.name,
+                nums: productDTO.nums !== undefined ? Number(productDTO.nums) : entity.nums,
+                price: productDTO.price !== undefined ? Number(productDTO.price) : entity.price,
+                detail: productDTO.detail ?? entity.detail,
+                brand: productDTO.brand ?? entity.brand,
+                link: productDTO.link ?? entity.link,
+                discount_price: productDTO.discount_price !== undefined ? (Number(productDTO.price) - (Number(productDTO.price) * (Number(productDTO.discount) / 100))) : entity.discount_price,
+                description: productDTO.description ?? entity.description,
+                image: productDTO.image ?? entity.image,
+                discount: productDTO.discount !== undefined ? Number(productDTO.discount) : entity.discount,
+                hide: productDTO.hide !== undefined ? (Number(productDTO.hide) === 1 || productDTO.hide === true) : (Number(productDTO.hide) === 0 || productDTO.hide === false),
+                id_category: productDTO.category && productDTO.category.id_category 
+                    ? Number(productDTO.category.id_category) 
+                    : entity.id_category, // Sử dụng id_category hiện tại nếu category không tồn tại
+            };
+    
+            console.log('Sanitized DTO:', sanitizedDTO); // Log để debug
+    
+            // Gán dữ liệu từ DTO vào entity
+            Object.assign(entity, sanitizedDTO);
+    
+            // Lưu entity đã cập nhật
+            const updatedEntity = await this.repository.save(entity);
+            console.log('Entity sau khi cập nhật:', updatedEntity);
+    
+            return updatedEntity;
+        } catch (error) {
+            console.error('Lỗi trong ProductService.updateProduct:', error);
+            throw error; // Ném lỗi để ProductController xử lý
+        }
     }
 
     async deleteProduct(id_product: number): Promise<boolean> {
         return this.delete(id_product);
+    }
+
+    async hideProduct(id_product: number): Promise<any> {
+        return this.repository.update(id_product, { hide: true });
     }
 
     async uploadImage(req: Request): Promise<string> {
