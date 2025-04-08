@@ -1,18 +1,30 @@
-const TableHeader = () => (
-    <div className="flex items-center justify-between p-4 mb-3 bg-white border-b-2 rounded-lg shadow">
-        <div className="flex items-center space-x-4">
-            <div className="flex justify-center w-8">
-                <input type="checkbox" className="w-4 h-4" />
+import PropTypes from "prop-types";
+
+const TableHeader = ({ selectAll, onSelectAll }) => {
+    return (
+        <div className="flex items-center justify-between w-full p-4 mb-4 bg-white border-2 rounded-lg shadow">
+            <div className="flex items-center space-x-4">
+                <input 
+                    type="checkbox" 
+                    className="w-4 h-4" 
+                    checked={selectAll}
+                    onChange={(e) => onSelectAll(e.target.checked)}
+                />
+                <span className="font-semibold">Sản phẩm</span>
             </div>
-            <h3 className="text-lg font-semibold">Sản phẩm</h3>
+            <div className="flex items-center space-x-16">
+                <span className="font-semibold">Đơn giá</span>
+                <span className="font-semibold">Số lượng</span>
+                <span className="font-semibold">Thành tiền</span>
+                <span className="font-semibold">Thao tác</span>
+            </div>
         </div>
-        <div className="flex items-center space-x-8">
-            <span className="w-24 font-semibold text-center">Giá</span>
-            <span className="w-24 font-semibold text-center">Số lượng</span>
-            <span className="w-24 font-semibold text-center">Tổng tiền</span>
-            <span className="w-24 font-semibold text-center"></span>
-        </div>
-    </div>
-);
+    );
+};
+
+TableHeader.propTypes = {
+    selectAll: PropTypes.bool.isRequired,
+    onSelectAll: PropTypes.func.isRequired,
+};
 
 export default TableHeader;

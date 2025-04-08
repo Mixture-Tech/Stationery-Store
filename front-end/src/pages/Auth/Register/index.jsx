@@ -16,20 +16,20 @@ export default function FormRegister(props) {
     const [errors, setErrors] = useState({});
     const [errorString, setErrorString] = useState("");
     const [loading, setLoading] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
 
     const title = props.title;
     useEffect(() => {
         document.title = title ? `${title}` : "Page Does Not Exist";
     }, [title]);
 
- const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const validationErrors = {};
         validationErrors.email = validateEmail(email);
         if (validationErrors.email === "") delete validationErrors.email;
         validationErrors.password = validatePassword(password);
-        validationErrors.password = validatePassword(rePassword);
         if (validationErrors.password === "") delete validationErrors.password;
         validationErrors.rePassword = validateRePassword(password, rePassword); 
         if(validationErrors.rePassword === "") delete validationErrors.rePassword;
@@ -42,11 +42,17 @@ export default function FormRegister(props) {
         } else {
             try {
                 setLoading(true);
-                const response = await registerAxios({email, password, confirm});
-                toast.success(response.message, {
-                    onClose: () => navigate('/notify?type=verifyEmail'),
-                    autoClose: 2000
-                });
+                const response = await registerAxios({email, password, rePassword});
+                if (response) {
+                    toast.success("Tài khoản đã được tạo thành công! Vui lòng kiểm tra email để xác thực tài khoản.", {
+                        position: "top-center",
+                        autoClose: 5000,
+                    });
+                    setIsNavigating(true);
+                    setTimeout(() => {
+                        navigate("/xac-nhan-email");
+                    }, 5000);
+                }
             } catch (err) {
                 toast.error(err.message);
                 setErrorString(err.message)
@@ -59,6 +65,15 @@ export default function FormRegister(props) {
 
     return (
         <div style={{ backgroundImage: "linear-gradient(-45deg, #3674B5, #578FCA, #A1E3F9, #BFDBFE)" }} className="animate-gradient-move h-screen overflow-hidden flex items-center justify-center my-2 mx-5 md:mx-0 md:my-0">
+            {isNavigating && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                        <p className="text-lg font-semibold text-gray-700">Đang chuyển hướng...</p>
+                        <p className="text-sm text-gray-500 mt-2">Vui lòng đợi trong giây lát</p>
+                    </div>
+                </div>
+            )}
             <div className="absolute start-36 top-12 animate-zoomIn">
                 <img src="https://placehold.co/100x100" alt="Logo" className="w-20 "/>
             </div>

@@ -2,10 +2,12 @@ import Cookies from "js-cookie";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { StorageKeys } from "../services/key/keys";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Header/components/Navbar";
 
 export default function BasicLayout() {
+    const location = useLocation();
+    
     // Check if the user is logged in and on the login or signup page
     if (
         Cookies.get(StorageKeys.ACCESS_TOKEN) &&
@@ -15,7 +17,7 @@ export default function BasicLayout() {
     }
 
     // Conditional rendering of Header or Navbar
-    const isHomePage = location.pathname === "/trang-chu" || location.pathname === "/";
+    const isHomePage = location.pathname === "/" || location.pathname === "/trang-chu";
 
     return (
         <div className="flex flex-col w-full min-h-screen">

@@ -5,11 +5,13 @@ import { useState, useEffect } from 'react';
 import {faAngleDown} from '@fortawesome/free-solid-svg-icons';
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faSignOutAlt, faShoppingBag } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from 'prop-types';
 import { CustomTransparentButton } from "../../Forms/Button/customColor";
 import { categoryParentApi } from '../../../services/apis/CategoryParentApi';
 import { categoryApi } from '../../../services/apis/categoryApi';
 import { useNavigate } from 'react-router-dom';
+import { getCurrentUser } from '../../../services/apis/auth';
 
 const DropdownMenu = ({ title, data, navigate }) => {
     const flattenData = (data) => {
@@ -161,6 +163,8 @@ export default function Navbar() {
     const [categories, setCategories] = useState([]);
     const [categoryData, setCategoryData] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
+    const [user, setUser] = useState(null);
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
     const navigate = useNavigate();
 
     const handleSearch = (e) => {
@@ -219,6 +223,37 @@ export default function Navbar() {
         fetchData();
     }, []);
 
+    // Lấy thông tin user từ localStorage khi component mount
+    useEffect(() => {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+
+    // Lắng nghe sự kiện storage để cập nhật user khi đăng nhập/đăng xuất
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                setUser(JSON.parse(userData));
+            } else {
+                setUser(null);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
+    const handleLogout = () => {
+        // Xóa token và thông tin user
+        document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        localStorage.removeItem('user');
+        setUser(null);
+        navigate('/dang-nhap');
+    };
+
     return (
         <nav id="header" className="fixed top-0 z-30 w-full bg-transparent ">
             <div className="w-full h-[60px] bg-blue-800 shadow-lg flex items-center justify-between">
@@ -262,11 +297,66 @@ export default function Navbar() {
                             />
                         </form>
                     </div>
-                    <div className="relative justify-center items-center flex flex-row">                 
-                        <a href="/dang-nhap" className="hover:bg-slate-500 
-                                            text-white font-bold text-xs py-2 px-4 rounded-xl">
-                            Đăng Nhập
-                        </a>
+                    <div className="relative justify-center items-center flex flex-row space-x-4">                 
+                        {user ? (
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                                    className="flex items-center focus:outline-none"
+                                >
+                                    <div className="w-14 h-8 rounded-[80px] hover:bg-[#445672] flex items-center justify-center overflow-hidden hover:scale-110 transition-all duration-300">
+                                        {user.avatar ? (
+                                            <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <FontAwesomeIcon icon={faUser} className="w-4 h-4 text-[#1976d2]" />
+                                        )}
+                                    </div>
+                                </button>
+                                
+                                {showUserDropdown && (
+                                    <div className="absolute left-0 right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50">
+                                        <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+                                            {user.email}
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/trang-ca-nhan');
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                                        >
+                                            <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+                                            <span>Trang cá nhân</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/gio-hang');
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                                        >
+                                            <FontAwesomeIcon icon={faShoppingBag} className="w-4 h-4" />
+                                            <span>Giỏ hàng</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                handleLogout();
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center space-x-2"
+                                        >
+                                            <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4" />
+                                            <span>Đăng xuất</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <a href="/dang-nhap" className="hover:bg-slate-500 text-white font-bold text-xs py-2 px-4 rounded-xl">
+                                Đăng Nhập
+                            </a>
+                        )}
+                        
                         <CustomTransparentButton>
                             <a href="/gio-hang">
                                 <FontAwesomeIcon icon={faCartShopping} size="lg" />

@@ -6,14 +6,24 @@ import TableHeader from "./components/TableHeader";
 import Item from "./components/Item";
 import OrderSummary from "./components/OrderSummary";
 import { CartContext } from "../../context/CartContext";
-import useProducts from "../../hooks/useProduct";
+import { getCart, updateCartItem, removeFromCart } from "../../services/apis/cartApi";
+import { toast } from "react-toastify";
+import { productApi } from '../../services/apis/ProductApi';
+import { useNavigate } from "react-router-dom";
 
-const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemove }) {
+const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemove, selectedItems, onSelectItem, selectAll, onSelectAll }) {
     return (
         <div className="flex flex-col w-full px-40 mt-10">
-            <TableHeader />
+            <TableHeader selectAll={selectAll} onSelectAll={onSelectAll} />
             {items.map((item) => (
-                <Item key={item.id} item={item} onQuantityChange={onQuantityChange} onRemove={onRemove} />
+                <Item 
+                    key={item.id_product} 
+                    item={item} 
+                    onQuantityChange={onQuantityChange} 
+                    onRemove={onRemove} 
+                    selected={selectedItems.includes(item.id_product)} 
+                    onSelectItem={onSelectItem} 
+                />
             ))}
         </div>
     );
@@ -22,26 +32,29 @@ const Table = React.memo(function ItemCarouse({ items, onQuantityChange, onRemov
 Table.propTypes = {
     items: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.number.isRequired,
-            imagePath: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            description: PropTypes.string.isRequired,
-            price: PropTypes.number.isRequired,
+            id_product: PropTypes.number.isRequired,
+            productImage: PropTypes.string.isRequired,
+            productName: PropTypes.string.isRequired,
+            productPrice: PropTypes.number.isRequired,
             quantity: PropTypes.number.isRequired,
         }),
     ).isRequired,
     onQuantityChange: PropTypes.func.isRequired,
     onRemove: PropTypes.func.isRequired,
+    selectedItems: PropTypes.arrayOf(PropTypes.number).isRequired,
+    onSelectItem: PropTypes.func.isRequired,
+    selectAll: PropTypes.bool.isRequired,
+    onSelectAll: PropTypes.func.isRequired,
 };
 
 const ItemCarousel = React.memo(function ItemCarousel({ image, title, price }) {
     const formattedPrice = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
     return (
-        <div className="flex flex-col items-start justify-center w-48">
+        <div className="flex flex-col items-start justify-center w-48 shadow p-2">
             <img className="object-cover w-48 h-48 rounded-lg" src={image} alt={title} />
             <p className="mt-2 mb-2 text-lg font-bold h-14 line-clamp-2 hover:line-clamp-none">{title}</p>
             <p className="my-3 text-sm text-Light-Apricot-500">{formattedPrice}</p>
-            <button className="w-full px-3 py-2 font-semibold text-white rounded-lg bg-Coral-Pink-500 hover:bg-Coral-Pink-300">
+            <button className="w-full px-3 py-2 font-semibold text-white rounded-lg bg-indigo-600 hover:bg-indigo-500">
                 Đặt hàng ngay
             </button>
         </div>
@@ -73,20 +86,20 @@ const Carousel = React.memo(function Carousel({ items }) {
         <div className="container relative w-full mx-auto">
             <div className="flex flex-row items-center justify-center w-full gap-4 py-10 overflow-hidden rounded-lg">
                 {visibleItems.map((item, index) => (
-                    <ItemCarousel key={index} image={item.imagePath} title={item.title} price={item.price} />
+                    <ItemCarousel key={index} image={item.image} title={item.name} price={item.price} />
                 ))}
             </div>
             <button
                 onClick={prevSlide}
                 className="absolute w-10 h-10 p-2 transition-all transform -translate-y-1/2 rounded-full bg-Coral-Pink-500 left-15 top-1/2 hover:bg-opacity-75"
             >
-                <FontAwesomeIcon icon={faChevronLeft} className="w-6 h-6 text-white" />
+                <FontAwesomeIcon icon={faChevronLeft} className="w-6 h-6 text-indigo-600" />
             </button>
             <button
                 onClick={nextSlide}
                 className="absolute right-0 w-10 h-10 p-2 transition-all transform -translate-y-1/2 rounded-full bg-Coral-Pink-500 top-1/2 hover:bg-opacity-75"
             >
-                <FontAwesomeIcon icon={faChevronRight} className="w-6 h-6 text-white" />
+                <FontAwesomeIcon icon={faChevronRight} className="w-6 h-6 text-indigo-600" />
             </button>
             <div className="absolute flex flex-row w-full gap-2 transform -translate-x-1/2 bottom-2 left-[97%]">
                 {items.map((_, i) => (
@@ -106,20 +119,58 @@ const Carousel = React.memo(function Carousel({ items }) {
 Carousel.propTypes = {
     items: PropTypes.arrayOf(
         PropTypes.shape({
-            image: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            price: PropTypes.string.isRequired,
+            productImage: PropTypes.string.isRequired,
+            productName: PropTypes.string.isRequired,
+            productPrice: PropTypes.string.isRequired,
         }),
     ).isRequired,
 };
 
 export default function Cart() {
-    const { cart, removeFromCart, updateCartItemQuantity } = useContext(CartContext);
-    console.log(cart);
-    const { popularProducts } = useProducts();
-    const DELIVERY_FEE = 15000;
-
+    const navigate = useNavigate();
+    const [cartItems, setCartItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [popularProducts, setPopularProducts] = useState([]);
     const [discountCode, setDiscountCode] = useState("");
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+
+    useEffect(() => {
+        const fetchPopularProducts = async () => {
+            try {
+                const response = await productApi.getAllProducts();
+                const allProducts = response;
+                // Lấy ngẫu nhiên 5 sản phẩm
+                const randomProducts = allProducts
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 5);
+                setPopularProducts(randomProducts);
+            } catch (error) {
+                console.error("Error fetching popular products:", error);
+            }
+        };
+
+        fetchPopularProducts();
+    }, []);
+
+    useEffect(() => {
+        const fetchCart = async () => {
+            try {
+                setLoading(true);
+                const response = await getCart();
+                setCartItems(response);
+            } catch (error) {
+                toast.error("Không thể tải dữ liệu giỏ hàng");
+                console.error("Error fetching cart:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCart();
+    }, []);
+
+    const DELIVERY_FEE = 15000;
 
     useEffect(() => {
         const storedDiscountCode = sessionStorage.getItem("dicountCode");
@@ -135,29 +186,89 @@ export default function Cart() {
     };
 
     const calculateOrderTotal = useMemo(() => {
-        return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-    }, [cart]);
+        return cartItems.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    }, [cartItems]);
+
+    const calculateSelectedTotal = useMemo(() => {
+        return cartItems
+            .filter(item => selectedItems.includes(item.id_product))
+            .reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    }, [cartItems, selectedItems]);
 
     const handleQuantityChange = useCallback(
-        (id, newQuantity) => {
+        async (id_product, newQuantity) => {
             if (newQuantity < 1) return;
-            updateCartItemQuantity(id, newQuantity);
-            sessionStorage.setItem(`cart-item-${id}-quantity`, newQuantity);
+            try {
+                await updateCartItem(id_product, newQuantity);
+                setCartItems(prevItems =>
+                    prevItems.map(item =>
+                        item.id_product === id_product ? { ...item, quantity: newQuantity } : item
+                    )
+                );
+                toast.success("Cập nhật số lượng thành công");
+            } catch (error) {
+                toast.error("Không thể cập nhật số lượng");
+                console.error("Error updating quantity:", error);
+            }
         },
-        [updateCartItemQuantity],
+        []
     );
 
     const handleRemoveItem = useCallback(
-        (id) => {
-            removeFromCart(id);
+        async (id_product) => {
+            try {
+                // Gọi API để xóa sản phẩm khỏi database
+                await removeFromCart(id_product);
+                
+                // Cập nhật state local sau khi xóa thành công
+                setCartItems(prevItems => prevItems.filter(item => item.id_product !== id_product));
+                
+                // Cập nhật selectedItems để loại bỏ sản phẩm đã xóa
+                setSelectedItems(prev => prev.filter(id => id !== id_product));
+                
+                // Kiểm tra nếu không còn sản phẩm nào được chọn, tắt selectAll
+                if (selectedItems.length === 1 && selectedItems[0] === id_product) {
+                    setSelectAll(false);
+                }
+
+                toast.success("Xóa sản phẩm khỏi giỏ hàng thành công");
+            } catch (error) {
+                toast.error("Không thể xóa sản phẩm");
+                console.error("Error removing item:", error);
+            }
         },
-        [removeFromCart],
+        [selectedItems]
     );
 
     const total = useMemo(() => {
         const discountedTotal = calculateOrderTotal - calculateOrderTotal * (discountCode ? 0.1 : 0);
         return discountedTotal + DELIVERY_FEE;
     }, [calculateOrderTotal, discountCode]);
+
+    const handleSelectAll = (checked) => {
+        setSelectAll(checked);
+        if (checked) {
+            setSelectedItems(cartItems.map(item => item.id_product));
+        } else {
+            setSelectedItems([]);
+        }
+    };
+
+    const handleSelectItem = (id_product, checked) => {
+        if (checked) {
+            setSelectedItems(prev => [...prev, id_product]);
+        } else {
+            setSelectedItems(prev => prev.filter(id => id !== id_product));
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center w-full h-screen">
+                <div className="w-16 h-16 border-4 border-Coral-Pink-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center justify-center w-full pt-20">
@@ -169,7 +280,15 @@ export default function Cart() {
                 </div>
             </div>
 
-            <Table items={cart} onQuantityChange={handleQuantityChange} onRemove={handleRemoveItem} />
+            <Table 
+                items={cartItems} 
+                onQuantityChange={handleQuantityChange} 
+                onRemove={handleRemoveItem}
+                selectedItems={selectedItems}
+                onSelectItem={handleSelectItem}
+                selectAll={selectAll}
+                onSelectAll={handleSelectAll}
+            />
 
             <div className="flex flex-row items-center justify-end w-full px-40 mt-4">
                 <div className="flex flex-row px-2 py-2 border-2 rounded-lg border-Coral-Pink-500">
@@ -185,11 +304,12 @@ export default function Cart() {
             </div>
             <div className="w-full px-40 mt-5">
                 <OrderSummary
-                    cart={cart}
-                    order={calculateOrderTotal}
-                    offers={discountCode}
-                    delivery={DELIVERY_FEE}
-                    total={total}
+                    cart={cartItems.filter(item => selectedItems.includes(item.id_product))}
+                    order={calculateSelectedTotal}
+                    deliveryFee={DELIVERY_FEE}
+                    discountCode={discountCode}
+                    total={calculateSelectedTotal + DELIVERY_FEE}
+                    selectedItems={selectedItems}
                 />
             </div>
             <div className="w-full px-40 mt-5">

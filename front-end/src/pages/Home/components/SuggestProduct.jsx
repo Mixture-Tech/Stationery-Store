@@ -20,9 +20,9 @@ const SuggestProduct = ({products}) => {
                     <span className="text-white text-2xl">👍</span> 
                 </div>
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap p-6">
                 {products.slice(0, displayCount).map((product, index) => (
-                    <div key={index} className="px-2 w-[20%] mb-4">
+                    <div key={index} className="px-2 w-[20%] mb-2">
                         <ProductCard {...product}/>
                     </div>
                 ))}
@@ -31,7 +31,7 @@ const SuggestProduct = ({products}) => {
                 <div className="flex justify-center pb-4">
                     <button 
                         onClick={handleShowMore}
-                        className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+                        className="px-2 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
                     >
                         Xem thêm
                     </button>
