@@ -1,31 +1,52 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Container, Typography, Button, Grid } from "@mui/material";
-import PaymentStep from "./components/PaymentStep";
-import PaymentMethod from "./components/PaymentMethod";
-import OrderSummary from "./components/OrderSummary";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button, Grid, Paper, Typography, Box } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PaymentMethod from './components/PaymentMethod';
+import OrderSummary from './components/OrderSummary';
+import paymentApi from '../../services/apis/paymentApi';
+import { toast } from 'react-toastify';
 
-export default function Payment() {
-    const [phuongThucThanhToan, setPhuongThucThanhToan] = useState("PayPal");
-    const [buocHienTai, setBuocHienTai] = useState(1);
+const Payment = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.products) {
+            setProducts(location.state.products);
+        }
+    }, [location.state]);
+
+    const calculateTotal = () => {
+        return products.reduce((total, item) => total + (item.productPrice * item.quantity), 0);
+    };
 
     return (
-        <Container maxWidth="md" sx={{ mt: 12 }}>
-            <Button variant="text" color="primary" sx={{ mb: 2 }} onClick={() => navigate("/gio-hang")}>
-                ← Quay lại giỏ hàng
+        <Box sx={{ p: 3 }}>
+            <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={() => navigate('/cart')}
+                sx={{ mb: 3 }}
+            >
+                Quay lại giỏ hàng
             </Button>
 
-            <PaymentStep buocHienTai={buocHienTai} />
-
-            <Grid container spacing={2} sx={{ mt: 2 }}>
-                <Grid item xs={12} md={6}>
-                    <PaymentMethod phuongThucThanhToan={phuongThucThanhToan} setPhuongThucThanhToan={setPhuongThucThanhToan} />
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={3}>
+                    <PaymentMethod />
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <OrderSummary />
+
+                <Grid item xs={12} md={9}>
+                    <OrderSummary 
+                            products={products}
+                            total={calculateTotal()}
+                        />
                 </Grid>
             </Grid>
-        </Container>
+        </Box>
     );
-}
+};
+
+export default Payment;

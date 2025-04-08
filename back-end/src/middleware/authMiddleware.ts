@@ -1,5 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthService } from "../services/AuthService";
+import * as jwt from "jsonwebtoken";
+import { User } from "../entity/User";
+import { AppDataSource } from "../config/database";
+
+const JWT_SECRET = "Mixture-Tech";
+const JWT_EXPIRES_IN = "24h";
+
+interface JwtPayload {
+    id_user: number;
+    email: string;
+}
 
 declare global {
     namespace Express {
@@ -13,42 +23,75 @@ declare global {
     }
 }
 
-export const authenticateToken = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): Promise<void> => {
+export const authenticateToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const authHeader = req.headers["authorization"];
-        const token = authHeader && authHeader.split(" ")[1];
-
-        if (!token) {
-            res.status(401).json({ message: "Không có token" });
+        const authHeader = req.headers.authorization;
+        
+        if (!authHeader) {
+            res.status(401).json({
+                success: false,
+                message: "Không tìm thấy token"
+            });
             return;
         }
 
-        const authService = await AuthService.getInstance();
-        const user = await authService.verifyToken(token);
-
-        if (!user) {
-            res.status(403).json({ message: "Token không hợp lệ" });
+        const parts = authHeader.split(" ");
+        if (parts.length !== 2 || parts[0] !== "Bearer") {
+            res.status(401).json({
+                success: false,
+                message: "Token không hợp lệ"
+            });
             return;
         }
 
-        if (!user.role?.name) {
-            res.status(403).json({ message: "Người dùng không có quyền" });
-            return;
+        const token = parts[1];
+        console.log("Token received:", token);
+        console.log("JWT_SECRET:", JWT_SECRET);
+        try {
+            console.log("Verifying token...");
+            const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+            console.log("Decoded token:", decoded);
+            
+            // Kiểm tra user có tồn tại không
+            const userRepository = (await AppDataSource).getRepository(User);
+            const user = await userRepository.findOne({ where: { id_user: decoded.id_user } });
+
+            if (!user) {
+                res.status(401).json({
+                    success: false,
+                    message: "Người dùng không tồn tại"
+                });
+                return;
+            }
+
+            // Lưu thông tin user vào request để sử dụng ở các middleware sau
+            req.user = {
+                id: user.id_user,
+                email: user.email,
+                role: user.role?.name || "user"
+            };
+
+            next();
+        } catch (error: any) {
+            console.log("Token verification error:", error);
+            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+                res.status(401).json({
+                    success: false,
+                    message: "Token không hợp lệ hoặc đã hết hạn"
+                });
+            } else {
+                console.log("Other Error:", error);
+                res.status(500).json({
+                    success: false,
+                    message: "Lỗi xác thực token"
+                });
+            }
         }
-
-        req.user = {
-            id: user.id_user,
-            email: user.email,
-            role: user.role.name
-        };
-
-        next();
-    } catch (error) {
-        res.status(403).json({ message: "Token không hợp lệ" });
-        return;
+    } catch (error: any) {
+        console.log("Outer Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Lỗi xác thực"
+        });
     }
 }; 

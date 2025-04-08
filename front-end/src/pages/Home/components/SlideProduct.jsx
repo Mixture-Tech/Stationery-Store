@@ -95,7 +95,7 @@ export default function SlideProduct({title, categories}) {
     };
 
     return(
-        <div className="w-[60%] flex flex-col items-start shadow-2xl px-6 py-2">
+        <div className="w-[65%] flex flex-col items-start shadow-2xl px-6 py-2">
             {/* Tiêu đề */}
             <div className="font-nunito text-2xl font-bold px-4 py-2 text-blue-gray-800">
                 {title}
@@ -113,12 +113,12 @@ export default function SlideProduct({title, categories}) {
                 ))}
             </div>
             <div className="w-full">
-                <div className="rounded-lg p-6 sm:p-4 md:p-6">
+                <div className="rounded-lg p-4 sm:p-4 md:p-6">
                     {categories[tab]?.products.length > 0 ? (
                         <Slider ref={sliderRef} {...getSliderSettings()}>
                             {categories[tab]?.products.map((product, index) => (
                                 <div key={index} className={`${categories[tab]?.products.length < 5 ? 'pr-3' : 'pr-6'}`} 
-                                     style={{ width: categories[tab]?.products.length < 5 ? '150px' : '140px' }}>
+                                     style={{ width: categories[tab]?.products.length < 5 ? '152px' : '154px' }}>
                                     <ProductCard {...product} />
                                 </div>
                             ))}
@@ -135,16 +135,16 @@ export default function SlideProduct({title, categories}) {
 }
 
 SlideProduct.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     categories: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
+        name: PropTypes.string,
         products: PropTypes.arrayOf(PropTypes.shape({
-            src: PropTypes.string.isRequired,     
-            name: PropTypes.string.isRequired, 
-            nums: PropTypes.number.isRequired,   
-            rating: PropTypes.number.isRequired,  
-            price: PropTypes.string.isRequired, 
-            discount: PropTypes.string.isRequired,   
-        })).isRequired
-    })).isRequired
+            src: PropTypes.string,     
+            name: PropTypes.string, 
+            nums: PropTypes.number,   
+            rating: PropTypes.number,  
+            price: PropTypes.string, 
+            discount: PropTypes.string,   
+        }))
+    }))
 };

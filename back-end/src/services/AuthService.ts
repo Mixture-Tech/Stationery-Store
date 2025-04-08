@@ -2,15 +2,24 @@ import { User } from "../entity/User";
 import { UserDTO } from "../dto/userDTO";
 import { BaseService } from "./BaseService";
 import { AppDataSource } from "../config/database";
-import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/jwt";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
+import * as bcrypt from "bcrypt";
+import { EmailService } from "./EmailService";
+import { OTP } from "../entity/OTP";
+import { MoreThan } from "typeorm";
+
+const JWT_SECRET = "Mixture-Tech";
+const JWT_EXPIRES_IN = "24h";
 
 export class AuthService extends BaseService<User, UserDTO> {
     private static instance: AuthService;
+    private otpRepository: any;
+    private emailService: EmailService;
 
     private constructor(dataSource: any) {
         super(User, dataSource);
+        this.otpRepository = dataSource.getRepository(OTP);
+        this.emailService = EmailService.getInstance();
     }
 
     public static async getInstance(): Promise<AuthService> {
@@ -21,81 +30,128 @@ export class AuthService extends BaseService<User, UserDTO> {
         return AuthService.instance;
     }
 
-    async login(email: string, password: string): Promise<{ token: string; user: UserDTO }> {
-        const user = await this.repository.findOne({ where: { email } });
-        if (!user) {
-            throw new Error("User not found");
-        }
-
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
-            throw new Error("Invalid password");
-        }
-
-        const token = jwt.sign(
-            { id: user.id_user, email: user.email },
-            JWT_SECRET,
-            { expiresIn: JWT_EXPIRES_IN }
-        );
-
-        return {
-            token,
-            user: {
-                id_user: user.id_user,
-                user_name: user.user_name,
-                email: user.email,
-                password: user.password,
-                address: user.address,
-                avatar: user.avatar,
-                id_role: user.id_role,
-                hide: user.hide,
-                gender: user.gender,
-                phone: user.phone,
-                role: user.role,
-                orders: user.orders,
-                carts: user.carts
-            }
-        };
+    private generateOTP(): string {
+        return Math.floor(100000 + Math.random() * 900000).toString();
     }
 
-    async register(userData: UserDTO): Promise<{ token: string; user: UserDTO }> {
-        const existingUser = await this.repository.findOne({ where: { email: userData.email } });
-        if (existingUser) {
-            throw new Error("User already exists");
-        }
+    public async login(email: string, password: string): Promise<{ user: User; token: string }> {
+        try {
+            const user = await this.repository.findOne({
+                where: { email },
+                relations: ["role"]
+            });
 
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-        const user = this.repository.create({
-            ...userData,
-            password: hashedPassword
-        });
-
-        await this.repository.save(user);
-
-        const token = jwt.sign(
-            { id: user.id_user, email: user.email },
-            JWT_SECRET,
-            { expiresIn: JWT_EXPIRES_IN }
-        );
-
-        return {
-            token,
-            user: {
-                id_user: user.id_user,
-                user_name: user.user_name,
-                email: user.email,
-                password: user.password,
-                address: user.address,
-                avatar: user.avatar,
-                id_role: user.id_role,
-                hide: user.hide,
-                gender: user.gender,
-                phone: user.phone,
-                role: user.role,
-                orders: user.orders,
-                carts: user.carts
+            if (!user) {
+                throw new Error("Email hoặc mật khẩu không chính xác");
             }
-        };
+
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                throw new Error("Email hoặc mật khẩu không chính xác");
+            }
+
+            if (!user.is_email_verified) {
+                throw new Error("Vui lòng xác thực email trước khi đăng nhập");
+            }
+
+            // Tạo token khi đăng nhập thành công
+            const token = jwt.sign(
+                { 
+                    id_user: user.id_user,
+                    email: user.email,
+                    role: user.role.name
+                },
+                JWT_SECRET,
+                { expiresIn: "1d" }
+            );
+
+            return { user, token };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async register(userDTO: UserDTO): Promise<{ user: User }> {
+        try {
+            if (!userDTO.email || !userDTO.password) {
+                throw new Error("Email và mật khẩu là bắt buộc");
+            }
+
+            // Kiểm tra email đã tồn tại chưa
+            const existingUser = await this.repository.findOne({
+                where: { email: userDTO.email }
+            });
+
+            if (existingUser) {
+                throw new Error("Email đã được sử dụng");
+            }
+
+            // Tạo mã OTP
+            const otp = this.generateOTP();
+            const otpExpiry = new Date();
+            otpExpiry.setMinutes(otpExpiry.getMinutes() + 5); // OTP hết hạn sau 5 phút
+
+            // Lấy id_user lớn nhất hiện tại
+            const maxId = await this.repository
+                .createQueryBuilder("user")
+                .select("MAX(user.id_user)", "maxId")
+                .getRawOne();
+
+            const nextId = (maxId?.maxId || 0) + 1;
+
+            // Tạo user mới và lưu vào database
+            const user = new User();
+            user.id_user = nextId;
+            user.email = userDTO.email;
+            user.password = await bcrypt.hash(userDTO.password, 10);
+            user.id_role = 1; // Mặc định là customer
+            user.hide = false;
+            user.user_name = userDTO.email.split("@")[0];
+            user.otp = otp;
+            user.otp_expiry = otpExpiry;
+            user.is_email_verified = false;
+
+            // Lưu user vào database
+            await this.repository.save(user);
+
+            // Gửi email xác thực
+            await this.emailService.sendVerificationEmail(user.email, otp);
+
+            return { user };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async verifyOTP(email: string, otp: string): Promise<void> {
+        try {
+            // Tìm user theo email
+            const user = await this.repository.findOne({
+                where: { email }
+            });
+
+            if (!user) {
+                throw new Error("Không tìm thấy người dùng");
+            }
+
+            // Kiểm tra OTP
+            if (user.otp !== otp) {
+                throw new Error("Mã OTP không chính xác");
+            }
+
+            // Kiểm tra thời gian hết hạn của OTP
+            if (user.otp_expiry && user.otp_expiry < new Date()) {
+                throw new Error("Mã OTP đã hết hạn");
+            }
+
+            // Cập nhật trạng thái xác thực và lưu user vào database
+            user.is_email_verified = true;
+            user.otp = ""; // Thay vì null, sử dụng chuỗi rỗng
+            user.otp_expiry = new Date(); // Thay vì null, sử dụng ngày hiện tại
+            await this.repository.save(user);
+        } catch (error) {
+            throw error;
+        }
     }
 
     async changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void> {
@@ -136,6 +192,18 @@ export class AuthService extends BaseService<User, UserDTO> {
                 throw new Error("User not found");
             }
             return user;
+        } catch (error) {
+            throw new Error("Invalid token");
+        }
+    }
+
+    async logout(token: string): Promise<void> {
+        try {
+            // Verify token trước khi logout
+            await this.verifyToken(token);
+            // Trong trường hợp này, chúng ta chỉ cần verify token
+            // Vì JWT không cần phải invalidate token ở phía server
+            // Token sẽ tự động hết hạn sau thời gian JWT_EXPIRES_IN
         } catch (error) {
             throw new Error("Invalid token");
         }

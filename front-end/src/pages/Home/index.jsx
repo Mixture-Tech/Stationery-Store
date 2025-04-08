@@ -100,7 +100,7 @@ const Home = () => {
 
     return (
         <main>
-            <div className="flex gap-10 flex-col items-center justify-center w-full p-4">
+            <div className="flex gap-10 flex-col items-center justify-center w-full p-6">
                 {categoryData.map((parent, index) => (
                     <SlideProduct 
                         key={index} 

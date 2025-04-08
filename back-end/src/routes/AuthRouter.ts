@@ -32,7 +32,7 @@ const router = Router();
  *       400:
  *         description: Dữ liệu không hợp lệ
  */
-router.post(`${ApiPath.BaseApi}/auth/register`, AuthController.register);
+router.post(`/auth/register`, AuthController.register);
 
 /**
  * @swagger
@@ -62,7 +62,7 @@ router.post(`${ApiPath.BaseApi}/auth/register`, AuthController.register);
  *       401:
  *         description: Email hoặc mật khẩu không chính xác
  */
-router.post(`${ApiPath.BaseApi}/auth/login`, AuthController.login);
+router.post(`/auth/login`, AuthController.login);
 
 /**
  * @swagger
@@ -78,6 +78,31 @@ router.post(`${ApiPath.BaseApi}/auth/login`, AuthController.login);
  *       401:
  *         description: Token không hợp lệ
  */
-router.post(`${ApiPath.BaseApi}/auth/logout`, AuthController.logout);
+router.post(`/auth/logout`, AuthController.logout);
+
+/**
+ * @swagger
+ * /api/v1/auth/verify-otp:
+ *   post:
+ *     summary: Xác thực OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - otp
+ *             properties:
+ *               otp:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Xác thực thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ */
+router.post(`/auth/verify-otp`, AuthController.verifyOTP);
 
 export default router; 

@@ -1,64 +1,107 @@
 import { Request, Response } from "express";
 import { CartService } from "../services/CartService";
-import { CartDTO } from "../dto/CartDTO";
+
+interface RequestUser {
+    id: number;
+    email: string;
+    role: string;
+}
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: RequestUser;
+        }
+    }
+}
 
 export class CartController {
-    static async createCart(req: Request, res: Response): Promise<void> {
-        try {
-            const cartDTO: CartDTO = req.body;
-            const cart = await new CartService().createCart(cartDTO);
-            res.status(201).json(cart);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
-        }
+    private static cartService: CartService;
+
+    public static async initialize() {
+        CartController.cartService = await CartService.getInstance();
     }
 
-    static async getAllCarts(req: Request, res: Response): Promise<void> {
+    // Lấy giỏ hàng của người dùng
+    public static async getCart(req: Request, res: Response): Promise<void> {
         try {
-            const carts = await new CartService().getAllCarts();
-            res.status(200).json(carts);
-        } catch (error: any) {
-            res.status(400).json({ message: error.message });
-        }
-    }
-
-    static async getCartById(req: Request, res: Response): Promise<void> {
-        try {
-            const cart = await new CartService().getCartById(parseInt(req.params.id));
-            if (!cart) {
-                res.status(404).json({ message: "Cart not found" });
+            console.log('hehe');
+            const user = req.user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized" });
                 return;
             }
+
+            const cart = await CartController.cartService.getCartByUser(user.id);
             res.status(200).json(cart);
         } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.status(500).json({ message: error.message });
         }
     }
 
-    static async updateCart(req: Request, res: Response): Promise<void> {
+    // Thêm sản phẩm vào giỏ hàng
+    public static async addToCart(req: Request, res: Response): Promise<void> {
         try {
-            const cartDTO: CartDTO = req.body;
-            const updatedCart = await new CartService().update(parseInt(req.params.id), cartDTO);
-            if (!updatedCart) {
-                res.status(404).json({ message: "Cart not found" });
+            const user = req.user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized" });
                 return;
             }
-            res.status(200).json(updatedCart);
+
+            const { productId, quantity } = req.body;
+            if (!productId || !quantity) {
+                res.status(400).json({ message: "Missing required fields" });
+                return;
+            }
+
+            const cart = await CartController.cartService.addToCart(user.id, productId, quantity);
+            res.status(200).json(cart);
         } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.status(500).json({ message: error.message });
         }
     }
 
-    static async deleteCart(req: Request, res: Response): Promise<void> {
+    // Cập nhật số lượng sản phẩm trong giỏ hàng
+    public static async updateCartItem(req: Request, res: Response): Promise<void> {
         try {
-            const isDeleted = await new CartService().delete(parseInt(req.params.id));
-            if (!isDeleted) {
-                res.status(404).json({ message: "Cart not found" });
+            const user = req.user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized" });
                 return;
             }
-            res.status(200).json({ message: "Cart deleted successfully" });
+
+            const { productId, quantity } = req.body;
+            if (!productId || !quantity) {
+                res.status(400).json({ message: "Missing required fields" });
+                return;
+            }
+
+            const cart = await CartController.cartService.updateCartItem(user.id, productId, quantity);
+            res.status(200).json(cart);
         } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    // Xóa sản phẩm khỏi giỏ hàng
+    public static async removeFromCart(req: Request, res: Response): Promise<void> {
+        try {
+            const user = req.user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized" });
+                return;
+            }
+
+            const { productId } = req.params;
+            if (!productId) {
+                res.status(400).json({ message: "Missing product ID" });
+                return;
+            }
+
+            await CartController.cartService.removeFromCart(user.id, parseInt(productId));
+            res.status(200).json({ message: "Product removed from cart" });
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
         }
     }
 }

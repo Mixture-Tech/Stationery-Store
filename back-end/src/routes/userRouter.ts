@@ -5,86 +5,6 @@ const router = Router();
 const userController = new UserController();
 
 // Public routes
-/**
- * @swagger
- * /api/auth/register:
- *   post:
- *     tags: [Auth]
- *     summary: Đăng ký tài khoản mới
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserDTO'
- *     responses:
- *       201:
- *         description: Đăng ký thành công
- *       400:
- *         description: Dữ liệu không hợp lệ
- *       500:
- *         description: Lỗi server
- */
-router.post("/register", (req, res) => {
-    userController.register(req, res);
-});
-
-/**
- * @swagger
- * /api/auth/login:
- *   post:
- *     tags: [Auth]
- *     summary: Đăng nhập
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Đăng nhập thành công
- *       401:
- *         description: Thông tin đăng nhập không chính xác
- *       500:
- *         description: Lỗi server
- */
-router.post("/login", (req, res) => {
-    userController.login(req, res);
-});
-
-/**
- * @swagger
- * /api/auth/reset-password:
- *   post:
- *     tags: [Auth]
- *     summary: Đặt lại mật khẩu
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *     responses:
- *       200:
- *         description: Mật khẩu đã được đặt lại
- *       404:
- *         description: Không tìm thấy email
- *       500:
- *         description: Lỗi server
- */
-router.post("/reset-password", (req, res) => {
-    userController.resetPassword(req, res);
-});
-
 // User routes
 /**
  * @swagger
@@ -202,41 +122,6 @@ router.put("/users/:id", (req, res) => {
  */
 router.delete("/users/:id", (req, res) => {
     userController.delete(req, res);
-});
-
-/**
- * @swagger
- * /api/users/{id}/change-password:
- *   put:
- *     tags: [Users]
- *     summary: Đổi mật khẩu
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               oldPassword:
- *                 type: string
- *               newPassword:
- *                 type: string
- *     responses:
- *       200:
- *         description: Đổi mật khẩu thành công
- *       404:
- *         description: Không tìm thấy người dùng
- *       500:
- *         description: Lỗi server
- */
-router.put("/users/:id/change-password", (req, res) => {
-    userController.changePassword(req, res);
 });
 
 export default router;
