@@ -189,6 +189,12 @@ export default function Cart() {
         return cartItems.reduce((total, item) => total + item.productPrice * item.quantity, 0);
     }, [cartItems]);
 
+    const calculateSelectedTotal = useMemo(() => {
+        return cartItems
+            .filter(item => selectedItems.includes(item.id_product))
+            .reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    }, [cartItems, selectedItems]);
+
     const handleQuantityChange = useCallback(
         async (id_product, newQuantity) => {
             if (newQuantity < 1) return;
@@ -298,11 +304,12 @@ export default function Cart() {
             </div>
             <div className="w-full px-40 mt-5">
                 <OrderSummary
-                    cart={cartItems}
-                    order={calculateOrderTotal}
-                    offers={discountCode}
-                    delivery={DELIVERY_FEE}
-                    total={total}
+                    cart={cartItems.filter(item => selectedItems.includes(item.id_product))}
+                    order={calculateSelectedTotal}
+                    deliveryFee={DELIVERY_FEE}
+                    discountCode={discountCode}
+                    total={calculateSelectedTotal + DELIVERY_FEE}
+                    selectedItems={selectedItems}
                 />
             </div>
             <div className="w-full px-40 mt-5">

@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const OrderSummary = ({ order, deliveryFee, discountCode, total, cart }) => {
+const OrderSummary = ({ order, deliveryFee, discountCode, total, cart, selectedItems }) => {
     const navigate = useNavigate();
 
     const formatCurrency = (value) => {
@@ -10,29 +11,28 @@ const OrderSummary = ({ order, deliveryFee, discountCode, total, cart }) => {
     };
 
     const handleCheckout = () => {
-        if (order > 0) {
-            navigate("/thanh-toan", {
-                state: {
-                    orderDetails: {
-                        cart: cart,
-                        subtotal: order,
-                        discountCode: discountCode || "0%",
-                        deliveryFee: deliveryFee,
-                        total: total,
-                    },
-                },
-            });
-        } else {
-            alert("Vui lòng thêm sản phẩm vào giỏ hàng trước khi thanh toán");
+        if (!selectedItems || selectedItems.length === 0) {
+            toast.warning("Vui lòng chọn ít nhất một sản phẩm để thanh toán");
+            return;
         }
+
+        navigate("/thanh-toan", {
+            state: {
+                products: cart,
+                subtotal: order,
+                discountCode: discountCode || "0%",
+                deliveryFee: deliveryFee,
+                total: total,
+            },
+        });
     };
 
     return (
-        <div className="w-full p-6 bg-white border-2 rounded-lg shadow-md ">
+        <div className="w-full p-6 bg-white border-2 rounded-lg shadow-md">
             <h2 className="mb-4 text-xl font-semibold">Tóm tắt đơn hàng</h2>
             <div className="space-y-2">
                 <div className="flex justify-between">
-                    <span>Sản phẩm</span>
+                    <span>Sản phẩm ({cart.length})</span>
                     <span>{formatCurrency(order)}</span>
                 </div>
                 <div className="flex justify-between text-green-600">
@@ -50,9 +50,9 @@ const OrderSummary = ({ order, deliveryFee, discountCode, total, cart }) => {
             </div>
             <button
                 onClick={handleCheckout}
-                className="w-full px-4 py-2 mt-4 font-semibold text-white transition duration-300 rounded bg-indigo-700 hover:bg-indigo-500"
+                className="w-full px-4 py-2 mt-4 font-semibold text-white transition duration-300 rounded bg-indigo-700 hover:bg-indigo-600"
             >
-                Thanh Toán
+                Thanh Toán ({selectedItems?.length || 0} sản phẩm)
             </button>
         </div>
     );
@@ -64,6 +64,7 @@ OrderSummary.propTypes = {
     discountCode: PropTypes.string,
     total: PropTypes.number,
     cart: PropTypes.array,
+    selectedItems: PropTypes.array,
 };
 
 export default OrderSummary;

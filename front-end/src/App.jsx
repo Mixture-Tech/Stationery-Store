@@ -17,7 +17,7 @@ const ListProduct = loadable(() => import("./pages/list_product"));
 const AboutUs = loadable(() => import("./pages/AboutUs"));
 const ProductDetail = loadable(() => import("./pages/ProductDetail/index.jsx"));
 const VerifyEmail = loadable(() => import("./pages/Auth/VerifyEmail"));
-
+const Profile = loadable(() => import("./pages/Profile"));
 //ADMIN
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
@@ -94,6 +94,14 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Payment title="Payment" />
+                            </Suspense>
+                        }
+                    />
+                     <Route
+                        path="/trang-ca-nhan"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <Profile title="Trang cá nhân" />
                             </Suspense>
                         }
                     />

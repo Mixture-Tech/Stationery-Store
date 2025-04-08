@@ -4,26 +4,6 @@ import axios from "axios";
 import PropTypes from "prop-types";
 
 export default function PaymentMethod({ phuongThucThanhToan, setPhuongThucThanhToan }) {
-    const handlePayment = async () => {
-        try {
-            if (phuongThucThanhToan === "MoMo") {
-                const response = await axios.post("http://localhost:3001/payment/momo/create", {
-                    orderId: `ORDER_${Date.now()}`,
-                    amount: 10000, // Số tiền cần thanh toán
-                    orderInfo: "Thanh toán đơn hàng từ Stationery Store"
-                });
-
-                if (response.data.payUrl) {
-                    window.location.href = response.data.payUrl;
-                }
-            } else {
-                toast.info("Phương thức thanh toán này đang được phát triển");
-            }
-        } catch (error) {
-            toast.error("Có lỗi xảy ra khi tạo yêu cầu thanh toán");
-            console.error("Payment error:", error);
-        }
-    };
 
     return (
         <Box sx={{ p: 3, bgcolor: "background.paper", borderRadius: 2, boxShadow: 1 }}>
