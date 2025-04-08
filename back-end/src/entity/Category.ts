@@ -1,10 +1,10 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
 import { Category_Parent } from "./Category_Parent";
 import { Product } from "./Product";
 
 @Entity("category")
 export class Category {
-    @PrimaryColumn({ name: "id_category" })
+    @PrimaryGeneratedColumn()
     id_category: number;
 
     @Column({ name: "name_category" })
@@ -13,7 +13,15 @@ export class Category {
     @Column({ nullable: true })
     link: string;
 
-    @Column({ type: "bit", width: 1, default: () => "b'0'" })
+    @Column({
+        type: "bit",
+        width: 1,
+        default: () => "b'0'",
+        transformer: {
+          to: (value: boolean) => value ? 1 : 0, // Khi lưu vào DB
+          from: (value: Buffer) => value[0] === 1, // Khi lấy từ DB
+        },
+      })
     hide: boolean;
 
     @Column({ name: "id_parent", nullable: true })

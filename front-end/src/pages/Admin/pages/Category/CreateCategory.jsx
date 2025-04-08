@@ -1,76 +1,66 @@
-import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faImage, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import { categoryParentApi } from '../../../../services/apis/CategoryParentApi';
+import { categoryApi } from '../../../../services/apis/categoryApi';
 
 export default function CreateCategory () {
-    const [formData, setFormData] = useState({
-        name: '',
-        hide: 0,
-        image: null
+    const navigate = useNavigate();
+    const [categoryData, setCategoryData] = useState({
+        name_category: '',
+        id_parent: '',
+        hide: 0
     });
-    const [previewImage, setPreviewImage] = useState(null);
+    const [categoryParents, setCategoryParent] = useState([]);
+    const [loadingCategoryParent, setLoadingCategoryParent] = useState(true);
+    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        const fetchCategoryParent = async () => {
+            try {
+                const response = await categoryParentApi.getAll();
+                setCategoryParent(response);
+            } catch (error) {
+                console.error('Lỗi khi tải danh mục sản phẩm cha:', error);
+                toast.error('Không thể tải danh mục sản phẩm cha');
+            } finally {
+                setLoadingCategoryParent(false);
+            }
+        };
+
+        fetchCategoryParent();
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setCategoryData(prev => ({
             ...prev,
-            [name]: value
+            [name]: name === "hide" ? Number(value) :  value
         }));
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData(prev => ({
-                ...prev,
-                image: file
-            }));
-            // Tạo URL để preview ảnh
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // TODO: Xử lý submit form
-        console.log('Form data:', formData);
+        setLoading(true);
+
+        try{
+            console.log("Xin chào: ",categoryData);
+            await categoryApi.create(categoryData);
+            toast.success('Tạo danh mục thành công!');
+            setTimeout(() => {
+                navigate('/trang-chu-admin');
+            }, 1500);
+        } catch (error) {
+            console.error('Lỗi khi tạo danh mục:', error);
+            toast.error('Không thể tạo danh mục');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className="w-full max-w-2xl mx-auto p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Upload ảnh */}
-                <div className="flex flex-col items-center space-y-4">
-                    <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
-                        {previewImage ? (
-                            <img 
-                                src={previewImage} 
-                                alt="Preview" 
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="text-center">
-                                <FontAwesomeIcon icon={faImage} className="w-12 h-12 text-gray-400 mb-2" />
-                                <p className="text-sm text-gray-500">Chọn ảnh danh mục</p>
-                            </div>
-                        )}
-                    </div>
-                    <label className="cursor-pointer bg-navy-blue-500 text-white px-4 py-2 rounded-md hover:bg-navy-blue-600 transition-colors duration-300">
-                        <FontAwesomeIcon icon={faUpload} className="mr-2" />
-                        Upload ảnh
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                        />
-                    </label>
-                </div>
-
                 {/* Tên danh mục */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -78,12 +68,31 @@ export default function CreateCategory () {
                     </label>
                     <input
                         type="text"
-                        name="name"
-                        value={formData.name}
+                        name="name_category"
+                        value={categoryData.name_category}
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-blue-500"
                         required
                     />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="id_category">Danh mục sản phẩm</label>
+                    <select
+                        id="id_parent"
+                        name="id_parent"
+                        value={categoryData.id_parent}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-blue-500"
+                        required
+                    >
+                        <option value="">Chọn danh mục cha</option>
+                        {categoryParents.map(categoryParent => (
+                            <option key={categoryParent.id_parent} value={categoryParent.id_parent}>
+                                {categoryParent.name_parent}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 {/* Trạng thái ẩn/hiện */}
@@ -93,7 +102,7 @@ export default function CreateCategory () {
                     </label>
                     <select
                         name="hide"
-                        value={formData.hide}
+                        value={categoryData.hide}
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-blue-500"
                     >
@@ -103,15 +112,17 @@ export default function CreateCategory () {
                 </div>
 
                 {/* Nút submit */}
-                <div className="flex justify-end">
+                <div className="flex justify-center space-x-4">
                     <button
                         type="submit"
                         className="bg-navy-blue-500 text-white px-6 py-2 rounded-md hover:bg-navy-blue-600 transition-colors duration-300"
+                        disabled={loading}
                     >
-                        Tạo danh mục
+                        {loading ? 'Đang tạo...' : 'Tạo danh mục'}
                     </button>
                 </div>
             </form>
+            <ToastContainer />
         </div>
     );
 };

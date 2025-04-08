@@ -16,11 +16,13 @@ import { userApi } from "../../../services/apis/userApi";
 import SearchBox from "../Components/SearchBox";
 import ProductList from "./Product/ProductList.jsx"; 
 import CategoryList from "./Category/CategoryList.jsx";
+import EditCategory from "./Category/EditCategory.jsx";
 
 export default function DashBoard() {
     const [menu, setMenu] = useState(0);
     const [activeTab, setActiveTab] = useState('viewAll');
     const [selectedProductId, setSelectedProductId] = useState(null); // Thêm state để lưu productId
+    const [selectedCategoryId, setSelectedCategoryId] = useState(null); // Thêm state để lưu categoryId
 
     // Hàm xử lý khi click vào menu
     const handleMenuChange = (newMenu) => {
@@ -33,6 +35,11 @@ export default function DashBoard() {
     const handleEditProduct = (productId) => {
         setActiveTab('edit');
         setSelectedProductId(productId);
+    };
+
+    const handleEditCategory = (categoryId) => {
+        setActiveTab('edit');
+        setSelectedCategoryId(categoryId);
     };
 
     return (
@@ -54,7 +61,9 @@ export default function DashBoard() {
                             {/* {menu === 0 && activeTab === 'viewAll' && <UserList />} */}
 
                             {/* Category Management */}
-                            {menu === 1 && activeTab === 'viewAll' && <CategoryList />}
+                            {menu === 1 && activeTab === 'viewAll' && (
+                                <CategoryList onEditCategory={handleEditCategory}/>
+                            )}
 
                             {/* Product Management */}
                             {menu === 2 && activeTab === 'viewAll' && (
@@ -72,6 +81,14 @@ export default function DashBoard() {
                                     {/* {menu === 0 && <CreateUser />} */}
                                     {menu === 1 && <CreateCategory />}
                                     {menu === 2 && <CreateProduct />}
+                                </div>
+                            )}
+
+                            {/* Edit Category */}
+                            {menu === 1 && activeTab === 'edit' && selectedCategoryId && (
+                                <div className="flex flex-col w-full">
+                                    <h2 className="text-2xl font-bold mb-4">Chỉnh sửa danh mục sản phẩm</h2>
+                                    <EditCategory categoryId={selectedCategoryId} />
                                 </div>
                             )}
 

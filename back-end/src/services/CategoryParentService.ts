@@ -19,9 +19,10 @@ class CategoryParentService {
         if (!this.categoryParentRepository) {
             await this.initRepository();
         }
-        return await this.categoryParentRepository.find({
-            relations: ["categories"]
-        });
+        // return await this.categoryParentRepository.find({
+        //     relations: ["categories"]
+        // });
+        return await this.categoryParentRepository.find();
     }
 
     async findById(id_parent: number) {

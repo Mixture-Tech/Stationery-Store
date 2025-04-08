@@ -72,7 +72,7 @@ router.get("/categories/parent/:parentId", CategoryController.getByParentId);
  *       201:
  *         description: Trả về thông tin danh mục vừa được tạo
  */
-router.post("/categories", authenticateToken, CategoryController.create);
+router.post("/categories", CategoryController.create);
 
 /**
  * @swagger
@@ -99,7 +99,7 @@ router.post("/categories", authenticateToken, CategoryController.create);
  *       404:
  *         description: Danh mục không tồn tại
  */
-router.put("/categories/:id", authenticateToken, CategoryController.update);
+router.put("/categories/:id", CategoryController.update);
 
 /**
  * @swagger
@@ -142,5 +142,26 @@ router.delete("/categories/id/:id", authenticateToken, CategoryController.delete
  *         description: Danh mục không tồn tại
  */
 router.get("/categories/name/:name", CategoryController.getCategoryByName);
+
+/**
+ * @swagger
+ * /api/v1/categories/{id}/hide:
+ *   put:
+ *     summary: Ẩn danh mục theo ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: ID của danh mục cần ẩn
+ *     responses:
+ *       200:
+ *         description: Trả về thông báo thành công
+ *       404:
+ *         description: Danh mục không tồn tại
+ */
+router.put("/categories/:id/hide", CategoryController.hide);
 
 export default router; 

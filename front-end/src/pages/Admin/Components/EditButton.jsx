@@ -3,26 +3,50 @@ import { faAngleDown, faTrash, faPenToSquare } from '@fortawesome/free-solid-svg
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { productApi } from '../../../services/apis/productApi';
 import { toast } from 'react-toastify';
+import { categoryApi } from '../../../services/apis/categoryApi';
 
-const EditButton = ({ productId, onDeleteSuccess, onEditProduct }) => {
+const EditButton = ({ productId, categoryId, onDeleteSuccess, onEditProduct, onEditCategory }) => {
     const [isDeleting, setIsDeleting] = useState(false);
 
+    const handleEditCategory = () => {
+        onEditCategory(categoryId);
+    }
+
+    const handleEditProduct = () => {
+        onEditProduct(productId);
+    }
+
     const handleEdit = () => {
-        onEditProduct(productId); // Gọi hàm từ props để chuyển sang edit mode
+        if(productId){
+            handleEditProduct();
+        }
+        else if(categoryId){
+            handleEditCategory();
+        }
     };
 
     const handleDelete = async () => {
-        if (window.confirm('Bạn có chắc chắn muốn ẩn sản phẩm này?')) {
+        const confirmMessage = productId 
+            ? 'Bạn có chắc chắn muốn ẩn sản phẩm này?' 
+            : 'Bạn có chắc chắn muốn ẩn danh mục này?';
+            
+        if (window.confirm(confirmMessage)) {
             setIsDeleting(true);
             try {
-                await productApi.hideProduct(productId);
-                toast.success('Ẩn sản phẩm thành công!');
+                if (productId) {
+                    await productApi.hideProduct(productId);
+                    toast.success('Ẩn sản phẩm thành công!');
+                } else if (categoryId) {
+                    await categoryApi.hideCategory(categoryId);
+                    toast.success('Ẩn danh mục thành công!');
+                }
+                
                 if (onDeleteSuccess) {
-                    onDeleteSuccess(productId);
+                    onDeleteSuccess(productId || categoryId);
                 }
             } catch (error) {
-                console.error('Lỗi khi ẩn sản phẩm:', error);
-                toast.error('Ẩn sản phẩm thất bại!');
+                console.error('Lỗi khi ẩn mục:', error);
+                toast.error('Thao tác thất bại!');
             } finally {
                 setIsDeleting(false);
             }

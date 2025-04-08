@@ -4,8 +4,10 @@ import CategoryCard from "../../Components/CardCategory";
 import { ITEMS_PER_PAGE } from "../../../../util/constants";
 import { categoryApi } from "../../../../services/apis/categoryApi";
 import Pagination from "../../Components/Pagination";
+import { ToastContainer } from 'react-toastify';
+import CardCategory from "../../Components/CardCategory";
 
-export default function CategoryList () {
+export default function CategoryList ({ onEditCategory }) {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,7 +17,11 @@ export default function CategoryList () {
         const fetchCategories = async () => {
             try {
                 const response = await categoryApi.getAll();
-                setCategories(response);
+                const formartedResponse = response.map(category => ({
+                    ...category,
+                    hide: Number(category.hide),
+                }));
+                setCategories(formartedResponse);
                 setTotalPages(Math.ceil(response.length / ITEMS_PER_PAGE));
             } catch (error) {
                 console.error('Lỗi khi lấy danh sách categories:', error);
@@ -26,6 +32,10 @@ export default function CategoryList () {
 
         fetchCategories();
     }, []);
+
+    const handleCategoryDelete = () => {
+        setCategories(categories);
+    }
 
     // Phân trang dữ liệu sản phẩm
     const getCurrentPageData = () => {
@@ -38,8 +48,6 @@ export default function CategoryList () {
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
-
-    
 
     return (
         <div className="flex flex-col w-full">
@@ -64,7 +72,12 @@ export default function CategoryList () {
                 <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu danh mục</div>
             ) : (
                 <>
-                    <CategoryCard categories={getCurrentPageData()} />
+                    <CategoryCard 
+                        categories={getCurrentPageData()} 
+                        onCategoryDelete={handleCategoryDelete}
+                        onEditCategory={onEditCategory} // Truyền hàm xử lý sự kiện sửa danh mục
+
+                    />
 
                     <Pagination 
                         currentPage={currentPage}
@@ -74,6 +87,7 @@ export default function CategoryList () {
                     />
                 </>
             )}
+            <ToastContainer />
         </div>
     );
 };

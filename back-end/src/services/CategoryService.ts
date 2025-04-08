@@ -77,6 +77,10 @@ class CategoryService {
         }
         return await this.categoryRepository.findOne({ where: { name_category: name } });
     }
+
+    async hideCategory(id_category: number): Promise<any> {
+        return this.categoryRepository.update(id_category, { hide: true });
+    }
 }
 
 export default new CategoryService();
