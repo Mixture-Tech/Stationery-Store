@@ -7,6 +7,30 @@ const productController = new ProductController();
 
 /**
  * @swagger
+ * /api/v1/products/upload-image:
+ *   post:
+ *     summary: Upload ảnh sản phẩm
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Trả về đường dẫn của ảnh đã upload
+ *       500:
+ *         description: Lỗi khi upload ảnh
+ */
+router.post("/products/upload-image", productController.uploadImage);
+
+/**
+ * @swagger
  * /api/v1/products:
  *   get:
  *     summary: Lấy danh sách tất cả sản phẩm
@@ -111,8 +135,9 @@ router.get("/products/name/:name", productController.getByName);
  *       201:
  *         description: Trả về thông tin sản phẩm vừa được tạo
  */
-router.post("/products", authenticateToken, productController.create);
+// router.post("/products", authenticateToken, productController.create);
 
+router.post("/products", productController.create);
 /**
  * @swagger
  * /api/v1/products/{id}:
@@ -138,7 +163,7 @@ router.post("/products", authenticateToken, productController.create);
  *       404:
  *         description: Sản phẩm không tồn tại
  */
-router.put("/products/:id", authenticateToken, productController.update);
+router.put("/products/:id", productController.update);
 
 /**
  * @swagger
@@ -160,5 +185,26 @@ router.put("/products/:id", authenticateToken, productController.update);
  *         description: Sản phẩm không tồn tại
  */
 router.delete("/products/:id", authenticateToken, productController.delete);
+
+/**
+ * @swagger
+ * /api/v1/products/{id}/hide:
+ *   put:
+ *     summary: Ẩn sản phẩm theo ID (xóa mềm)
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: ID của sản phẩm cần ẩn
+ *     responses:
+ *       200:
+ *         description: Thông báo ẩn sản phẩm thành công
+ *       404:
+ *         description: Sản phẩm không tồn tại
+ */
+router.put("/products/:id/hide", productController.hide);
 
 export default router;

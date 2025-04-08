@@ -1,119 +1,268 @@
-import Logo from "../../assets/img/Logo/Logo.png";
+import Logo from "../../../assets/img/Logo/Logo.svg";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { useState, useEffect } from 'react';
 import {faAngleDown} from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faSignOutAlt, faShoppingBag } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from 'prop-types';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { CustomTransparentButton } from "../../Forms/Button/customColor";
+import { categoryParentApi } from '../../../services/apis/CategoryParentApi';
+import { categoryApi } from '../../../services/apis/categoryApi';
+import { useNavigate } from 'react-router-dom';
+import { getCurrentUser } from '../../../services/apis/auth';
 
-const categories = [
-    { name: "Phim Hành Động", path: "/the-loai/hanh-dong" },
-    { name: "Phim Tình Cảm", path: "/the-loai/tinh-cam" },
-    { name: "Phim Kinh Dị", path: "/the-loai/kinh-di" },
-    { name: "Phim Hài", path: "/the-loai/hai" },
-    { name: "Phim Hoạt Hình", path: "/the-loai/hoat-hinh" },
-    { name: "Phim Viễn Tưởng", path: "/the-loai/vien-tuong" },
-    { name: "Phim Cổ Trang", path: "/the-loai/co-trang" },
-];
+const DropdownMenu = ({ title, data, navigate }) => {
+    const flattenData = (data) => {
+        if (!data || Object.keys(data).length === 0) {
+            return {};
+        }
 
-const countries = [
-    { name: "Phim Hàn Quốc", path: "/quoc-gia/han-quoc" },
-    { name: "Phim Trung Quốc", path: "/quoc-gia/trung-quoc" },
-    { name: "Phim Nhật Bản", path: "/quoc-gia/nhat-ban" },
-    { name: "Phim Thái Lan", path: "/quoc-gia/thai-lan" },
-    { name: "Phim Âu Mỹ", path: "/quoc-gia/au-my" },
-    { name: "Phim Việt Nam", path: "/quoc-gia/viet-nam" },
-];
+        let result = {};
+    
+        Object.keys(data).forEach((category) => {
+            result[category] = {};
+    
+            Object.keys(data[category]).forEach((subCategory) => {
+                result[category][subCategory] = Object.keys(data[category][subCategory]).map((subject) => ({
+                    name: subject,
+                    path: data[category][subCategory][subject]
+                }));
+            });
+        });
+    
+        return result;
+    };
 
-const DropdownMenu = ({ items, title }) => {
+    const flattenedItems = flattenData(data);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [isHovered, setIsHovered] = useState(false);
+
+    // Khi hover vào dropdown, set category đầu tiên
+    const handleMouseEnter = () => {
+        setIsHovered(true);
+        if (Object.keys(flattenedItems).length > 0) {
+            setSelectedCategory(Object.keys(flattenedItems)[0]);
+        }
+    };
+
+    if (!data || Object.keys(data).length === 0) {
+        return (
+            <div className="group relative inline-block">
+                <button className="text-white hover:text-yellow-500 flex items-center space-x-1">
+                    <span>{title}</span>
+                    <FontAwesomeIcon 
+                        icon={faAngleDown} 
+                        className="w-4 h-4 ml-1 transform rotate-180 transition-transform duration-300 ease-in-out
+                                 group-hover:rotate-0"
+                    />
+                </button>
+            </div>
+        );
+    }
+
     return (
-        <div className="group relative inline-block">
+        <div className="group relative inline-block" onMouseEnter={handleMouseEnter}>
             <button className="text-white hover:text-yellow-500 flex items-center space-x-1">
                 <span>{title}</span>
                 <FontAwesomeIcon 
                     icon={faAngleDown} 
                     className="w-4 h-4 ml-1 transform rotate-180 transition-transform duration-300 ease-in-out
-                             group-hover:rotate-0 "
+                             group-hover:rotate-0"
                 />
             </button>
-            <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-slate-500 opacity-0 invisible 
+            <div className="absolute left-0 mt-2 min-w-[1000px] rounded-md shadow-lg bg-blue-700 opacity-0 invisible 
                           group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="rounded-md ring-1 ring-black ring-opacity-5">
-                    <div className="py-1">
-                        {items.map((item, index) => (
-                            <a
-                                key={index}
-                                href={item.path}
-                                className="block px-4 py-2 text-sm text-white hover:bg-yellow-500
-                                         hover:text-white transition-colors duration-150"
-                            >
-                                {item.name}
-                            </a>
-                        ))}
+                    <div className="py-2 px-4">
+                        <div className="flex gap-[1%] flex-wrap content-start">
+                            <div className="w-[30%] h-3/4 p-2">
+                                <div className="font-nunito text-[22px] text-white">
+                                    Danh Mục Sản Phẩm
+                                </div>
+                                {Object.keys(flattenedItems).map((category, index) => (
+                                    <div key={index} className={`block p-2 text-[15px] text-white hover:bg-gray-500
+                                                hover:text-white transition-colors duration-150 ${selectedCategory === category ? 'bg-gray-500': 'text-white'}`}
+                                                onMouseEnter={()=> setSelectedCategory(category)}>
+                                        {category}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="grow h-3/4 border-l-[1px] border-gray-700">
+                                <div className="w-[100%] p-2">
+                                    <div className="font-nunito text-[20px] text-white">{selectedCategory}</div>
+                                    <div className="flex flex-col gap-4">
+                                        {(() => {
+                                            const subCategories = Object.keys(flattenedItems[selectedCategory] || {});
+                                            
+                                            return (
+                                                <>
+                                                    {subCategories.map((subCategory, subIndex) => {
+                                                        const subjects = flattenedItems[selectedCategory]?.[subCategory] || [];
+                                                        const midPoint = Math.ceil(subjects.length / 2);
+                                                        const firstRowSubjects = subjects.slice(0, midPoint);
+                                                        const secondRowSubjects = subjects.slice(midPoint);
+
+                                                        return (
+                                                            <div key={subIndex} className="flex flex-col gap-2">
+                                                                <div className="text-white font-semibold">{subCategory}</div>
+                                                                <div className="grid grid-cols-2 gap-x-2">
+                                                                    <div className="flex flex-col">
+                                                                        {firstRowSubjects.map((subject, subjectIndex) => (
+                                                                            <div
+                                                                                key={subjectIndex}
+                                                                                onClick={() => navigate('/danh-sach-san-pham', { 
+                                                                                    state: { categoryName: subject.name } 
+                                                                                })}
+                                                                                className="block p-1 text-sm text-white hover:text-yellow-500 transition-colors duration-150 cursor-pointer"
+                                                                            >
+                                                                                {subject.name}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                    <div className="flex flex-col">
+                                                                        {secondRowSubjects.map((subject, subjectIndex) => (
+                                                                            <div
+                                                                                key={subjectIndex}
+                                                                                onClick={() => navigate('/danh-sach-san-pham', { 
+                                                                                    state: { categoryName: subject.name } 
+                                                                                })}
+                                                                                className="block p-1 text-sm text-white hover:text-yellow-500 transition-colors duration-150 cursor-pointer"
+                                                                            >
+                                                                                {subject.name}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+
 DropdownMenu.propTypes = {
     title: PropTypes.string.isRequired,
-    items: PropTypes.arrayOf(
-        PropTypes.shape({
-            path: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired
-        })
-    ).isRequired
+    data: PropTypes.object.isRequired,
+    navigate: PropTypes.func.isRequired
 };
-
 
 export default function Navbar() {
     const [isFocused, setIsFocused] = useState(false);
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
+    const [categories, setCategories] = useState([]);
+    const [categoryData, setCategoryData] = useState({});
+    const [searchQuery, setSearchQuery] = useState('');
+    const [user, setUser] = useState(null);
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const userData = await getCurrentUser();
+                setUser(userData);
+            } catch (error) {
+                console.error('Lỗi khi lấy thông tin user:', error);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    const handleLogout = () => {
+        // Xóa token và thông tin user
+        document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        localStorage.removeItem('user');
+        setUser(null);
+        navigate('/dang-nhap');
     };
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate('/danh-sach-san-pham', { 
+                state: { searchQuery: searchQuery.trim() } 
+            });
+        }
+    };
 
-    
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Lấy danh sách category parent
+                const parentResponse = await categoryParentApi.getAll();
+                const parentData = parentResponse;
+
+                // Lấy ngẫu nhiên 5 category parent
+                const randomParents = parentData
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, 5);
+
+                // Lấy dữ liệu cho mỗi category parent
+                const processedData = {};
+                await Promise.all(
+                    randomParents.map(async (parent) => {
+                        // Lấy danh sách category con
+                        const categoriesResponse = await categoryApi.getByParentId(parent.id_parent);
+                        const categories = categoriesResponse;
+
+                        // Tạo cấu trúc dữ liệu cho menu
+                        processedData[parent.name_parent] = {
+                            "": categories.reduce((acc, category) => {
+                                acc[category.name_category] = {
+                                    "Sản phẩm": {
+                                        [category.name_category]: `/danh-muc/${parent.name_parent.toLowerCase()}/${category.name_category.toLowerCase()}`
+                                    }
+                                };
+                                return acc;
+                            }, {})
+                        };
+                    })
+                );
+
+                setCategoryData(processedData);
+                setCategories(randomParents.map(parent => ({
+                    name: parent.name_parent,
+                    path: `/danh-muc/${parent.name_parent.toLowerCase()}`
+                })));
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     return (
-        <nav id="header" className="fixed top-0 z-30 w-full bg-transparent ">
-            <div className="h-[60px] bg-blue-800 shadow-lg flex items-center justify-between">
-                {/* Hamburger Menu for Small Screens */}
-                <div className="flex items-center md:hidden">
-                    <button onClick={toggleMenu} className="text-white focus:outline-none">
-                        <FontAwesomeIcon icon={faBars} className="w-6 h-6" />
-                    </button>
-                </div>
-                {/* Mid (Nav Links) */}
-                <div className="hidden md:flex space-x-12 text-white items-center mx-auto">
-                    {/*  (Logo) */}
+        <nav id="header" className="fixed top-0 z-30 w-full bg-transparent">
+            <div className="w-full h-[60px] bg-blue-800 shadow-lg flex items-center justify-between">
+                <div className="w-[100%] hidden md:flex space-x-14 text-white items-center justify-center mx-auto">
                     <div className="flex justify-center items-center">
-                        <a href="/">
+                        <a href="/" className="hover:scale-125">
                             <img src={Logo} alt="Logo" className="h-12 rounded-full overflow-hidden" />
                         </a>
-                        
                     </div>
 
-                    <a href="/" className="text-Light-Cream-500 hover:text-yellow-500">
-                        Trang Chủ
+                    <DropdownMenu title="Danh Mục" data={categoryData} navigate={navigate} />
+                                    
+                    <div onClick={() => navigate('/danh-sach-san-pham')} className="cursor-pointer hover:text-yellow-500">
+                       Sản Phẩm
+                    </div>
+                    <a href="/ve-chung-toi" className=" hover:text-yellow-500">
+                        About Us
                     </a>
-                    <DropdownMenu title="Thể Loại" items={categories} >
-                        <FontAwesomeIcon className="text-white" icon={faAngleDown} />
-                    </DropdownMenu>
-                        
-                    <DropdownMenu title="Quốc Gia" items={countries} />                
-                    <a href="/danh-sach-san-pham" className=" hover:text-yellow-500">
-                        Phim mới
-                    </a>
-                    <a href="/contact" className=" hover:text-yellow-500">
-                        Phim bộ
-                    </a>
-                    <a href="/support" className=" hover:text-yellow-500">
-                        Blog
-                    </a>
-                    <div className="max-w-4xl mx-auto pb-2 pt-2">   
-                        <div className={`relative transition-all duration-300 ${isFocused ? 'shadow-lg' : 'shadow-md'}`}>
+                    <div className={`w-[20%] relative transition-all duration-300 ${isFocused ? 'shadow-lg' : 'shadow-md'}`}>
+                        <form onSubmit={handleSearch} className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <FontAwesomeIcon 
                                     icon={faMagnifyingGlass} 
@@ -121,42 +270,95 @@ export default function Navbar() {
                                 />
                             </div>
                             <input 
-                            type="search" 
-                            id="default-search" 
-                            className="block w-full p-1  pl-12 text-sm text-gray-900 border border-gray-300 rounded-lg 
+                                type="search" 
+                                id="default-search" 
+                                className="block w-full p-1 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg 
                                         bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent 
                                         transition-all duration-300 ease-in-out
                                         dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
                                         dark:text-white dark:focus:ring-blue-500 dark:focus:border-Dark-Blue-400" 
-                            placeholder="Search..." 
-                            required 
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
+                                placeholder="Tìm kiếm sản phẩm..." 
+                                required 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => setIsFocused(false)}
                             />
-                            
-                        </div>
+                        </form>
                     </div>
-                    <div className="relative">
-                    
-                        <a href="/login" className="hover:bg-slate-500 
-                                            text-white font-bold text-xs py-2 px-4 rounded-xl">
-                            Đăng Nhập
-                        </a>
-                    </div>  
-                    {/* Mobile Menu */}
-                    <div className={`md:hidden fixed top-0 left-0 w-full h-full bg-[#252631] transition-transform transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} z-20`}>
-                        <div className="flex flex-col items-center justify-center h-full space-y-6">
-                            <a href="/" className="text-white text-lg hover:text-yellow-500" onClick={toggleMenu}>Home</a>
-                            <a href="/reviews" className="text-white text-lg hover:text-yellow-500" onClick={toggleMenu}>Movies</a>
-                            <a href="/about" className="text-white text-lg hover:text-yellow-500" onClick={toggleMenu}>About</a>
-                            <a href="/menu" className="text-white text-lg hover:text-yellow-500" onClick={toggleMenu}>Menu</a>
-                            <a href="/contact" className="text-white text-lg hover:text-yellow-500" onClick={toggleMenu}>Contact</a>
-                            <a href="/support" className="text-white text-lg hover:text-yellow-500" onClick={toggleMenu}>Policy</a>
-                            <button className="border-2 border-Bright-Pink-300 border-solid hover:bg-Bright-Pink-300 text-white font-bold text-xs py-2 px-4 rounded-xl" onClick={toggleMenu}>
+                    <div className="relative justify-center items-center flex flex-row space-x-4">                 
+                        {user ? (
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                                    className="flex items-center space-x-2 focus:outline-none"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                                        {user.avatar ? (
+                                            <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <FontAwesomeIcon icon={faUser} className="w-6 h-6 text-gray-600" />
+                                        )}
+                                    </div>
+                                    <span className="text-white">{user.email}</span>
+                                    <FontAwesomeIcon 
+                                        icon={faAngleDown} 
+                                        className={`w-4 h-4 transition-transform duration-200 ${showUserDropdown ? 'rotate-180' : ''}`}
+                                    />
+                                </button>
+                                
+                                {showUserDropdown && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                        <button
+                                            onClick={() => {
+                                                navigate('/trang-ca-nhan');
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                                        >
+                                            <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+                                            <span>Trang cá nhân</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/don-hang');
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                                        >
+                                            <FontAwesomeIcon icon={faShoppingBag} className="w-4 h-4" />
+                                            <span>Đơn hàng</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                handleLogout();
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center space-x-2"
+                                        >
+                                            <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4" />
+                                            <span>Đăng xuất</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <a href="/dang-nhap" className="hover:bg-slate-500 text-white font-bold text-xs py-2 px-4 rounded-xl">
                                 Đăng Nhập
-                            </button>
-                        </div>
-                    </div>
+                            </a>
+                        )}
+                        
+                        <CustomTransparentButton>
+                            <a href="/gio-hang">
+                                <FontAwesomeIcon icon={faCartShopping} size="lg" />
+                            </a>
+                        </CustomTransparentButton>
+                        <CustomTransparentButton>
+                            <a>
+                                <FontAwesomeIcon icon={faBell} size="lg" />
+                            </a>
+                        </CustomTransparentButton>
+                    </div>  
                 </div>
             </div>
         </nav>

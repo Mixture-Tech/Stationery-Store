@@ -12,6 +12,16 @@ export class ProductController {
         });
     }
 
+    // API để upload ảnh
+    uploadImage = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const imageUrl = await this.productService.uploadImage(req);
+            res.status(200).json({ imageUrl });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi upload ảnh", error });
+        }
+    };
+
     getAll = async (req: Request, res: Response): Promise<void> => {
         try {
             const products = await this.productService.getAll();
@@ -19,7 +29,7 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi lấy danh sách sản phẩm", error });
         }
-    }
+    };
 
     getById = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -33,7 +43,7 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi lấy thông tin sản phẩm", error });
         }
-    }
+    };
 
     getByCategoryId = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -43,7 +53,7 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi lấy danh sách sản phẩm theo danh mục", error });
         }
-    }
+    };
 
     getByBrand = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -53,7 +63,7 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi lấy danh sách sản phẩm theo thương hiệu", error });
         }
-    }
+    };
 
     create = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -62,7 +72,7 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi tạo sản phẩm mới", error });
         }
-    }
+    };
 
     update = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -76,7 +86,7 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi cập nhật sản phẩm", error });
         }
-    }
+    };
 
     delete = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -90,7 +100,7 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi xóa sản phẩm", error });
         }
-    }
+    };
 
     getByName = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -100,6 +110,19 @@ export class ProductController {
         } catch (error) {
             res.status(500).json({ message: "Lỗi khi tìm kiếm sản phẩm theo tên", error });
         }
-    }
-}
+    };
 
+    hide = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const id = parseInt(req.params.id);
+            const result = await this.productService.hideProduct(id);
+            if (!result) {
+                res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+                return;
+            }
+            res.json({ message: "Đã ẩn sản phẩm thành công" });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi khi ẩn sản phẩm", error });
+        }
+    };
+}

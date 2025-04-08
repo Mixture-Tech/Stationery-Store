@@ -53,7 +53,7 @@ const ProductCard = ({ id, src, name, rating, price, discount, discountPrice, ca
     return (
         <div className="w-[140px] h-auto rounded-lg overflow-hidden hover:shadow-lg shadow-xl hover:border-2 border-black flex flex-col mb-1 cursor-pointer"> {/* Thêm class cursor-pointer */}
             <div className="relative flex-grow" onClick={handleProductClick}>  {/* Thêm onClick */}
-                <img src={src} alt="Product" className="w-full h-[120px] object-cover hover:scale-110" />
+                <img src={src} alt="Product" className="w-full h-[120px] object-cover group-hover:scale-110 transition duration-200" />
             </div>
             <div className="p-2 flex flex-col justify-between">
                 <div>
@@ -73,14 +73,14 @@ const ProductCard = ({ id, src, name, rating, price, discount, discountPrice, ca
 };
 
 ProductCard.propTypes = {
-    id: PropTypes.string.isRequired,
-    src: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    rating: PropTypes.number.isRequired,
-    price: PropTypes.string.isRequired,
-    discount: PropTypes.string.isRequired,
-    discountPrice: PropTypes.string.isRequired,
-    categoryName: PropTypes.string.isRequired,
+    id: PropTypes.string,
+    src: PropTypes.string,
+    name: PropTypes.string,
+    rating: PropTypes.number,
+    price: PropTypes.string,
+    discount: PropTypes.string,
+    discountPrice: PropTypes.string,
+    categoryName: PropTypes.string,
 };
 
 export default ProductCard;

@@ -1,18 +1,45 @@
 import { useState } from "react";
-import { Button } from "@mui/material";
+import { Button, Snackbar, Alert } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import { addToCart } from "../../services/apis/cartApi";
 
 const ProductDetail = () => {
     const location = useLocation();
     const product = location.state;
     const [quantity, setQuantity] = useState(1);
+    const [notification, setNotification] = useState({
+        open: false,
+        message: "",
+        severity: "success" // success, error, warning, info
+    });
 
-    const handleAddToCart = () => {
-        alert("Đã thêm vào giỏ hàng!");
+    const handleAddToCart = async () => {
+        try {
+            await addToCart(product.productId, quantity);
+            setNotification({
+                open: true,
+                message: "Đã thêm sản phẩm vào giỏ hàng thành công!",
+                severity: "success"
+            });
+        } catch (error) {
+            setNotification({
+                open: true,
+                message: error.message || "Có lỗi xảy ra khi thêm vào giỏ hàng",
+                severity: "error"
+            });
+        }
     };
 
     const handleBuyNow = () => {
-        alert("Mua ngay!");
+        setNotification({
+            open: true,
+            message: "Tính năng đang được phát triển!",
+            severity: "info"
+        });
+    };
+
+    const handleCloseNotification = () => {
+        setNotification(prev => ({ ...prev, open: false }));
     };
 
     if (!product) {
@@ -176,6 +203,23 @@ const ProductDetail = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Component thông báo */}
+            <Snackbar
+                open={notification.open}
+                autoHideDuration={3000}
+                onClose={handleCloseNotification}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+                <Alert
+                    onClose={handleCloseNotification}
+                    severity={notification.severity}
+                    variant="filled"
+                    sx={{ width: "100%" }}
+                >
+                    {notification.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

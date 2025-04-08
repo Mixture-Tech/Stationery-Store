@@ -6,6 +6,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import BasicLayout from "./layouts/BasicLayout";
 import BlankLayout from "./layouts/LayoutNotSearch";
 import CartProvider from "./context/CartProvider";
+import AdminLayout from "./pages/Admin/layouts/LayoutAdmin.jsx"
 
 const Login = loadable(() => import("./pages/Auth/Login"));
 const Regiter = loadable(() => import("./pages/Auth/Register"));
@@ -16,7 +17,8 @@ const Payment = loadable(() => import('./pages/Payment'));
 const ListProduct = loadable(() => import("./pages/list_product"));
 const AboutUs = loadable(() => import("./pages/AboutUs"));
 const ProductDetail = loadable(() => import("./pages/ProductDetail/index.jsx"));
-
+const VerifyEmail = loadable(() => import("./pages/Auth/VerifyEmail"));
+const Profile = loadable(() => import("./pages/Profile"));
 //ADMIN
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
@@ -96,6 +98,14 @@ export default function App() {
                             </Suspense>
                         }
                     />
+                     <Route
+                        path="/trang-ca-nhan"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <Profile title="Trang cá nhân" />
+                            </Suspense>
+                        }
+                    />
                 </Route>
                 <Route element={<BlankLayout />}>
                     <Route
@@ -114,6 +124,14 @@ export default function App() {
                             </Suspense>
                         }
                     />
+                    <Route
+                        path="/xac-nhan-email"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <VerifyEmail title="Xác Nhận Email" />
+                            </Suspense>
+                        }
+                    />
                 </Route>
                 {/* ADMIN */}
                 <Route element={<BlankLayout />}>
@@ -126,7 +144,7 @@ export default function App() {
                         }
                     />
                 </Route>
-                <Route element={<BasicLayout />}>
+                <Route element={<AdminLayout />}>
                     <Route
                         path="/trang-chu-admin"
                         element={

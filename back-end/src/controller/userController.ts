@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserService } from "../services/userService";
+import { UserService } from "../services/UserService";
 import { AuthService } from "../services/AuthService";
 import { UserDTO } from "../dto/userDTO";
 
@@ -104,47 +104,6 @@ export class UserController {
                 status: 500,
                 error: error instanceof Error ? error.message : "Unknown error",
             });
-        }
-    }
-
-    async login(req: Request, res: Response) {
-        try {
-            const { email, password } = req.body;
-            const result = await this.authService.login(email, password);
-            res.json(result);
-        } catch (error) {
-            res.status(401).json({ message: "Invalid credentials", error });
-        }
-    }
-
-    async register(req: Request, res: Response) {
-        try {
-            const userData: UserDTO = req.body;
-            const result = await this.authService.register(userData);
-            res.status(201).json(result);
-        } catch (error) {
-            res.status(500).json({ message: "Error registering user", error });
-        }
-    }
-
-    async changePassword(req: Request, res: Response) {
-        try {
-            const { oldPassword, newPassword } = req.body;
-            const userId = Number(req.params.id);
-            await this.authService.changePassword(userId, oldPassword, newPassword);
-            res.json({ message: "Password changed successfully" });
-        } catch (error) {
-            res.status(500).json({ message: "Error changing password", error });
-        }
-    }
-
-    async resetPassword(req: Request, res: Response) {
-        try {
-            const { email } = req.body;
-            await this.authService.resetPassword(email);
-            res.json({ message: "Password reset successfully" });
-        } catch (error) {
-            res.status(500).json({ message: "Error resetting password", error });
         }
     }
 }

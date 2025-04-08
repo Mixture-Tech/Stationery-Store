@@ -35,7 +35,7 @@ export class Order {
     @UpdateDateColumn()
     update_at: Date;
 
-    @Column({ type: "bit", width: 1, default: 0 })
+    @Column({ type: "bit", width: 1, default: () => "b'0'" })
     hide: boolean;
 
     @ManyToOne(() => User, (user) => user.orders)

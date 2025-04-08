@@ -23,13 +23,17 @@ export const categoryApi = {
 
     // Cập nhật category
     update: (id, data) => {
-        return axiosClient.put(`/categories/id/${id}`, data);
+        return axiosClient.put(`/categories/${id}`, data);
     },
 
     // Xóa category
-    delete: (id) => {
-        return axiosClient.delete(`/categories/${id}`);
+    // delete: (id) => {
+    //     return axiosClient.delete(`/categories/${id}`);
+    // },
+    hideCategory: (id) => {
+        return axiosClient.put(`/categories/${id}/hide`);
     },
+
 
     // Lấy category theo tên
     getCategoryByName: (categoryName) => {
