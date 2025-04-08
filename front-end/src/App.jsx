@@ -6,6 +6,7 @@ import AuthLayout from "./layouts/AuthLayout";
 import BasicLayout from "./layouts/BasicLayout";
 import BlankLayout from "./layouts/LayoutNotSearch";
 import CartProvider from "./context/CartProvider";
+import AdminLayout from "./pages/Admin/layouts/LayoutAdmin.jsx"
 
 const Login = loadable(() => import("./pages/Auth/Login"));
 const Regiter = loadable(() => import("./pages/Auth/Register"));
@@ -143,7 +144,7 @@ export default function App() {
                         }
                     />
                 </Route>
-                <Route element={<BasicLayout />}>
+                <Route element={<AdminLayout />}>
                     <Route
                         path="/trang-chu-admin"
                         element={

@@ -3,35 +3,60 @@ import EditButton from './EditButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
+import { categoryParentApi } from '../../../services/apis/CategoryParentApi';
 
-const CardCategory = ({ categories }) => {
+const CardCategory = ({ categories, onCategoryDelete, onEditCategory }) => {
+  const [categoryParents, setCategoryParents] = useState({}); // Khởi tạo là object thay vì mảng
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    // Khởi tạo state cho mỗi Category (nếu chưa có)
-    const initialStates = {};
-    categories.forEach(Category => {
-      initialStates[Category.id] = false;
-    });
-  }, [categories]);
+    const fetchCategoryParents = async () => {
+      try {
+        const response = await categoryParentApi.getAll();
+        // Chuyển mảng response thành object map
+        const categoryParentMap = response.reduce((acc, categoryParent) => {
+          acc[categoryParent.id_parent] = categoryParent.name_parent;
+          return acc;
+        }, {});
+        setCategoryParents(categoryParentMap); // Gán object map vào state
+      } catch (error) {
+        console.error('Lỗi khi tải danh mục sản phẩm cha:', error);
+        toast.error('Không thể tải danh mục sản phẩm cha');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Hàm hiển thị trạng thái ẩn/hiện
+    fetchCategoryParents();
+  }, []);
+
   const getHideStatus = (hide) => {
-    return hide === 0 ? 'Ẩn' : 'Hiện';
+    return hide ? 'Ẩn' : 'Hiện';
+  };
+
+  const getCategoryParentName = (id_parent) => {
+    return categoryParents[id_parent] || 'Chưa phân loại';
+  };
+
+  const handleDeleteSuccess = (deletedCategoryId) => {
+    if (onCategoryDelete) {
+      onCategoryDelete(deletedCategoryId);
+    }
   };
 
   return (
     <>
       {categories.map((category) => (
-        <div key={category.id}>
-          {/* Hàng thông tin sản phẩm */}
+        <div key={category.id_category}>
           <div className="grid grid-cols-4 gap-2 mt-2 border rounded-md place-items-center">
             <div className="w-1/2">
               <div className="px-2 py-3 font-nunito text-gray-800 text-center">
-                {category.id_category}
+                {category.name_category}
               </div>
             </div>
             <div className="w-full">
               <div className="px-2 py-3 font-nunito text-gray-800 text-center">
-                {category.name_category}
+                {getCategoryParentName(category.id_parent)}
               </div>
             </div>
             <div className="w-full">
@@ -40,9 +65,11 @@ const CardCategory = ({ categories }) => {
               </div>
             </div>
             <div className="w-[100%] flex justify-center">
-              <EditButton>
-                <FontAwesomeIcon className="text-white" icon={faAngleDown} />
-              </EditButton>
+              <EditButton
+                categoryId={category.id_category}
+                onDeleteSuccess={handleDeleteSuccess}
+                onEditCategory={onEditCategory}
+              />
             </div>
           </div>
         </div>
@@ -54,11 +81,13 @@ const CardCategory = ({ categories }) => {
 CardCategory.propTypes = {
     categories: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
+      id_category: PropTypes.number.isRequired,
+      name_category: PropTypes.string.isRequired,
       hide: PropTypes.number.isRequired,
     })
   ).isRequired,
+  onCategoryDelete: PropTypes.func,
+  onEditCategory: PropTypes.func,
 };
 
 export default CardCategory;

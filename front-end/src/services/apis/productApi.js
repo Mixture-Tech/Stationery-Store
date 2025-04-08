@@ -22,8 +22,11 @@ export const productApi = {
     },
 
     // Xóa sản phẩm
-    deleteProduct: (id) => {
-        return axiosClient.delete(`/products/${id}`);
+    // deleteProduct: (id) => {
+    //     return axiosClient.delete(`/products/${id}`);
+    // },
+    hideProduct: (id) => {
+        return axiosClient.put(`/products/${id}/hide`);
     },
 
     // Lấy sản phẩm theo danh mục
@@ -39,5 +42,17 @@ export const productApi = {
     searchProducts: (name) => {
         const url = `/products/name/${encodeURIComponent(name)}`;
         return axiosClient.get(url);
-    }
+    },
+
+    uploadImage: (file) => {
+        const formData = new FormData();
+        formData.append('image', file); // Key 'image' phải khớp với upload.single('image') ở backend
+    
+        return axiosClient.post('/products/upload-image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+    
 };

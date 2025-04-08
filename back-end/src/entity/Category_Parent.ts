@@ -12,7 +12,7 @@ export class Category_Parent {
     @Column({ length: 20, nullable: true })
     link: string;
 
-    @Column({ type: "bit", width: 1, default: 0 })
+    @Column({ type: "bit", width: 1, default: () => "b'0'" })
     hide: boolean;
 
     @CreateDateColumn()

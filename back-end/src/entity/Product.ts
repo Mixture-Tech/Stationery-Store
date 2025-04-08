@@ -1,11 +1,11 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
 import { Category } from "./Category";
 import { Order_Detail } from "./Order_Detail";
 import { Cart } from "./Cart";
 
 @Entity("product")
 export class Product {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id_product: number;
 
     @Column()
@@ -47,7 +47,15 @@ export class Product {
     @Column({ nullable: true })
     discount: number;
 
-    @Column({ type: "bit", width: 1, default: 0 })
+    @Column({
+        type: "bit",
+        width: 1,
+        default: () => "b'0'",
+        transformer: {
+          to: (value: boolean) => value ? 1 : 0, // Khi lưu vào DB
+          from: (value: Buffer) => value[0] === 1, // Khi lấy từ DB
+        },
+      })
     hide: boolean;
 
     @ManyToOne(() => Category, (category) => category.products)

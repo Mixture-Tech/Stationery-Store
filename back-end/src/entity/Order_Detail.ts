@@ -29,7 +29,7 @@ export class Order_Detail {
     @Column({ nullable: true })
     total_product: number;
 
-    @Column({ type: "bit", width: 1, default: 0 })
+    @Column({ type: "bit", width: 1, default: () => "b'0'" })
     hide: boolean;
 
     @ManyToOne(() => Product, (product) => product.orderDetails)

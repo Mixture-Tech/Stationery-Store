@@ -4,8 +4,9 @@ import SideBar from "../Components/SideBar";
 import SubSidebar from "../Components/SubSidebar";
 import CardUser from "../Components/CardUser";
 import CardProduct from "../Components/CardProduct";
-import CreateProduct from "../Components/CreateProduct";
-import CreateCategory from "../Components/CreateCategory";
+import CreateProduct from "./Product/CreateProduct.jsx";
+import EditProduct from "./Product/EditProduct.jsx"; // Thêm import EditProduct
+import CreateCategory from "./Category/CreateCategory.jsx";
 import CreateUser from "../Components/CreateUser";
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import CardCategory from "../Components/CardCategory";
@@ -13,68 +14,38 @@ import { categoryApi } from "../../../services/apis/categoryApi";
 import { productApi } from "../../../services/apis/productApi";
 import { userApi } from "../../../services/apis/userApi";
 import SearchBox from "../Components/SearchBox";
+import ProductList from "./Product/ProductList.jsx"; 
+import CategoryList from "./Category/CategoryList.jsx";
+import EditCategory from "./Category/EditCategory.jsx";
 
-const DashBoard = () => {
+export default function DashBoard() {
     const [menu, setMenu] = useState(0);
-    const [isFocused, setIsFocused] = useState(false);
     const [activeTab, setActiveTab] = useState('viewAll');
-    const [categories, setCategories] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [loadingProducts, setLoadingProducts] = useState(true);
-    const [loadingUsers, setLoadingUsers] = useState(true);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await categoryApi.getAll();
-                setCategories(response);
-            } catch (error) {
-                console.error('Lỗi khi lấy danh sách categories:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        const fetchProducts = async () => {
-            try {
-                const response = await productApi.getAllProducts();
-                setProducts(response);
-            } catch (error) {
-                console.error('Lỗi khi lấy danh sách products:', error);
-            } finally {
-                setLoadingProducts(false);
-            }
-        };
-
-        const fetchUsers = async () => {
-            try {
-                const response = await userApi.getAllUsers();
-                setUsers(response);
-            } catch (error) {
-                console.error('Lỗi khi lấy danh sách users:', error);
-            } finally {
-                setLoadingUsers(false);
-            }
-        };
-
-        fetchCategories();
-        fetchProducts();
-        fetchUsers();
-        
-    }, []);
+    const [selectedProductId, setSelectedProductId] = useState(null); // Thêm state để lưu productId
+    const [selectedCategoryId, setSelectedCategoryId] = useState(null); // Thêm state để lưu categoryId
 
     // Hàm xử lý khi click vào menu
     const handleMenuChange = (newMenu) => {
         setMenu(newMenu);
         setActiveTab('viewAll'); // Reset về viewAll khi chuyển menu
+        setSelectedProductId(null); // Reset productId khi chuyển menu
+    };
+
+    // Hàm xử lý khi chọn chỉnh sửa sản phẩm
+    const handleEditProduct = (productId) => {
+        setActiveTab('edit');
+        setSelectedProductId(productId);
+    };
+
+    const handleEditCategory = (categoryId) => {
+        setActiveTab('edit');
+        setSelectedCategoryId(categoryId);
     };
 
     return (
         <main>
-            <div className="container min-h-screen mt-16">
-                <div className="flex gap-[1%] p-6">
+            <div className="container min-h-screen">
+                <div className="flex gap-[0.5%] p-6">
                     {/* Sidebar */}
                     <SideBar menu={menu} setMenu={handleMenuChange}></SideBar>
 
@@ -86,83 +57,17 @@ const DashBoard = () => {
                     {/* Content */}
                     <div className="flex-1">
                         <div className="w-full min-h-screen p-4 bg-white shadow-lg border-2 rounded-xl">
-                            {/* Action User (menu === 0) */}
-                            {menu === 0 && activeTab === 'viewAll' && (
-                                <div className="flex flex-col w-full">
-                                    <SearchBox width="15%" />
-                                    {/* Hàng tiêu đề (Header) */}
-                                    <div className="grid grid-cols-6 gap-6 bg-gray-200 rounded-md">
-                                        {["ID", "Tên", "Email", "Create At", "Role","Action"].map((label, index) => (
-                                            <div key={index} className="px-2 py-3 font-nunito font-bold text-gray-600 text-center">
-                                                {label}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {loadingUsers ? (
-                                        <div className="text-center py-4">Đang tải...</div>
-                                    ) : users.length === 0 ? (
-                                        <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu người dùng</div>
-                                    ) : (
-                                        <CardUser users={users}/>
-                                    )}
-                                </div>
-                            )}
+                            {/* User Management */}
+                            {/* {menu === 0 && activeTab === 'viewAll' && <UserList />} */}
 
-                            {/* Action Category (menu === 1) */}
+                            {/* Category Management */}
                             {menu === 1 && activeTab === 'viewAll' && (
-                                <div className="flex flex-col w-full">
-                                    <SearchBox width="15%" />
-                                    {/* Hàng tiêu đề (Header) */}
-                                    <div className="grid grid-cols-4 gap-4 bg-gray-200 rounded-md place-items-center">
-                                        {[
-                                            { label: "ID" },
-                                            { label: "Tên" },
-                                            { label: "Ẩn/Hiện" },
-                                            { label: "Action" },
-                                        ].map((item, index) => (
-                                            <div key={index} className="px-2 py-3 font-nunito font-bold text-gray-600 text-center">
-                                                {item.label}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {loading ? (
-                                        <div className="text-center py-4">Đang tải...</div>
-                                    ) : categories.length === 0 ? (
-                                        <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu danh mục</div>
-                                    ) : (
-                                        <CardCategory categories={categories}/>
-                                    )}
-                                </div>
+                                <CategoryList onEditCategory={handleEditCategory}/>
                             )}
 
-                            {/* Action Product (menu === 2) */}
+                            {/* Product Management */}
                             {menu === 2 && activeTab === 'viewAll' && (
-                                <div className="flex flex-col w-full">
-                                    <SearchBox width="15%" />
-                                    {/* Hàng tiêu đề (Header) */}
-                                    <div className="grid grid-cols-[0.3fr_1.6fr_0.7fr_0.5fr_0.5fr_0.5fr_0.9fr] gap-4 bg-gray-200 rounded-md place-items-center">
-                                        {[
-                                            { label: "ID" },
-                                            { label: "Tên" },
-                                            { label: "Hàng Tồn" },
-                                            { label: "Giá" },
-                                            { label: "Ẩn/Hiện" },
-                                            {label: "Hãng"},
-                                            { label: "Action" },
-                                        ].map((item, index) => (
-                                            <div key={index} className="px-2 py-3 font-nunito font-bold text-gray-600 text-center">
-                                                {item.label}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {loadingProducts ? (
-                                        <div className="text-center py-4">Đang tải...</div>
-                                    ) : products.length === 0 ? (
-                                        <div className="text-center py-4 font-nunito font-bold text-gray-500">Chưa có dữ liệu sản phẩm</div>
-                                    ) : (
-                                        <CardProduct products={products}/>   
-                                    )}
-                                </div>
+                                <ProductList onEditProduct={handleEditProduct} /> // Truyền hàm handleEditProduct
                             )}
 
                             {/* Create Forms */}
@@ -170,12 +75,28 @@ const DashBoard = () => {
                                 <div className="flex flex-col w-full">
                                     <h2 className="text-2xl font-bold mb-4">
                                         {menu === 0 ? 'Create New User' : 
-                                         menu === 1 ? 'Create New Category' : 
-                                         'Create New Product'}
+                                         menu === 1 ? 'Thêm loại mới' : 
+                                         'Thêm sản phẩm mới'}
                                     </h2>
-                                    {menu === 0 && <CreateUser />}
+                                    {/* {menu === 0 && <CreateUser />} */}
                                     {menu === 1 && <CreateCategory />}
                                     {menu === 2 && <CreateProduct />}
+                                </div>
+                            )}
+
+                            {/* Edit Category */}
+                            {menu === 1 && activeTab === 'edit' && selectedCategoryId && (
+                                <div className="flex flex-col w-full">
+                                    <h2 className="text-2xl font-bold mb-4">Chỉnh sửa danh mục sản phẩm</h2>
+                                    <EditCategory categoryId={selectedCategoryId} />
+                                </div>
+                            )}
+
+                            {/* Edit Product */}
+                            {menu === 2 && activeTab === 'edit' && selectedProductId && (
+                                <div className="flex flex-col w-full">
+                                    <h2 className="text-2xl font-bold mb-4">Chỉnh sửa sản phẩm</h2>
+                                    <EditProduct productId={selectedProductId} />
                                 </div>
                             )}
                         </div>
@@ -184,6 +105,4 @@ const DashBoard = () => {
             </div>
         </main>
     );
-};
-
-export default DashBoard;
+}
