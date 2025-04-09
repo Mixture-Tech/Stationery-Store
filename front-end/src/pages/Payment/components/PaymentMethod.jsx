@@ -1,6 +1,4 @@
-import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography, Button } from "@mui/material";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
 export default function PaymentMethod({ phuongThucThanhToan, setPhuongThucThanhToan }) {
@@ -15,6 +13,11 @@ export default function PaymentMethod({ phuongThucThanhToan, setPhuongThucThanhT
                     value={phuongThucThanhToan}
                     onChange={(e) => setPhuongThucThanhToan(e.target.value)}
                 >
+                    <FormControlLabel
+                        value="COD"
+                        control={<Radio />}
+                        label="Thanh toán khi nhận hàng (COD)"
+                    />
                     <FormControlLabel
                         value="MoMo"
                         control={<Radio />}
@@ -41,6 +44,7 @@ export default function PaymentMethod({ phuongThucThanhToan, setPhuongThucThanhT
                             </Box>
                         }
                     />
+                    
                 </RadioGroup>
             </FormControl>
         </Box>

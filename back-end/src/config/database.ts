@@ -26,9 +26,8 @@ export async function initializeDatabase(): Promise<DataSource> {
 
     const connection = await mysql.createConnection({
         host: "localhost",
-        port: 3310,
+        port: 3306,
         user: "root",
-        password: "password",
     }); 
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
     await connection.end();
@@ -36,9 +35,8 @@ export async function initializeDatabase(): Promise<DataSource> {
     const dataSource = new DataSource({
         type: "mysql",
         host: "localhost",
-        port: 3310,
+        port: 3306,
         username: "root",
-        password: "password",
         database: DB_NAME,
         synchronize: false, // Tự động đồng bộ schema
         dropSchema: false, // Không xóa schema cũ mỗi khi khởi động (nên dùng trong production)

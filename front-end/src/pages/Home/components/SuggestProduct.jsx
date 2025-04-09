@@ -31,7 +31,7 @@ const SuggestProduct = ({products}) => {
                 <div className="flex justify-center pb-4">
                     <button 
                         onClick={handleShowMore}
-                        className="px-2 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+                        className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
                     >
                         Xem thêm
                     </button>

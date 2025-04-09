@@ -12,6 +12,7 @@ const Payment = () => {
     const location = useLocation();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [phuongThucThanhToan, setPhuongThucThanhToan] = useState("COD");
 
     useEffect(() => {
         if (location.state?.products) {
@@ -35,7 +36,7 @@ const Payment = () => {
 
             <Grid container spacing={3}>
                 <Grid item xs={12} md={3}>
-                    <PaymentMethod />
+                    <PaymentMethod phuongThucThanhToan={phuongThucThanhToan} setPhuongThucThanhToan={setPhuongThucThanhToan} />
                 </Grid>
 
                 <Grid item xs={12} md={9}>

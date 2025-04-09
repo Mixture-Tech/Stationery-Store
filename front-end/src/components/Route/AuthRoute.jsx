@@ -1,4 +1,4 @@
-import {Route, Navigate, Outlet} from "react-router-dom";
+import {Navigate, Outlet} from "react-router-dom";
 import { checkAuth } from "../../services/auth/auth";
 
 const isAuthenticated = () =>{

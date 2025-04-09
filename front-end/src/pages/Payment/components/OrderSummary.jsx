@@ -1,26 +1,12 @@
 import { Card, CardContent, Typography, Box, Button } from "@mui/material";
-import { useState } from "react";
 import PropTypes from 'prop-types';
-import payementApi from "../../../services/apis/paymentApi";
+import { useNavigate } from 'react-router-dom';
 
 export default function OrderSummary({ products, deliveryFee, total }) {
-    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handlePayment = async () => {
-        try {
-            setIsLoading(true);
-            const orderData = {
-                amount: total,
-                orderId: `ORDER_${Date.now()}`,
-                orderInfo: `Thanh toán đơn hàng từ Stationery Store - ${products.length} sản phẩm`
-            };
-            await payementApi.createMomoPayment(orderData);
-        } catch (error) {
-            console.error('Payment failed:', error);
-            // TODO: Hiển thị thông báo lỗi cho người dùng
-        } finally {
-            setIsLoading(false);
-        }
+        navigate('/thanh-toan/thanh-cong', {state: {products, deliveryFee, total}});
     };
 
     return (
@@ -29,9 +15,12 @@ export default function OrderSummary({ products, deliveryFee, total }) {
                 <Typography variant="h6" gutterBottom>Chi tiết đơn hàng</Typography>
                 {products.map(product => (
                     <Box key={product.id_product} display="flex" alignItems="center" justifyContent="space-between" my={1}>
-                        <img src={product.productImage} alt="Áo thun" width={50} height={50} />
-                        <Typography>{product.productName}</Typography>
-                        <Typography>{product.total_price.toLocaleString()}₫</Typography>
+                        <img src={product.productImage} alt={product.productName} width={50} height={50} style={{marginRight: '10px'}}/>
+                        <Box flexGrow={1}>
+                            <Typography>{product.productName}</Typography>
+                            <Typography variant="body2" color="text.secondary">SL: {product.quantity || 1}</Typography>
+                        </Box>
+                        <Typography sx={{minWidth: '80px', textAlign: 'right'}}>{typeof product.total_price === 'number' ? product.total_price.toLocaleString() : 'N/A'}₫</Typography>
                     </Box>
                 ))}
                 <Box display="flex" justifyContent="space-between" my={1}>
@@ -40,20 +29,19 @@ export default function OrderSummary({ products, deliveryFee, total }) {
                 </Box>
                 <Box display="flex" justifyContent="space-between" my={1}>
                     <Typography>Phí vận chuyển</Typography>
-                    <Typography>{deliveryFee}</Typography>
+                    <Typography>{typeof deliveryFee === 'number' ? deliveryFee.toLocaleString() : 'N/A'}₫</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" my={2} fontWeight="bold">
                     <Typography>Tổng cộng</Typography>
-                    <Typography>{total}</Typography>
+                    <Typography>{typeof total === 'number' ? total.toLocaleString() : 'N/A'}₫</Typography>
                 </Box>
                 <Button 
                     variant="contained" 
                     color="primary" 
                     fullWidth
                     onClick={handlePayment}
-                    disabled={isLoading}
                 >
-                    {isLoading ? 'Đang xử lý...' : 'Tiếp tục thanh toán'}
+                    Tiếp tục thanh toán
                 </Button>
                 <Button variant="text" color="error" fullWidth>
                     Hủy thanh toán
@@ -65,11 +53,12 @@ export default function OrderSummary({ products, deliveryFee, total }) {
 
 OrderSummary.propTypes = {
     products: PropTypes.arrayOf(PropTypes.shape({
-        id_product: PropTypes.string.isRequired,
+        id_product: PropTypes.number.isRequired,
         productImage: PropTypes.string.isRequired,
         productName: PropTypes.string.isRequired,
-        total_price: PropTypes.number.isRequired
+        quantity: PropTypes.number.isRequired,
+        total_price: PropTypes.number
     })).isRequired,
-    deliveryFee: PropTypes.number.isRequired,
-    total: PropTypes.number.isRequired
+    deliveryFee: PropTypes.number,
+    total: PropTypes.number
 };

@@ -116,7 +116,7 @@ export default function ListProduct() {
                     <div className="space-y-4">
                         <div>
                             <h3 className="font-medium mb-2">Theo Danh Mục</h3>
-                            <div className="space-y-2">
+                            <div className="space-y-2 max-h-[300px] overflow-y-auto">
                                 {allCategories.map((cat) => (
                                     <label key={cat.id_category} className="flex items-center">
                                         <input 
@@ -125,7 +125,7 @@ export default function ListProduct() {
                                             checked={category?.id_category === cat.id_category}
                                             onChange={() => {
                                                 setCategory(cat);
-                                                setCurrentPage(1); // Reset về trang 1 khi chọn category mới
+                                                setCurrentPage(1);
                                                 navigate('/danh-sach-san-pham', { 
                                                     state: { categoryName: cat.name_category } 
                                                 });
