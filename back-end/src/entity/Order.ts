@@ -1,49 +1,50 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { User } from "./User";
-import { District } from "./District";
-import { Order_Detail } from "./Order_Detail";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { User } from './User';
+import { Province } from './Province';
+import { District } from './District';
+import { Order_Detail } from './Order_Detail';
 
-@Entity("order_table")
+@Entity('order_table')
 export class Order {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id_order: number;
 
-    @Column({ type: "double" })
-    total_price: number;
-
-    @Column({ length: 100, nullable: true })
-    status: string;
-
     @Column()
-    id_district: number;
+    id_user: number;
 
     @Column()
     id_province: number;
 
     @Column()
-    id_area: number;
-
-    @Column({ nullable: true })
-    paymentmethods: string;
+    id_district: number;
 
     @Column()
-    id_user: number;
+    area: string;
 
-    @CreateDateColumn()
-    create_at: Date;
+    @Column()
+    phone: string;
 
-    @UpdateDateColumn()
-    update_at: Date;
+    @Column()
+    delivery_fee: number;
 
-    @Column({ type: "bit", width: 1, default: () => "b'0'" })
-    hide: boolean;
+    @Column()
+    total_price: number;
 
-    @ManyToOne(() => User, (user) => user.orders)
+    @Column({ default: 'pending' })
+    status: string;
+
+    @ManyToOne(() => User, user => user.orders)
+    @JoinColumn({ name: 'id_user' })
     user: User;
 
-    @ManyToOne(() => District, (district) => district.orders)
+    @ManyToOne(() => Province, province => province.orders)
+    @JoinColumn({ name: 'id_province' })
+    province: Province;
+
+    @ManyToOne(() => District, district => district.orders)
+    @JoinColumn({ name: 'id_district' })
     district: District;
 
-    @OneToMany(() => Order_Detail, (orderDetail) => orderDetail.order)
+    @OneToMany(() => Order_Detail, orderDetail => orderDetail.order)
     orderDetails: Order_Detail[];
 }

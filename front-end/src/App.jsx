@@ -23,8 +23,7 @@ const Profile = loadable(() => import("./pages/Profile"));
 const NotFoundPage = loadable(() => import("./components/404"));
 const UnauthorizedPage = loadable(() => import("./components/401"));
 const Success = loadable(() => import("./pages/Payment/Success"));
-const OrderHistory = loadable(() => import("./pages/OrderHistory"));
-//ADMIN
+
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
 
@@ -86,14 +85,6 @@ export default function App() {
                         }
                     />
                     <Route element={<ProtectedRoute />}>
-                        <Route
-                            path="/lich-su-don-hang"
-                            element={
-                                <Suspense fallback={<CircularProgress />}>
-                                    <OrderHistory title="Lịch sử đơn hàng" />
-                                </Suspense>
-                            }
-                        />
                         <Route
                             path="/thanh-toan"
                             element={

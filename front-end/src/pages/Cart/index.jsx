@@ -48,12 +48,17 @@ Table.propTypes = {
 };
 
 const ItemCarousel = React.memo(function ItemCarousel({ image, title, price }) {
-    const formattedPrice = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
+    const formattedPrice = new Intl.NumberFormat("vi-VN", { 
+        style: "currency", 
+        currency: "VND",
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+    }).format(price);
     return (
         <div className="flex flex-col items-start justify-center w-48 shadow p-2">
             <img className="object-cover w-48 h-48 rounded-lg" src={image} alt={title} />
             <p className="mt-2 mb-2 text-lg font-bold h-14 line-clamp-2 hover:line-clamp-none">{title}</p>
-            <p className="my-3 text-sm text-Light-Apricot-500">{formattedPrice}</p>
+            <p className="my-3 text-sm font-bold text-Light-Apricot-500">{formattedPrice}</p>
             <button className="w-full px-3 py-2 font-semibold text-white rounded-lg bg-indigo-600 hover:bg-indigo-500">
                 Đặt hàng ngay
             </button>

@@ -73,7 +73,7 @@ router.get("/orders/user/:userId", authenticateToken, orderController.getByUserI
  *       201:
  *         description: Trả về thông tin đơn hàng vừa được tạo
  */
-router.post("/orders", authenticateToken, orderController.create);
+router.post("/orders/create", authenticateToken, orderController.create);
 
 /**
  * @swagger

@@ -12,6 +12,8 @@ import { categoryParentApi } from '../../../services/apis/CategoryParentApi';
 import { categoryApi } from '../../../services/apis/categoryApi';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../../../services/apis/auth';
+import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
+
 
 const DropdownMenu = ({ title, data, navigate }) => {
     const flattenData = (data) => {
@@ -321,13 +323,23 @@ export default function Navbar() {
                                         </button>
                                         <button
                                             onClick={() => {
-                                                navigate('/don-hang');
+                                                navigate('/gio-hang');
                                                 setShowUserDropdown(false);
                                             }}
                                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                                         >
                                             <FontAwesomeIcon icon={faShoppingBag} className="w-4 h-4" />
-                                            <span>Đơn hàng</span>
+                                            <span>Giỏ hàng</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                navigate('/thanh-toan/thanh-cong');
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                                        >
+                                            <FontAwesomeIcon icon={faClipboardList} className="w-4 h-4" />
+                                            <span>Xem đơn hàng</span>
                                         </button>
                                         <button
                                             onClick={() => {

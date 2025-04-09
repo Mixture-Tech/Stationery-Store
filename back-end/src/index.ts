@@ -11,6 +11,9 @@ import categoryParentRouter from "./routes/CategoryParentRouter";
 import { AppDataSource } from "./config/database";
 import authRouter from "./routes/AuthRouter";
 import cartRouter from "./routes/CartRouter";
+import orderRouter from "./routes/OrderRouter";
+import provinceRouter from "./routes/ProvinceRouter";
+import districtRouter from "./routes/DistrictRouter";
 
 const app = express();
 
@@ -47,6 +50,9 @@ app.use("/api/v1", categoryRouter);
 app.use("/api/v1", categoryParentRouter);
 app.use("/api/v1", authRouter);
 app.use("/api/v1", cartRouter);
+app.use("/api/v1", orderRouter);
+app.use("/api/v1", provinceRouter);
+app.use("/api/v1", districtRouter);
 // Khởi động server
 const PORT = process.env.PORT || 3000;
 

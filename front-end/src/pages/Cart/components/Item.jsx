@@ -37,7 +37,7 @@ const Item = ({ item, onQuantityChange, onRemove, selected, onSelectItem }) => {
                 </div>
             </div>
             <div className="flex items-center space-x-20">
-                <span className="font-semibold">{item.productPrice.toLocaleString()} ₫</span>
+                <span className="font-semibold">{item.productPrice}₫</span>
                 <div className="flex items-center space-x-2">
                     <button 
                         className="px-2 py-1 border rounded"

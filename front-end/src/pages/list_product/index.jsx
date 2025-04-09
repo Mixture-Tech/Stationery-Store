@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { productApi } from '../../services/apis/ProductApi';
 import { categoryApi } from '../../services/apis/categoryApi';
+import { addToCart } from '../../services/apis/cartApi';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { FaCartPlus, FaShoppingBag } from 'react-icons/fa';
 
 export default function ListProduct() {
     const [products, setProducts] = useState([]);
@@ -107,8 +111,48 @@ export default function ListProduct() {
         sortProducts();
     }, [sortOption]);
 
+    const handleAddToCart = async (productId) => {
+        try {
+            await addToCart(productId, 1);
+            toast.success('Đã thêm sản phẩm vào giỏ hàng thành công!', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } catch (error) {
+            toast.error(error.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
+
+    const handleBuyNow = (productId, productImage, productName, productPrice) => {
+        navigate('/thanh-toan', {
+            state: {
+                products: [{
+                    id_product: productId,
+                    productImage: productImage,
+                    productName: productName,
+                    productPrice: productPrice,
+                    quantity: 1,
+                }]
+            }
+        });
+    };
+
     return (
         <div className="container mx-auto p-4 mt-20">
+            <ToastContainer />
             <div className="flex gap-4">
                 {/* Filters */}
                 <div className="w-1/4 bg-white p-4 rounded shadow">
@@ -198,35 +242,59 @@ export default function ListProduct() {
                         <>
                             <div className="grid grid-cols-5 gap-4">
                                 {currentProducts.map((product, index) => (
-                                    <div key={index} className="border p-2 rounded-lg w-[180px] cursor-pointer shadow  hover:shadow-2xl group"
-                                         onClick={() => navigate('/chi-tiet-san-pham', { 
-                                             state: { 
-                                                 productId: product.id,
-                                                 productName: product.title,
-                                                 productPrice: product.price,
-                                                 productImage: product.image,
-                                                 productDiscount: product.discount,
-                                                 productOldPrice: product.oldPrice,
-                                                 categoryName: product.categoryName
-                                             } 
-                                         })}>
-                                        <img 
-                                            src={product.image} 
-                                            alt={product.title} 
-                                            className="w-full h-[160px] transform scale-90 group-hover:scale-100 transition duration-200"
-                                        />
-                                        <h3 className="text-sm font-semibold mt-2">
-                                            {product.title}
-                                        </h3>
-                                        <p className="text-red-500 font-bold">{product.price}</p>
-                                        {product.oldPrice && (
-                                            <p className="text-gray-500 line-through text-sm">{product.oldPrice}</p>
-                                        )}
-                                        {product.discount && (
-                                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                                                {product.discount}
-                                            </span>
-                                        )}
+                                    <div key={index} className="border p-2 rounded-lg w-[180px] cursor-pointer shadow hover:shadow-2xl group">
+                                        <div onClick={() => navigate('/chi-tiet-san-pham', { 
+                                            state: { 
+                                                productId: product.id,
+                                                productName: product.title,
+                                                productPrice: product.price,
+                                                productImage: product.image,
+                                                productDiscount: product.discount,
+                                                productOldPrice: product.oldPrice,
+                                                categoryName: product.categoryName
+                                            } 
+                                        })}>
+                                            <img 
+                                                src={product.image} 
+                                                alt={product.title} 
+                                                className="w-full h-[160px] transform scale-90 group-hover:scale-100 transition duration-200"
+                                            />
+                                            <h3 className="text-sm font-semibold mt-2">
+                                                {product.title}
+                                            </h3>
+                                            <p className="text-red-500 font-bold">{product.price}</p>
+                                            {product.oldPrice && (
+                                                <p className="text-gray-500 line-through text-sm">{product.oldPrice}</p>
+                                            )}
+                                            {product.discount && (
+                                                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                                                    {product.discount}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="mt-2 flex flex-row gap-1">
+                                            <button
+                                                className="bg-indigo-600 text-white py-1 px-2 rounded text-sm hover:bg-indigo-700 transition-colors flex-1 flex items-center justify-center gap-1"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleAddToCart(product.id);
+                                                }}
+                                            >
+                                                <FaCartPlus className="text-sm" />
+                                                <span>Thêm</span>
+                                            </button>
+                                            <button
+                                                className="bg-white text-indigo-600 border border-indigo-600 py-1 px-2 rounded text-sm hover:bg-indigo-700 
+                                                transition-colors flex-1 flex items-center justify-center gap-1 hover:text-white"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleBuyNow(product.id, product.image, product.title, product.price);
+                                                }}
+                                            >
+                                                <FaShoppingBag className="text-sm" />
+                                                <span>Mua</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

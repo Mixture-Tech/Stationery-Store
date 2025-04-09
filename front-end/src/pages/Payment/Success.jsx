@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 const Success = () => {
     const location = useLocation();
-    const { products = [], deliveryFee = 0, total = 0 } = location.state || {};
+    const { products = [], delivery_fee = 0, total_price = 0 } = location.state || {};
 
     const formatCurrency = (amount) => {
         if (typeof amount !== 'number') {
@@ -12,8 +12,8 @@ const Success = () => {
         return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     };
 
-    const numericTotal = typeof total === 'number' ? total : 0;
-    const numericDeliveryFee = typeof deliveryFee === 'number' ? deliveryFee : 0;
+    const numericTotal = typeof total_price === 'number' ? total_price : 0;
+    const numericDeliveryFee = typeof delivery_fee === 'number' ? delivery_fee : 0;
     const totalPaid = numericTotal + numericDeliveryFee;
 
     const customerName = "Bạn";
@@ -72,11 +72,11 @@ const Success = () => {
                         <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: { xs: 2, md: 0 } }}>
                                 <Typography variant="body2" color="text.secondary">Tổng tiền hàng</Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(total)}</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(total_price)}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <Typography variant="body2" color="text.secondary">Phí vận chuyển</Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(deliveryFee)}</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(delivery_fee)}</Typography>
                             </Box>
                         </Grid>
                     </Grid>

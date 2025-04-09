@@ -1,53 +1,85 @@
 import { useState } from "react";
-import { Button, Snackbar, Alert } from "@mui/material";
+import { Button } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { addToCart } from "../../services/apis/cartApi";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductDetail = () => {
     const location = useLocation();
     const product = location.state;
     const [quantity, setQuantity] = useState(1);
-    const [notification, setNotification] = useState({
-        open: false,
-        message: "",
-        severity: "success" // success, error, warning, info
-    });
 
     const handleAddToCart = async () => {
         try {
             await addToCart(product.productId, quantity);
-            setNotification({
-                open: true,
-                message: "Đã thêm sản phẩm vào giỏ hàng thành công!",
-                severity: "success"
+            toast.success('Đã thêm sản phẩm vào giỏ hàng thành công!', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
             });
         } catch (error) {
-            setNotification({
-                open: true,
-                message: error.message || "Có lỗi xảy ra khi thêm vào giỏ hàng",
-                severity: "error"
+            toast.error(error.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
             });
         }
     };
 
     const handleBuyNow = () => {
-        setNotification({
-            open: true,
-            message: "Tính năng đang được phát triển!",
-            severity: "info"
+        toast.info('Tính năng đang được phát triển!', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
         });
     };
 
-    const handleCloseNotification = () => {
-        setNotification(prev => ({ ...prev, open: false }));
+    const formatStringToNumber = (str) => {
+        // Loại bỏ tất cả các ký tự không phải số, dấu chấm và dấu trừ
+        const cleanStr = str.replace(/[^\d.-]/g, '');
+        // Lấy giá trị tuyệt đối của số
+        return Math.abs(parseFloat(cleanStr));
+    };
+
+    const calculateOriginalPrice = (discountedPrice, discountPercent) => {
+        // Chuyển đổi string sang number
+        const price = typeof discountedPrice === 'string' 
+            ? formatStringToNumber(discountedPrice) 
+            : discountedPrice;
+        
+        const discount = formatStringToNumber(discountPercent);
+        console.log(price, discount);
+        if (typeof price !== 'number' || typeof discount !== 'number') {
+            return null;
+        }
+        if (discount <= 0 || discount >= 100) {
+            return null;
+        }
+        // Tính giá gốc từ giá đã giảm và phần trăm giảm giá
+        const originalPrice = price / (1 - discount/100);
+        return Math.round(originalPrice).toFixed(3); // Làm tròn để tránh số thập phân
     };
 
     if (!product) {
         return <div className="text-center py-8">Không tìm thấy sản phẩm</div>;
     }
-
+    console.log(product);
     return (
         <div className="max-w-full p-4 mt-14">
+            <ToastContainer />
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Ảnh sản phẩm */}
                 <div className="w-full md:w-2/5 rounded-lg shadow-md p-4">
@@ -113,7 +145,7 @@ const ProductDetail = () => {
                         {/* Giá sản phẩm */}
                         <div className="mt-2">
                             <span className="text-red-700 text-3xl font-bold">
-                                {product.productPrice}
+                                {calculateOriginalPrice(product.productOldPrice, product.productDiscount)}
                             </span>
                             {product.productDiscount && (
                                 <>
@@ -146,23 +178,6 @@ const ProductDetail = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Component thông báo */}
-            <Snackbar
-                open={notification.open}
-                autoHideDuration={3000}
-                onClose={handleCloseNotification}
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-                <Alert
-                    onClose={handleCloseNotification}
-                    severity={notification.severity}
-                    variant="filled"
-                    sx={{ width: "100%" }}
-                >
-                    {notification.message}
-                </Alert>
-            </Snackbar>
         </div>
     );
 };
