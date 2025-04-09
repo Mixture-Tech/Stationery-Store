@@ -12,8 +12,13 @@ export const getCart = async () => {
                 Authorization: `Bearer ${token}`
             }
         });
-        console.log('response cart: ', response);
-        return response;
+        // Chuyển đổi productPrice thành số
+        const formattedResponse = response.map(item => ({
+            ...item,
+            productPrice: Number(item.productPrice)
+        }));
+        console.log('response cart: ', formattedResponse);
+        return formattedResponse;
     } catch (error) {
         throw error.response?.data || error.message;
     }

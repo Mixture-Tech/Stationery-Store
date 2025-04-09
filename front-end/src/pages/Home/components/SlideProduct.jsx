@@ -23,7 +23,7 @@ Button.propTypes = {
     isActive: PropTypes.bool.isRequired,  
 };
   
-export default function SlideProduct({title, categories}) {
+export default function SlideProduct({title, categories, onAddToCartSuccess, onAddToCartError}) {
     const [tab, setTab] = useState(0);
     const sliderRef = useRef(null);  
 
@@ -119,7 +119,18 @@ export default function SlideProduct({title, categories}) {
                             {categories[tab]?.products.map((product, index) => (
                                 <div key={index} className={`${categories[tab]?.products.length < 5 ? 'pr-3' : 'pr-6'}`} 
                                      style={{ width: categories[tab]?.products.length < 5 ? '152px' : '154px' }}>
-                                    <ProductCard {...product} />
+                                    <ProductCard
+                                        id={product.id}
+                                        src={product.src}
+                                        name={product.name}
+                                        rating={product.rating}
+                                        price={product.price}
+                                        discount={product.discount}
+                                        discountPrice={product.discountPrice}
+                                        categoryName={product.categoryName}
+                                        onAddToCartSuccess={onAddToCartSuccess}
+                                        onAddToCartError={onAddToCartError}
+                                    />
                                 </div>
                             ))}
                         </Slider>
@@ -146,5 +157,7 @@ SlideProduct.propTypes = {
             price: PropTypes.string, 
             discount: PropTypes.string,   
         }))
-    }))
+    })),
+    onAddToCartSuccess: PropTypes.func,
+    onAddToCartError: PropTypes.func
 };

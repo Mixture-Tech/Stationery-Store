@@ -25,10 +25,10 @@ const Payment = () => {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{mt:10, p: 3 }}>
             <Button
                 startIcon={<ArrowBackIcon />}
-                onClick={() => navigate('/cart')}
+                onClick={() => navigate('/gio-hang')}
                 sx={{ mb: 3 }}
             >
                 Quay lại giỏ hàng
