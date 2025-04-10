@@ -8,6 +8,8 @@ import BlankLayout from "./layouts/LayoutNotSearch";
 import CartProvider from "./context/CartProvider";
 import AdminLayout from "./pages/Admin/layouts/LayoutAdmin.jsx"
 import ProtectedRoute from "./components/Route/ProtectedRoute";
+import MomoCallback from './pages/Payment/MomoCallback';
+import Failure from './pages/Payment/Failure';
 
 const Login = loadable(() => import("./pages/Auth/Login"));
 const Regiter = loadable(() => import("./pages/Auth/Register"));
@@ -117,6 +119,22 @@ export default function App() {
                             element={
                                 <Suspense fallback={<CircularProgress />}>
                                     <Success title="Thanh toán thành công" />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="/thanh-toan/momo/callback"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <MomoCallback />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="/thanh-toan/that-bai"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <Failure />
                                 </Suspense>
                             }
                         />

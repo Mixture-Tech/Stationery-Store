@@ -78,7 +78,7 @@ const Home = ({ title }) => {
                                         id: product.id_product,
                                         src: product.image || "https://placehold.co/1200x1000",
                                         name: product.name,
-                                        price: `${product.price} VND`,
+                                        price: `${product.price} đ`,
                                         nums: product.nums || 0,
                                         discountPrice: product.discount_price,
                                         discount: `${product.discount || 0}`,
