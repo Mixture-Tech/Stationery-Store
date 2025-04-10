@@ -13,7 +13,7 @@ import { District } from "../entity/District";
 import { Order } from "../entity/Order";
 import { OTP } from "../entity/OTP";
 
-const DB_NAME = "stationery_store";
+const DB_NAME = "stationery-store";
 
 // Sử dụng biến toàn cục để lưu instance
 let dataSourceInstance: DataSource | null = null;
@@ -26,8 +26,9 @@ export async function initializeDatabase(): Promise<DataSource> {
 
     const connection = await mysql.createConnection({
         host: "localhost",
-        port: 3306,
+        port: 3310,
         user: "root",
+        password: "password"
     }); 
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
     await connection.end();
@@ -35,8 +36,9 @@ export async function initializeDatabase(): Promise<DataSource> {
     const dataSource = new DataSource({
         type: "mysql",
         host: "localhost",
-        port: 3306,
+        port: 3310,
         username: "root",
+        password: "password",
         database: DB_NAME,
         synchronize: false, // Tự động đồng bộ schema
         dropSchema: false, // Không xóa schema cũ mỗi khi khởi động (nên dùng trong production)

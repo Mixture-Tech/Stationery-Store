@@ -60,4 +60,30 @@ export const verifyOTP = (data) => {
     });
 };
 
+// Thêm hàm lấy Google Auth URL
+export const getGoogleAuthUrl = async () => {
+    const url = "/auth/google";
+    const response = await axiosClient.get(url);
+    return response.url; // Trả về URL từ server
+};
 
+export const googleCallback = async (code) => {
+    try {
+        const url = `/api/v1/auth/google/callback?code=${code}`;
+        const response = await axiosClient.get(url);
+        
+        console.log("Google callback response:", response);
+        
+        const { token, user } = response; // Đảm bảo response có token và user
+        if (token && user) {
+            document.cookie = `token=${token}; path=/; max-age=86400`; 
+            localStorage.setItem("user", JSON.stringify(user));
+            return { token, user }; // Trả về dữ liệu để client xử lý
+        } else {
+            throw new Error("Đăng nhập Google thất bại: Không nhận được token hoặc thông tin user");
+        }
+    } catch (error) {
+        console.error("Google callback error:", error);
+        throw error;
+    }
+};

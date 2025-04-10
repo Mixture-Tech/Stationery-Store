@@ -170,11 +170,66 @@ const ProductDetail = () => {
                                 <td className="py-2">{product.productId}</td>
                             </tr>
                             <tr>
+                                <td className="py-2 font-semibold text-gray-600">Tên sản phẩm</td>
+                                <td className="py-2">{product.productName}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Giá gốc</td>
+                                <td className="py-2">{product.productOldPrice}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Khuyến mãi</td>
+                                <td className="py-2">{product.productDiscount}</td>
+                            </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Giá khuyến mãi</td>
+                                <td className="py-2">{product.productPrice}</td>
+                            </tr>
+                            <tr>
                                 <td className="py-2 font-semibold text-gray-600">Danh mục</td>
                                 <td className="py-2">{product.categoryName || 'N/A'}</td>
                             </tr>
+                            <tr>
+                                <td className="py-2 font-semibold text-gray-600">Thông tin mô tả</td>
+                                <td className="py-2">{product.product_description|| 'N/A'}</td>
+                            </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Sản phẩm liên quan */}
+                    <div className="rounded-lg shadow-md p-4 mt-6">
+                        <h2 className="font-bold text-lg mb-4">Sản phẩm liên quan</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {[1, 2, 3, 4].map((item) => (
+                                <div key={item} className="border rounded-md p-4 shadow hover:shadow-lg transition duration-300">
+                                    <img
+                                        src={product.productImage}
+                                        alt="Sản phẩm liên quan"
+                                        className="w-full h-40 object-cover mb-2 rounded"
+                                    />
+                                    <h3 className="font-semibold text-md mb-1">{product.productName} #{item}</h3>
+                                    <span className="text-red-700 text-xxl font-bold">
+                                        {product.productPrice}
+                                    </span>
+                                    {product.productDiscount && (
+                                        <>
+                                            <span className="text-gray-400 line-through ml-2">
+                                                {product.productOldPrice}
+                                            </span>
+                                        </>
+                                    )}
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        size="small"
+                                        className="mt-2"
+                                    >
+                                        Xem chi tiết
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
