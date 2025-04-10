@@ -313,7 +313,7 @@ export default function Cart() {
                     order={calculateSelectedTotal}
                     deliveryFee={DELIVERY_FEE}
                     discountCode={discountCode}
-                    total={calculateSelectedTotal + DELIVERY_FEE}
+                    total={calculateSelectedTotal}
                     selectedItems={selectedItems}
                 />
             </div>

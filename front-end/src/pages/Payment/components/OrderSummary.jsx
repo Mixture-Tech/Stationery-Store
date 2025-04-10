@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../../../services/apis/orderApi';
 import { getDistricts, getProvinces } from '../../../services/apis/locationApi';
 import momoApi from '../../../services/apis/momoApi';
+import vnpayApi from '../../../services/apis/vnpayApi';
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
 
@@ -56,7 +57,7 @@ export default function OrderSummary({ products, total, paymentMethod }) {
 
         districts.map(district => {
             if (district.id_district === selectedDistrictId) {
-                setDeliveryFee(district.fee);
+                setDeliveryFee(district.fee / 1000);
             }
         });
     };
@@ -83,6 +84,7 @@ export default function OrderSummary({ products, total, paymentMethod }) {
             };
             if (paymentMethod === "MoMo") {
                 const orderInfo = `Thanh toán đơn hàng từ Stationery Store - Tổng tiền: ${totalPrice}`;
+                // const response = await momoApi.createPayment(parseInt(totalPrice.replace(/[^\d]/g, '')), orderInfo);
                 const response = await momoApi.createPayment(parseInt(totalPrice.replace(/[^\d]/g, '')), orderInfo);
                 
                 if (response.payUrl) {
@@ -90,7 +92,33 @@ export default function OrderSummary({ products, total, paymentMethod }) {
                 } else {
                     toast.error('Không thể tạo thanh toán MoMo');
                 }
-            } else {
+            }
+            else if (paymentMethod === "VNPay") {
+                const formattedTotalPrice = totalPrice.replace(/[,.₫\s]/g, ''); // Loại bỏ dấu phẩy, ký hiệu ₫ và khoảng trắng
+                const numericTotalPrice = parseInt(formattedTotalPrice, 10); // Chuyển đổi thành số nguyên 
+                console.log(numericTotalPrice);
+                
+                // Lưu thông tin đơn hàng vào localStorage
+                const orderData = {
+                    products,
+                    delivery_fee: deliveryFee,
+                    total_price: total,
+                    id_province: selectedProvince,
+                    id_district: selectedDistrict,
+                    area: address,
+                    phone: phone
+                };
+                localStorage.setItem('pendingOrder', JSON.stringify(orderData));
+                
+                const response = await vnpayApi.createPaymentUrl(numericTotalPrice,`Thanh toán đơn hàng từ Stationery Store - Tổng tiền`);
+                if (response) {
+                    console.log(response);
+                    window.location.href = response;
+                } else {
+                    toast.error('Không thể tạo thanh toán VNPay');
+                }
+            }
+             else {
                 await createOrder(orderData);
                 navigate('/thanh-toan/thanh-cong', {
                     state: {
@@ -110,17 +138,37 @@ export default function OrderSummary({ products, total, paymentMethod }) {
         }
     };
 
+    const formatCurrency = (amount) => {
+        if (isNaN(amount) || amount === 0) {
+            return '0 ₫';
+        }
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
+        }).format(amount);
+    };
+
+    const formatDeliveryFee = (amount) => {
+        if (isNaN(amount) || amount === 0) {
+            return '0 ₫';
+        }
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
+        }).format(40);
+    };
+
     useEffect(() => {
         let result = 0;
         products.forEach(product => {
-            // Chuyển đổi giá từ chuỗi sang số
-            const price = parseInt(product.productPrice.replace(/[^\d]/g, ''));
-            result += price * product.quantity;
+            result += product.productPrice * product.quantity;
         });
         result += deliveryFee;
-        // Format số thành chuỗi có dấu chấm và đơn vị đ
-        const formattedTotal = result.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " đ";
-        setTotalPrice(formattedTotal);
+        setTotalPrice(formatCurrency(result));
     }, [deliveryFee, products]);
 
     return (
@@ -135,7 +183,7 @@ export default function OrderSummary({ products, total, paymentMethod }) {
                             <Typography variant="body2" color="text.secondary">SL: {product.quantity || 1}</Typography>
                         </Box>
                         <Typography sx={{minWidth: '80px', textAlign: 'right'}}>
-                            {product.productPrice}
+                            {formatCurrency(product.productPrice)}
                         </Typography>
                     </Box>
                 ))}
@@ -187,10 +235,15 @@ export default function OrderSummary({ products, total, paymentMethod }) {
                             <InputLabel>Quận/Huyện</InputLabel>
                             <Select
                                 value={selectedDistrict}
-                                // onChange={(e) => setSelectedDistrict(e.target.value)}
                                 onChange={handleDistrictChange}
                                 label="Quận/Huyện"
+                                disabled={!selectedProvince} // Vô hiệu hóa nếu chưa chọn tỉnh
                             >
+                                {!selectedProvince && (
+                                    <MenuItem disabled>
+                                        Vui lòng chọn tỉnh trước
+                                    </MenuItem>
+                                )}
                                 {filteredDistricts.map(district => (
                                     <MenuItem key={district.id_district} value={district.id_district}>
                                         {district.name}
@@ -204,12 +257,7 @@ export default function OrderSummary({ products, total, paymentMethod }) {
                 <Box display="flex" justifyContent="space-between" my={1}>
                     <Typography>Phí vận chuyển</Typography>
                     <Typography>
-                        {new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND',
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0
-                        }).format(deliveryFee)}
+                        {formatDeliveryFee(deliveryFee)}
                     </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" my={2} fontWeight="bold">

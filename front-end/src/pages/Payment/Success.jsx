@@ -1,15 +1,47 @@
 import { Box, Typography, Card, CardContent, Grid, Divider, Container } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const Success = () => {
     const location = useLocation();
-    const { products = [], delivery_fee = 0, total_price = 0 } = location.state || {};
+    const navigate = useNavigate();
+    const searchParams = new URLSearchParams(location.search);
+    const success = searchParams.get('success');
+    const message = searchParams.get('message');
+
+    useEffect(() => {
+        console.log(success, message);
+        // if (success === 'false') {
+        //     toast.error(message || 'Thanh toán thất bại');
+        //     navigate('/thanh-toan/that-bai');
+        //     return;
+        // }
+
+        // const pendingOrder = localStorage.getItem('pendingOrder');
+        // if (!pendingOrder) {
+        //     toast.error('Không tìm thấy thông tin đơn hàng');
+        //     navigate('/thanh-toan/that-bai');
+        //     return;
+        // }
+
+        // // Xóa thông tin đơn hàng đã lưu
+        // localStorage.removeItem('pendingOrder');
+    }, [success, message, navigate]);
+
+    const orderData = JSON.parse(localStorage.getItem('pendingOrder') || '{}');
+    const { products = [], delivery_fee = 0, total_price = 0 } = orderData;
 
     const formatCurrency = (amount) => {
-        if (typeof amount !== 'number') {
-            return 'N/A';
+        if (isNaN(amount) || amount === 0) {
+            return '0 ₫';
         }
-        return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
+        }).format(amount);
     };
 
     const numericTotal = typeof total_price === 'number' ? total_price : 0;
@@ -18,6 +50,10 @@ const Success = () => {
 
     const customerName = "Bạn";
     const receiptVoucher = "";
+
+    if (success === 'false') {
+        return null;
+    }
 
     return (
         <Container maxWidth="md" sx={{ my: 10 }}>
@@ -52,7 +88,7 @@ const Success = () => {
                                         <Typography variant="body2" color="text.secondary">SL: {item.quantity || 1}</Typography>
                                     </Grid>
                                     <Grid item xs={6} sm={4} sx={{ textAlign: 'right' }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>6,650đ</Typography>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>{formatCurrency(item.productPrice)}</Typography>
                                     </Grid>
                                 </Grid>
                             </CardContent>
@@ -72,11 +108,11 @@ const Success = () => {
                         <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: { xs: 2, md: 0 } }}>
                                 <Typography variant="body2" color="text.secondary">Tổng tiền hàng</Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>6,650đ</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(numericTotal)}</Typography>
                             </Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <Typography variant="body2" color="text.secondary">Phí vận chuyển</Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>15,000đ</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(numericDeliveryFee)}</Typography>
                             </Box>
                         </Grid>
                     </Grid>
@@ -92,7 +128,7 @@ const Success = () => {
                 textAlign: 'right' 
             }}>
                 <Typography variant="h6">
-                    TỔNG THANH TOÁN: <span style={{ fontWeight: 'bold' }}>46,650đ</span>
+                    TỔNG THANH TOÁN: <span style={{ fontWeight: 'bold' }}>{formatCurrency(totalPaid)}</span>
                 </Typography>
             </Box>
         </Container>

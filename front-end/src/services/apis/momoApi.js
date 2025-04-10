@@ -2,11 +2,10 @@ import axiosClient from './axiosClient';
 
 const momoApi = {
     createPayment: async (amount, orderInfo) => {
-        console.log('amount', amount);
-        console.log('orderInfo', orderInfo);
         const response = await axiosClient.post('/momo/create-payment', {
             amount,
-            orderInfo
+            orderInfo,
+            redirectUrl: 'http://localhost:5173/thanh-toan/momo/callback'
         });
         return response.data;
     }
