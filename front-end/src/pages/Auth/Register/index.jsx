@@ -75,7 +75,7 @@ export default function FormRegister(props) {
                 </div>
             )}
             <div className="absolute start-36 top-12 animate-zoomIn">
-                <img src="https://placehold.co/100x100" alt="Logo" className="w-20 "/>
+                <img src="/img/Login-Register/login1.jpg" alt="Logo" className="w-20 "/>
             </div>
             
             {/* container */}
@@ -83,7 +83,7 @@ export default function FormRegister(props) {
                             p-6">
                 {/* part image */}
                 <div className="md:w-1/3 w-1/3 ">
-                    <img src="https://placehold.co/1000x1000" alt="Login image" className=" w-2/3 h-auto animate-fade-in-left" />
+                    <img src="/img/Login-Register/login1.jpg" alt="Login image" className=" w-2/3 h-auto animate-fade-in-left" />
                 </div>
 
                 <div className=" border-2 rounded-lg bg-slate-500 shadow-md ml-2 w-[35%] p-6 animate-zoomIn">

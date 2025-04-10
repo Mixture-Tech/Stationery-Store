@@ -1,17 +1,49 @@
 import { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
-import SlideProduct from './components/SlideProduct'
+import SlideProduct from './components/SlideProduct';
 import SuggestProduct from './components/SuggestProduct';
 import { categoryParentApi } from '../../services/apis/CategoryParentApi';
 import { categoryApi } from '../../services/apis/categoryApi';
 import { productApi } from '../../services/apis/ProductApi';
+import { useSearchParams } from 'react-router-dom';
 
-const Home = () => {
+const Home = ({ title }) => {
     const [categoryData, setCategoryData] = useState([]);
     const [suggestProducts, setSuggestProducts] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams(); // Thêm useSearchParams
 
     useEffect(() => {
+        // Cập nhật tiêu đề trang
+        document.title = title || "Trang Chủ";
+
+        // Xử lý query string từ Google OAuth redirect
+        const token = searchParams.get("token");
+        const userId = searchParams.get("userId");
+
+        if (token && userId) {
+            // Lưu token vào cookie
+            document.cookie = `token=${token}; path=/; max-age=86400`;
+            // Lưu user vào localStorage
+            const user = { id_user: userId };
+            localStorage.setItem("user", JSON.stringify(user));
+
+            // Hiển thị thông báo thành công
+            toast.success('Đăng nhập bằng Google thành công!', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+
+            // Xóa query string khỏi URL
+            setSearchParams({}, { replace: true });
+        }
+
+        // Logic hiện tại để lấy dữ liệu sản phẩm
         const fetchData = async () => {
             try {
                 // Lấy danh sách category parent
@@ -46,7 +78,7 @@ const Home = () => {
                                         id: product.id_product,
                                         src: product.image || "https://placehold.co/1200x1000",
                                         name: product.name,
-                                        price: `${product.price} VND`,
+                                        price: `${product.price} đ`,
                                         nums: product.nums || 0,
                                         discountPrice: product.discount_price,
                                         discount: `${product.discount || 0}`,
@@ -68,6 +100,7 @@ const Home = () => {
                 );
 
                 setCategoryData(processedData);
+
                 const allCategory = await categoryApi.getAll();
                 // Lấy tất cả sản phẩm cho SuggestProduct
                 const allProductsResponse = await productApi.getAllProducts();
@@ -94,11 +127,15 @@ const Home = () => {
                 setSuggestProducts(allProducts);
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
+                toast.error("Lỗi khi tải dữ liệu sản phẩm", {
+                    position: "top-center",
+                    autoClose: 2000,
+                });
             }
         };
 
         fetchData();
-    }, []);
+    }, [searchParams, setSearchParams, title]);
 
     const handleAddToCartSuccess = () => {
         toast.success('Đã thêm sản phẩm vào giỏ hàng thành công!', {
@@ -147,6 +184,6 @@ const Home = () => {
             </div>
         </main>
     );
-}
+};
 
 export default Home;

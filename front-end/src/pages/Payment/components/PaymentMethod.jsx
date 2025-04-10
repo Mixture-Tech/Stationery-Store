@@ -1,6 +1,6 @@
 import { Box, Radio, RadioGroup, FormControlLabel, FormControl, Typography } from "@mui/material";
 import PropTypes from "prop-types";
-
+import VNPay from "../../../assets/img/Icon/VNPAY_id-sVSMjm2_0.png"
 export default function PaymentMethod({ phuongThucThanhToan, setPhuongThucThanhToan }) {
 
     return (
@@ -19,27 +19,14 @@ export default function PaymentMethod({ phuongThucThanhToan, setPhuongThucThanhT
                         label="Thanh toán khi nhận hàng (COD)"
                     />
                     <FormControlLabel
-                        value="MoMo"
+                        value="VNPay"
                         control={<Radio />}
                         label={
                             <Box sx={{ display: "flex", alignItems: "center" }}>
                                 <img
-                                    src="https://static.mservice.io/img/logo-momo.png"
-                                    alt="MoMo"
-                                    style={{ width: "55px", height: "55px", marginLeft: "10px" }}
-                                />
-                            </Box>
-                        }
-                    />
-                    <FormControlLabel
-                        value="PayPal"
-                        control={<Radio />}
-                        label={
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <img
-                                    src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg"
-                                    alt="PayPal"
-                                    style={{ width: "60px", height: "60px", marginLeft: "10px" }}
+                                    src={VNPay}
+                                    alt="VNPay"
+                                    style={{ width: "70px", height: "20px", marginLeft: "10px" }}
                                 />
                             </Box>
                         }

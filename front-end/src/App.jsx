@@ -8,6 +8,8 @@ import BlankLayout from "./layouts/LayoutNotSearch";
 import CartProvider from "./context/CartProvider";
 import AdminLayout from "./pages/Admin/layouts/LayoutAdmin.jsx"
 import ProtectedRoute from "./components/Route/ProtectedRoute";
+import MomoCallback from './pages/Payment/MomoCallback';
+import Failure from './pages/Payment/Failure';
 
 const Login = loadable(() => import("./pages/Auth/Login"));
 const Regiter = loadable(() => import("./pages/Auth/Register"));
@@ -26,6 +28,7 @@ const Success = loadable(() => import("./pages/Payment/Success"));
 
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
+const AuthCallback = loadable(() => import("./pages/Auth/components/AuthCallback.jsx"));
 
 
 export default function App() {
@@ -119,6 +122,22 @@ export default function App() {
                                 </Suspense>
                             }
                         />
+                        <Route
+                            path="/thanh-toan/momo/callback"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <MomoCallback />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="/thanh-toan/that-bai"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <Failure />
+                                </Suspense>
+                            }
+                        />
                     </Route>
                 </Route>
                 <Route element={<BlankLayout />}>
@@ -135,6 +154,14 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Regiter title="Đăng Kí" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/auth-callback"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <AuthCallback title="Xác thực" />
                             </Suspense>
                         }
                     />
