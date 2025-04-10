@@ -14,6 +14,8 @@ import cartRouter from "./routes/CartRouter";
 import orderRouter from "./routes/OrderRouter";
 import provinceRouter from "./routes/ProvinceRouter";
 import districtRouter from "./routes/DistrictRouter";
+import momoRoutes from "./routes/momoRoutes";
+import vnpayRoutes from "./routes/VNpayRouter";
 
 const app = express();
 
@@ -53,6 +55,8 @@ app.use("/api/v1", cartRouter);
 app.use("/api/v1", orderRouter);
 app.use("/api/v1", provinceRouter);
 app.use("/api/v1", districtRouter);
+app.use("/api/v1", momoRoutes);
+app.use("/api/v1", vnpayRoutes);
 // Khởi động server
 const PORT = process.env.PORT || 3000;
 
