@@ -86,7 +86,10 @@ export class OrderController {
 
     addOrderDetail = async (req: Request, res: Response): Promise<void> => {
         try {
+            const orderId = parseInt(req.params.orderId); // 👈 Lấy orderId từ URL
             const orderDetailDTO: Order_DetailDTO = req.body;
+            orderDetailDTO.id = orderId; // 👈 Gắn vào DTO
+
             const orderDetail = await this.orderService.createOrderDetail(orderDetailDTO);
             res.status(201).json(orderDetail);
         } catch (error: any) {

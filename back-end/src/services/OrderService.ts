@@ -17,15 +17,24 @@ export class OrderService extends BaseService<Order, OrderDTO> {
     async findById(id_order: number): Promise<Order | null> {
         return this.repository.findOne({ 
             where: { id_order },
-            relations: ["user", "district", "orderDetails"]
+            relations: ["user", "district", "province", "orderDetails", "orderDetails.product"]
         });
     }
 
     async findByUserId(id_user: number): Promise<Order[]> {
-        return this.repository.find({
-            where: { id_user },
-            relations: ["user", "district", "orderDetails"]
-        });
+        try {
+            return await this.repository
+                .createQueryBuilder("order")
+                .leftJoinAndSelect("order.user", "user")
+                .leftJoinAndSelect("order.district", "district")
+                .leftJoinAndSelect("order.orderDetails", "orderDetails")
+                .leftJoinAndSelect("orderDetails.product", "product")
+                .where("order.id_user = :id_user", { id_user })
+                .getMany();
+        } catch (error) {
+            console.error("Lỗi khi truy vấn đơn hàng theo user:", error);
+            throw error;
+        }
     }
 
     async findByDistrictId(id_district: number): Promise<Order[]> {
