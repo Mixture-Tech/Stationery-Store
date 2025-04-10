@@ -83,7 +83,7 @@ export default function EditProfile() {
     return (
         <div className="mt-20">
             <div className="container mx-auto md:mx-40 p-4 md:p-8 mb-0">
-                <p className="text-4xl font-bold">Edit Profile</p>
+                <p className="text-4xl font-bold">Cập nhật thông tin cá nhân</p>
             </div>
 
             <div
@@ -93,15 +93,15 @@ export default function EditProfile() {
                 {/* Personal Information */}
                 <div className="w-full flex justify-center items-center" style={{gridArea: 'personalInfo'}}>
                     <div className="space-y-8 max-w-[24rem] mx-auto">
-                        <h2 className="text-2xl font-bold text-pink-600 mb-4 text-start">Personal Information</h2>
+                        <h2 className="text-2xl font-bold text-pink-600 mb-4 text-start">Thông tin cá nhân</h2>
                         <TextField
-                            label="Last Name"
+                            label="Họ"
                             value={values.lastName}
                             onChange={handleChange('lastName')}
                             fullWidth
                         />
                         <TextField
-                            label="First Name"
+                            label="Tên"
                             value={values.firstName}
                             onChange={handleChange('firstName')}
                             fullWidth
@@ -114,23 +114,22 @@ export default function EditProfile() {
                             fullWidth
                         />
                         <TextField
-                            label="Phone Number"
+                            label="Số điện thoại"
                             value={values.phoneNumber}
                             onChange={handleChange('phoneNumber')}
                             fullWidth
                         />
                         <TextField
                             select
-                            label="Gender"
+                            label="Giới tính"
                             value={values.gender}
                             onChange={handleChange('gender')}
                             fullWidth
                         >
-                            <MenuItem value="male" sx={{'&:hover': {backgroundColor: '#ec407a'}}}>Male</MenuItem>
+                            <MenuItem value="male" sx={{'&:hover': {backgroundColor: '#ec407a'}}}>Nam</MenuItem>
                             <MenuItem value="female"
-                                      sx={{'&:hover': {backgroundColor: '#ec407a'}}}>Female</MenuItem>
-                            <MenuItem value="preferNotToSay" sx={{'&:hover': {backgroundColor: '#ec407a'}}}>I don't
-                                want to say</MenuItem>
+                                      sx={{'&:hover': {backgroundColor: '#ec407a'}}}>Nữ</MenuItem>
+                            <MenuItem value="preferNotToSay" sx={{'&:hover': {backgroundColor: '#ec407a'}}}>Không muốn nói</MenuItem>
                         </TextField>
                     </div>
                 </div>
@@ -162,10 +161,10 @@ export default function EditProfile() {
                     {/* Change Password Section */}
                     <div className={`w-full flex flex-col ${width < 768 ? 'hidden' : ''}`}
                          style={{gridArea: 'changePassword'}}>
-                        <h2 className="text-2xl font-bold text-pink-600 mb-4">Change Password</h2>
+                        <h2 className="text-2xl font-bold text-pink-600 mb-4">Đổi mật khẩu</h2>
                         <div className="space-y-6 max-w-96">
                             <TextField
-                                label="Password"
+                                label="Mật khẩu"
                                 type={values.showPassword ? 'text' : 'password'}
                                 value={values.password}
                                 onChange={handleChange('password')}
@@ -182,7 +181,7 @@ export default function EditProfile() {
                                 }}
                             />
                             <TextField
-                                label="Confirm Password"
+                                label="Nhập lại mật khẩu"
                                 type={values.showConfirmPassword ? 'text' : 'password'}
                                 value={values.confirmPassword}
                                 onChange={handleChange('confirmPassword')}
@@ -203,17 +202,17 @@ export default function EditProfile() {
                         <div className="flex justify-center">
                             <button
                                 className="mt-5 bg-pink-500 text-white font-bold py-2 px-10 rounded w-auto text-center">
-                                Save
+                                Cập nhật
                             </button>
                         </div>
                     </div>
                 </div>
                 <div className={`w-full flex flex-col ${width > 768 ? 'hidden' : ''}`}
                      style={{gridArea: 'changePassword'}}>
-                    <h2 className="text-2xl font-bold text-pink-600 mb-4">Change Password</h2>
+                    <h2 className="text-2xl font-bold text-pink-600 mb-4">Đổi mật khẩu</h2>
                     <div className="space-y-6 max-w-96">
                         <TextField
-                            label="Password"
+                            label="Mật khẩu"
                             type={values.showPassword ? 'text' : 'password'}
                             value={values.password}
                             onChange={handleChange('password')}
@@ -230,7 +229,7 @@ export default function EditProfile() {
                             }}
                         />
                         <TextField
-                            label="Confirm Password"
+                            label="Nhập lại mật khẩu"
                             type={values.showConfirmPassword ? 'text' : 'password'}
                             value={values.confirmPassword}
                             onChange={handleChange('confirmPassword')}
@@ -251,7 +250,7 @@ export default function EditProfile() {
                     <div className="flex justify-center">
                         <button
                             className="mt-5 md:mt-96 bg-pink-500 text-white font-bold py-2 px-10 rounded w-auto text-center">
-                            Save
+                            Cập nhật
                         </button>
                     </div>
                 </div>

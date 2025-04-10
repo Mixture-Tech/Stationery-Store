@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 import SlideProduct from './components/SlideProduct'
 import SuggestProduct from './components/SuggestProduct';
 import { categoryParentApi } from '../../services/apis/CategoryParentApi';
@@ -98,19 +100,50 @@ const Home = () => {
         fetchData();
     }, []);
 
+    const handleAddToCartSuccess = () => {
+        toast.success('Đã thêm sản phẩm vào giỏ hàng thành công!', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    };
+
+    const handleAddToCartError = (errorMessage) => {
+        toast.error(errorMessage, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    };
+
     return (
         <main>
+            <ToastContainer />
             <div className="flex gap-10 flex-col items-center justify-center w-full p-6">
                 {categoryData.map((parent, index) => (
                     <SlideProduct 
                         key={index} 
                         title={parent.name} 
                         categories={parent.categories}
+                        onAddToCartSuccess={handleAddToCartSuccess}
+                        onAddToCartError={handleAddToCartError}
                     />
                 ))}
             </div>
             <div className='flex gap-2 items-center justify-center mt-10'>
-                <SuggestProduct products={suggestProducts} />
+                <SuggestProduct 
+                    products={suggestProducts}
+                    onAddToCartSuccess={handleAddToCartSuccess}
+                    onAddToCartError={handleAddToCartError}
+                />
             </div>
         </main>
     );

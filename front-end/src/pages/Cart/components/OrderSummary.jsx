@@ -5,10 +5,10 @@ import { toast } from "react-toastify";
 const OrderSummary = ({ order, deliveryFee, discountCode, total, cart, selectedItems }) => {
     const navigate = useNavigate();
 
-    const formatCurrency = (value) => {
-        if (value === undefined || value === null) return "0 ₫";
-        return value.toLocaleString("vi-VN") + " ₫";
-    };
+    // const formatCurrency = (value) => {
+    //     if (value === undefined || value === null) return "0 ₫";
+    //     return value.toLocaleString("vi-VN") + " ₫";
+    // };
 
     const handleCheckout = () => {
         if (!selectedItems || selectedItems.length === 0) {
@@ -27,6 +27,18 @@ const OrderSummary = ({ order, deliveryFee, discountCode, total, cart, selectedI
         });
     };
 
+        const formatCurrency = (amount) => {
+        if (isNaN(amount) || amount === 0) {
+            return '0 ₫';
+        }
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
+        }).format(amount);
+    };
+
     return (
         <div className="w-full p-6 bg-white border-2 rounded-lg shadow-md">
             <h2 className="mb-4 text-xl font-semibold">Tóm tắt đơn hàng</h2>
@@ -39,10 +51,10 @@ const OrderSummary = ({ order, deliveryFee, discountCode, total, cart, selectedI
                     <span>Giảm giá</span>
                     <span>{discountCode ? "-10%" : "0%"}</span>
                 </div>
-                <div className="flex justify-between">
+                {/* <div className="flex justify-between">
                     <span>Vận chuyển</span>
                     <span>{formatCurrency(deliveryFee)}</span>
-                </div>
+                </div> */}
                 <div className="flex justify-between pt-2 font-semibold border-t">
                     <span>Tổng</span>
                     <span>{formatCurrency(total)}</span>

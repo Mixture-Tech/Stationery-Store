@@ -17,6 +17,18 @@ const Item = ({ item, onQuantityChange, onRemove, selected, onSelectItem }) => {
         onSelectItem(item.id_product, e.target.checked);
     };
 
+    const formatCurrency = (amount) => {
+        if (isNaN(amount) || amount === 0) {
+            return '0 ₫';
+        }
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
+        }).format(amount);
+    };
+
     return (
         <div className="flex items-center justify-between w-full p-4 mb-4 bg-white border-2 rounded-lg shadow">
             <div className="flex items-center space-x-4">
@@ -37,7 +49,7 @@ const Item = ({ item, onQuantityChange, onRemove, selected, onSelectItem }) => {
                 </div>
             </div>
             <div className="flex items-center space-x-20">
-                <span className="font-semibold">{item.productPrice.toLocaleString()} ₫</span>
+                <span className="font-semibold">{formatCurrency(item.productPrice)}</span>
                 <div className="flex items-center space-x-2">
                     <button 
                         className="px-2 py-1 border rounded"
@@ -53,7 +65,7 @@ const Item = ({ item, onQuantityChange, onRemove, selected, onSelectItem }) => {
                         +
                     </button>
                 </div>
-                <span className="font-semibold">{(item.productPrice * item.quantity).toLocaleString()} ₫</span>
+                <span className="font-semibold">{formatCurrency(item.productPrice * item.quantity)}</span>
                 <button 
                     className="text-red-500 hover:text-red-700"
                     onClick={handleRemove}

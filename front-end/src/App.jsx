@@ -7,6 +7,9 @@ import BasicLayout from "./layouts/BasicLayout";
 import BlankLayout from "./layouts/LayoutNotSearch";
 import CartProvider from "./context/CartProvider";
 import AdminLayout from "./pages/Admin/layouts/LayoutAdmin.jsx"
+import ProtectedRoute from "./components/Route/ProtectedRoute";
+import MomoCallback from './pages/Payment/MomoCallback';
+import Failure from './pages/Payment/Failure';
 
 const Login = loadable(() => import("./pages/Auth/Login"));
 const Regiter = loadable(() => import("./pages/Auth/Register"));
@@ -19,7 +22,10 @@ const AboutUs = loadable(() => import("./pages/AboutUs"));
 const ProductDetail = loadable(() => import("./pages/ProductDetail/index.jsx"));
 const VerifyEmail = loadable(() => import("./pages/Auth/VerifyEmail"));
 const Profile = loadable(() => import("./pages/Profile"));
-//ADMIN
+const NotFoundPage = loadable(() => import("./components/404"));
+const UnauthorizedPage = loadable(() => import("./components/401"));
+const Success = loadable(() => import("./pages/Payment/Success"));
+
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
 
@@ -65,16 +71,6 @@ export default function App() {
                         }
                     />
                     <Route
-                        path="/gio-hang"
-                        element={
-                            <Suspense fallback={<CircularProgress />}>
-                                <CartProvider>
-                                    <Cart title="Giỏ hàng" />
-                                </CartProvider>
-                            </Suspense>
-                        }
-                    />
-                    <Route
                         path="/ve-chung-toi"
                         element={
                             <Suspense fallback={<CircularProgress />}>
@@ -90,22 +86,58 @@ export default function App() {
                             </Suspense>
                         }
                     />
-                    <Route
-                        path="/thanh-toan"
-                        element={
-                            <Suspense fallback={<CircularProgress />}>
-                                <Payment title="Payment" />
-                            </Suspense>
-                        }
-                    />
-                     <Route
+                    <Route element={<ProtectedRoute />}>
+                        <Route
+                            path="/thanh-toan"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <Payment title="Thanh toán" />
+                                </Suspense>
+                            }
+                        />
+                        <Route
                         path="/trang-ca-nhan"
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Profile title="Trang cá nhân" />
                             </Suspense>
                         }
-                    />
+                        />
+                        <Route
+                            path="/gio-hang"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <CartProvider>
+                                        <Cart title="Giỏ hàng" />
+                                    </CartProvider>
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="/thanh-toan/thanh-cong"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <Success title="Thanh toán thành công" />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="/thanh-toan/momo/callback"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <MomoCallback />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="/thanh-toan/that-bai"
+                            element={
+                                <Suspense fallback={<CircularProgress />}>
+                                    <Failure />
+                                </Suspense>
+                            }
+                        />
+                    </Route>
                 </Route>
                 <Route element={<BlankLayout />}>
                     <Route
@@ -129,6 +161,22 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <VerifyEmail title="Xác Nhận Email" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/404"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <NotFoundPage title="404" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/401"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <UnauthorizedPage title="401" />
                             </Suspense>
                         }
                     />

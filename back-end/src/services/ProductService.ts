@@ -2,9 +2,10 @@ import { Repository, DataSource, EntityTarget, Like } from "typeorm";
 import { Product } from "../entity/Product";
 import { BaseService } from "./BaseService";
 import { ProductDTO } from "../dto/ProductDTO";
-import { Request } from 'express';
+import { Request, NextFunction } from 'express';
 import { uploadConfig } from "../config/uploadImg";
 import { Category } from "../entity/Category";
+import { MulterRequest } from '../types/multer';
 
 
 export class ProductService extends BaseService<Product, ProductDTO> {
@@ -99,10 +100,10 @@ export class ProductService extends BaseService<Product, ProductDTO> {
         return this.repository.update(id_product, { hide: true });
     }
 
-    async uploadImage(req: Request): Promise<string> {
+    async uploadImage(req: MulterRequest): Promise<string> {
         console.log('Bắt đầu upload ảnh...');
         return new Promise((resolve, reject) => {
-            this.uploadMiddleware(req, null as any, (error) => {
+            this.uploadMiddleware(req, null as any, (error: any) => {
                 if (error) {
                     console.error('Lỗi từ multer:', error);
                     reject(new Error(`Lỗi khi upload ảnh: ${error.message}`));

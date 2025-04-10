@@ -4,15 +4,17 @@ import { District } from "../entity/District";
 import { Province } from "../entity/Province";
 import { Area } from "../entity/Area";
 
-export class OrderDTO {
-    id: number;
+export interface OrderDTO {
+    id_user: number;
+    id_province: number;
+    id_district: number;
+    area: string;
+    phone: string;
+    delivery_fee: number;
     total_price: number;
-    status: string;
-    hide: boolean;
-    paymentmethods: string;
-    created_at: Date;
-    user: User;
-    district: District;
-    province: Province;
-    area: Area;
+    products: {
+        id_product: number;
+        quantity: number;
+        price: number;
+    }[];
 }

@@ -7,7 +7,7 @@ const NotFoundPage = () => {
             className="w-1/3 mb-8" />
 
             <div className="flex flex-col items-center justify-center">
-                <Link to="/" className="bg-white text-primary-500 px-4 py-2 rounded shadow hover:bg-gray-100">
+                <Link to="/" className="bg-white text-red-500 px-4 py-2 rounded shadow hover:bg-gray-100">
                     Go to Home
                 </Link>
 

@@ -1,138 +1,138 @@
-import {useState} from 'react';
-import PropTypes from "prop-types";
+import { Box, Typography, Card, CardContent, Grid, Divider, Container } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
-Shipping.propTypes = {
-    nextStep: PropTypes.func.isRequired,
-    formData: PropTypes.shape({
-        firstName: PropTypes.string,
-        lastName: PropTypes.string,
-        email: PropTypes.string,
-        phoneNumber: PropTypes.string,
-        flatHouseNo: PropTypes.string,
-        address: PropTypes.string,
-        city: PropTypes.string,
-        district: PropTypes.string,
-        ward: PropTypes.string,
-        note: PropTypes.string,
-    }).isRequired,
-    updateFormData: PropTypes.func.isRequired,
-};
+const Success = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const searchParams = new URLSearchParams(location.search);
+    const success = searchParams.get('success');
+    const message = searchParams.get('message');
 
-export default function Shipping ({ nextStep, formData, updateFormData }) {
-    const [privacyPolicy, setPrivacyPolicy] =  useState(false);
+    useEffect(() => {
+        console.log(success, message);
+        // if (success === 'false') {
+        //     toast.error(message || 'Thanh toán thất bại');
+        //     navigate('/thanh-toan/that-bai');
+        //     return;
+        // }
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        updateFormData({ [name]: value });
-    };
+        // const pendingOrder = localStorage.getItem('pendingOrder');
+        // if (!pendingOrder) {
+        //     toast.error('Không tìm thấy thông tin đơn hàng');
+        //     navigate('/thanh-toan/that-bai');
+        //     return;
+        // }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!privacyPolicy) return alert('Please accept the privacy policy to continue');
+        // // Xóa thông tin đơn hàng đã lưu
+        // localStorage.removeItem('pendingOrder');
+    }, [success, message, navigate]);
 
-        if (!formData.firstName || !formData.lastName || !formData.email || !formData.phoneNumber || !formData.address || !formData.city || !formData.district || !formData.ward) {
-            return alert('Please fill in all fields');
+    const orderData = JSON.parse(localStorage.getItem('pendingOrder') || '{}');
+    const { products = [], delivery_fee = 0, total_price = 0 } = orderData;
+
+    const formatCurrency = (amount) => {
+        if (isNaN(amount) || amount === 0) {
+            return '0 ₫';
         }
-        nextStep();
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
+        }).format(amount);
     };
+
+    const numericTotal = typeof total_price === 'number' ? total_price : 0;
+    const numericDeliveryFee = typeof delivery_fee === 'number' ? delivery_fee : 0;
+    const totalPaid = numericTotal + numericDeliveryFee;
+
+    const customerName = "Bạn";
+    const receiptVoucher = "";
+
+    if (success === 'false') {
+        return null;
+    }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h3 className="font-semibold mb-4">Contact Details</h3>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <input type="text" name="firstName" value={formData.firstName}
-                    onChange={handleChange}
-                    placeholder="First Name"
-                    className="p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    placeholder="Last Name"
-                    className="p-2 border rounded"
-                />
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                    className="p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    placeholder="Phone Number"
-                    className="p-2 border rounded"
-                />
-            </div>
+        <Container maxWidth="md" sx={{ my: 10 }}>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#2245b9' }}>
+                Cảm ơn {customerName} đã đặt hàng!
+            </Typography>
 
-            <h3 className="font-semibold mb-4">Shipping Details</h3>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-                <input
-                    type="text"
-                    name="flatHouseNo"
-                    value={formData.flatHouseNo}
-                    onChange={handleChange}
-                    placeholder="Flat/House no."
-                    className="p-2 border rounded col-span-2"
-                />
-                <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    placeholder="Address"
-                    className="p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="ward"
-                    value={formData.ward}
-                    onChange={handleChange}
-                    placeholder="Ward"
-                    className="p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="district"
-                    value={formData.district}
-                    onChange={handleChange}
-                    placeholder="District"
-                    className="p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    placeholder="City"
-                    className="p-2 border rounded"
-                />
-                <input
-                    type="text"
-                    name="note"
-                    value={formData.note}
-                    onChange={handleChange}
-                    placeholder="Note"
-                    className="p-2 border rounded col-span-2"
-                />
-            </div>
+            <Card sx={{ mt: 3, boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        <Typography variant="h6" sx={{ color: '#2245b9', fontWeight: 'medium' }}>
+                            Biên nhận
+                        </Typography>
+                        {receiptVoucher && (
+                            <Typography variant="body2" color="text.secondary">
+                                Mã biên nhận : {receiptVoucher}
+                            </Typography>
+                        )}
+                    </Box>
 
-            <div className="flex items-center mb-4">
-                <input type="checkbox" id="same-address" className="mr-2" onChange={() => setPrivacyPolicy(true)}/>
-                <label htmlFor="same-address" className="text-sm">
-                    Accept our purchase and delivery policy
-                </label>
-            </div>
+                    {products.length > 0 ? products.map((item) => (
+                        <Card key={item.id_product} variant="outlined" sx={{ mb: 2 }}>
+                            <CardContent>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={12} sm={2}>
+                                        <img src={item.productImage} alt={item.productName} style={{ width: '100%', maxWidth: '80px', height: 'auto', borderRadius: '4px' }} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>{item.productName}</Typography>
+                                    </Grid>
+                                    <Grid item xs={6} sm={2}>
+                                        <Typography variant="body2" color="text.secondary">SL: {item.quantity || 1}</Typography>
+                                    </Grid>
+                                    <Grid item xs={6} sm={4} sx={{ textAlign: 'right' }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>{formatCurrency(item.productPrice)}</Typography>
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    )) : (
+                        <Typography>Không có thông tin sản phẩm.</Typography>
+                    )}
 
-            <button type="submit" className="w-full p-3 bg-[#f05a7e] text-white rounded">
-                Continue
-            </button>
-        </form>
+                    <Divider sx={{ my: 3 }} />
+
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'medium' }}>
+                                Chi tiết đơn hàng
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: { xs: 2, md: 0 } }}>
+                                <Typography variant="body2" color="text.secondary">Tổng tiền hàng</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(numericTotal)}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography variant="body2" color="text.secondary">Phí vận chuyển</Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>{formatCurrency(numericDeliveryFee)}</Typography>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
+
+            <Box sx={{
+                mt: 3,
+                p: 2,
+                backgroundColor: '#2245b9',
+                color: 'white',
+                borderRadius: '4px',
+                textAlign: 'right' 
+            }}>
+                <Typography variant="h6">
+                    TỔNG THANH TOÁN: <span style={{ fontWeight: 'bold' }}>{formatCurrency(totalPaid)}</span>
+                </Typography>
+            </Box>
+        </Container>
     );
 };
+
+export default Success;

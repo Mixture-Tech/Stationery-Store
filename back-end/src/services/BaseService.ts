@@ -8,6 +8,7 @@ export abstract class BaseService<T extends ObjectLiteral, DTO> {
   }
 
   async create(dto: DTO): Promise<T> {
+    console.log(dto);
     const entity = this.repository.create(dto as DeepPartial<T>);
     return await this.repository.save(entity);
   }
