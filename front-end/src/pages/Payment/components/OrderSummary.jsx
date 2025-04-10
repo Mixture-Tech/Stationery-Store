@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../../../services/apis/orderApi';
 import { getDistricts, getProvinces } from '../../../services/apis/locationApi';
+import momoApi from '../../../services/apis/momoApi';
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
 
-export default function OrderSummary({ products, total }) {
+export default function OrderSummary({ products, total, paymentMethod }) {
     const navigate = useNavigate();
     const [districts, setDistricts] = useState([]);
     const [provinces, setProvinces] = useState([]);
@@ -16,6 +17,7 @@ export default function OrderSummary({ products, total }) {
     const [phone, setPhone] = useState('');
     const [deliveryFee, setDeliveryFee] = useState(0);
     const [filteredDistricts, setFilteredDistricts] = useState([]);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     const isFormValid = address && selectedProvince && selectedDistrict && phone;
 
@@ -65,8 +67,7 @@ export default function OrderSummary({ products, total }) {
                 toast.error("Vui lòng điền đầy đủ thông tin địa chỉ và số điện thoại");
                 return;
             }
-            console.log(selectedDistrict);
-            console.log(selectedProvince);
+
             const orderData = {
                 products: products.map(product => ({
                     id_product: product.id_product,
@@ -74,31 +75,53 @@ export default function OrderSummary({ products, total }) {
                     price: product.productPrice
                 })),
                 delivery_fee: deliveryFee,
-                total_price: total,
+                total_price: totalPrice,
                 id_province: selectedProvince,
                 id_district: selectedDistrict,
                 area: address,
                 phone: phone
             };
-            console.log(orderData);
-            const response = await createOrder(orderData);
-            
-            navigate('/thanh-toan/thanh-cong', {
-                state: {
-                    products,
-                    delivery_fee: deliveryFee,
-                    total_price: total,
-                    id_province: selectedProvince,
-                    id_district: selectedDistrict,
-                    area: address,
-                    phone: phone
+            if (paymentMethod === "MoMo") {
+                const orderInfo = `Thanh toán đơn hàng từ Stationery Store - Tổng tiền: ${totalPrice}`;
+                const response = await momoApi.createPayment(parseInt(totalPrice.replace(/[^\d]/g, '')), orderInfo);
+                
+                if (response.payUrl) {
+                    window.location.href = response.payUrl;
+                } else {
+                    toast.error('Không thể tạo thanh toán MoMo');
                 }
-            });
+            } else {
+                await createOrder(orderData);
+                navigate('/thanh-toan/thanh-cong', {
+                    state: {
+                        products,
+                        delivery_fee: deliveryFee,
+                        total_price: total,
+                        id_province: selectedProvince,
+                        id_district: selectedDistrict,
+                        area: address,
+                        phone: phone
+                    }
+                });
+            }
         } catch (error) {
             toast.error(error.message || "Có lỗi xảy ra khi tạo đơn hàng");
             console.error("Error creating order:", error);
         }
     };
+
+    useEffect(() => {
+        let result = 0;
+        products.forEach(product => {
+            // Chuyển đổi giá từ chuỗi sang số
+            const price = parseInt(product.productPrice.replace(/[^\d]/g, ''));
+            result += price * product.quantity;
+        });
+        result += deliveryFee;
+        // Format số thành chuỗi có dấu chấm và đơn vị đ
+        const formattedTotal = result.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " đ";
+        setTotalPrice(formattedTotal);
+    }, [deliveryFee, products]);
 
     return (
         <Card>
@@ -192,7 +215,7 @@ export default function OrderSummary({ products, total }) {
                 <Box display="flex" justifyContent="space-between" my={2} fontWeight="bold">
                     <Typography>Tổng cộng</Typography>
                     <Typography>
-                        {isNaN(total) ? products[0]?.productPrice : total}
+                        {totalPrice}
                     </Typography>
                 </Box>
                 <Button 
@@ -221,5 +244,6 @@ OrderSummary.propTypes = {
         total_price: PropTypes.number
     })).isRequired,
     deliveryFee: PropTypes.number,
-    total: PropTypes.number
+    total: PropTypes.number,
+    paymentMethod: PropTypes.string.isRequired
 };
