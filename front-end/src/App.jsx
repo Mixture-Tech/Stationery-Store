@@ -26,6 +26,7 @@ const Success = loadable(() => import("./pages/Payment/Success"));
 
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
+const AuthCallback = loadable(() => import("./pages/Auth/components/AuthCallback.jsx"));
 
 
 export default function App() {
@@ -135,6 +136,14 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <Regiter title="Đăng Kí" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/auth-callback"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <AuthCallback title="Xác thực" />
                             </Suspense>
                         }
                     />

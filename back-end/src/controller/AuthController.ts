@@ -86,4 +86,42 @@ export class AuthController {
             res.status(401).json({ message: error.message });
         }
     }
+
+    static async googleLogin(req: Request, res: Response): Promise<void> {
+        try {
+            const authService = await AuthService.getInstance();
+            const googleAuthUrl = authService.getGoogleAuthURL();
+            res.status(200).json({ url: googleAuthUrl });
+        } catch (error: any) {
+            res.status(500).json({ message: "Lỗi khi tạo URL đăng nhập Google" });
+        }
+    }
+
+    static async googleCallback(req: Request, res: Response): Promise<void> {
+        try {
+            const { code } = req.query;
+            if (!code || typeof code !== "string") {
+                res.status(400).json({ message: "Code không hợp lệ" });
+                return;
+            }
+
+            const authService = await AuthService.getInstance();
+            const { user, token } = await authService.googleLogin(code);
+            
+            // res.redirect(`http://localhost:3000/auth-callback?token=${token}&userId=${user.id_user}`);
+
+            // res.status(200).json({
+            //     message: "Đăng nhập bằng Google thành công",
+            //     user: {
+            //         id_user: user.id_user,
+            //         email: user.email,
+            //         role: user.role,
+            //     },
+            //     token,
+            // });
+            res.redirect(`http://localhost:5173?token=${token}&userId=${user.id_user}`);
+        } catch (error: any) {
+            res.status(400).json({ message: error.message });
+        }
+    }
 } 
