@@ -105,4 +105,43 @@ router.post(`/auth/logout`, AuthController.logout);
  */
 router.post(`/auth/verify-otp`, AuthController.verifyOTP);
 
+/**
+ * @swagger
+ * /api/v1/auth/google:
+ *   get:
+ *     summary: Bắt đầu đăng nhập bằng Google
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Trả về URL để redirect đến Google
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ */
+router.get(`/auth/google`, AuthController.googleLogin);
+
+/**
+ * @swagger
+ * /api/v1/auth/google/callback:
+ *   get:
+ *     summary: Xử lý callback từ Google
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Đăng nhập thành công
+ *       400:
+ *         description: Lỗi trong quá trình đăng nhập
+ */
+router.get(`/auth/google/callback`, AuthController.googleCallback);
+
 export default router; 
