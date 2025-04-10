@@ -25,6 +25,8 @@ const Profile = loadable(() => import("./pages/Profile"));
 const NotFoundPage = loadable(() => import("./components/404"));
 const UnauthorizedPage = loadable(() => import("./components/401"));
 const Success = loadable(() => import("./pages/Payment/Success"));
+const OrderHistory = loadable(() => import("./pages/OrderHistory/index.jsx"));
+const OrderDetail = loadable(() => import("./pages/OrderDetail/index.jsx"));
 
 const LoginAdmin = loadable(()=> import("./pages/Admin/Auth"));
 const DashBoard = loadable(() => import("./pages/Admin/pages/DashBoard"));
@@ -84,6 +86,22 @@ export default function App() {
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <ProductDetail title="Chi tiết sản phẩm" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/lich-su-don-hang"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <OrderHistory title="Lịch sử giao dịch" />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="/chi-tiet-hoa-don/:id"
+                        element={
+                            <Suspense fallback={<CircularProgress />}>
+                                <OrderDetail title="Chi tiết hóa đơn" />
                             </Suspense>
                         }
                     />

@@ -1,4 +1,4 @@
-import Cookies from "js-cookie";
+  import Cookies from "js-cookie";
 import axiosClient from './axiosClient';
 import { jwtDecode } from 'jwt-decode';
 
@@ -38,4 +38,38 @@ export const createOrder = async (orderData) => {
     } catch (error) {
         throw error.response?.data || error.message;
     }
-}; 
+};
+
+  export const getUserOrders = async () => {
+      const id_user = getUserIdFromToken();
+      const token = Cookies.get("token");
+
+      if (!id_user) throw new Error("User not authenticated");
+      if (!token) throw new Error("Token missing");
+
+      try {
+          const response = await axiosClient.get(`/orders/user/${id_user}`, {
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+          });
+
+          console.log("📦 response:", response);
+          return response;
+
+      } catch (error) {
+          console.error("Lỗi khi gọi API:", error.response?.data || error.message);
+          throw error;
+      }
+  };
+
+  // ✅ Lấy chi tiết đơn hàng theo ID
+  export const getOrderDetail = async (orderId) => {
+      const response = await axiosClient.get(`/orders/${orderId}`, {
+          headers: {
+              Authorization: `Bearer ${Cookies.get('token')}`
+          }
+      });
+
+      return response;
+  };
