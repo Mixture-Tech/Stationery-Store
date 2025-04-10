@@ -11,5 +11,10 @@ export class Order_DetailDTO{
     district: District;
     province: Province;
     area: Area;
+
+    @ManyToOne(() => Product, product => product.orderDetails)
+    @JoinColumn({ name: "id_product" })
     product: Product;
+
+
 }

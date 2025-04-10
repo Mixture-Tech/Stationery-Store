@@ -12,6 +12,7 @@ export interface OrderDTO {
     phone: string;
     delivery_fee: number;
     total_price: number;
+    create_at: string;
     products: {
         id_product: number;
         quantity: number;

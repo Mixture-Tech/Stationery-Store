@@ -9,7 +9,7 @@ export class Order {
     @PrimaryGeneratedColumn()
     id_order: number;
 
-    @Column()
+    @Column({ name: 'id_user' })
     id_user: number;
 
     @Column()
@@ -29,6 +29,12 @@ export class Order {
 
     @Column()
     total_price: number;
+
+    @Column()
+    create_at: string;
+
+    @Column()
+    paymentmethods: string;
 
     @Column({ default: 'pending' })
     status: string;
