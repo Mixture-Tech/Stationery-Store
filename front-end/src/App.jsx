@@ -87,7 +87,7 @@ export default function App() {
                         }
                     />
                     <Route
-                        path="/lich-su-giao-dich"
+                        path="/lich-su-don-hang"
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <OrderHistory title="Lịch sử giao dịch" />
@@ -95,7 +95,7 @@ export default function App() {
                         }
                     />
                     <Route
-                        path="/chi-tiet-hoa-don"
+                        path="/chi-tiet-hoa-don/:id"
                         element={
                             <Suspense fallback={<CircularProgress />}>
                                 <OrderDetail title="Chi tiết hóa đơn" />
